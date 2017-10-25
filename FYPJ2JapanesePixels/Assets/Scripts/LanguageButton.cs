@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class testButton : MonoBehaviour {
+public class LanguageButton : MonoBehaviour {
 
-    public Test globalBaby;
+    public LanguageSystem globalBaby;
     public int buttonIndex { get; set; }
 
 	// Use this for initialization
@@ -21,8 +21,14 @@ public class testButton : MonoBehaviour {
         //Debug.Log(globalBaby.theLetterIndex);
         //Debug.Log(buttonIndex);
         if (buttonIndex == globalBaby.theLetterIndex)
+        {
             Debug.Log("CORRECT");
+        }
         else
+        {
             Debug.Log("WRONG");
+            GameModeManager.instance.SendMessage("RecievePlayerChoice");
+
+        }
     }
 }

@@ -2,54 +2,54 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour 
+public class PlayerMoveController : MonoBehaviour 
 {
-    private float health;
-    private const float MAX_HEALTH = 100;
-
-    public enum CharacterState
+    public static PlayerMoveController instance = null;
+    private PlayerPawn pawn; // main character, can be an array of pawns for each character
+    private GameObject pawn_sprite; // can be an array of sprites for each character
+    public PlayerPawn GetPawn
     {
-        E_ALIVE,
-        E_DEAD,
-        E_STATUSAFFECTED
+        get
+        {
+            return pawn;
+        }
+    }
+    // Only for most foremost operations
+    void Awake()
+    {
+        if (instance == null)
+            instance = this;
+        else if (instance != this)
+            Destroy(gameObject);
+
+        DontDestroyOnLoad(gameObject);
     }
 
-    public CharacterState e_charState;
-
-	// Use this for initialization
-	void Start () {
-        health = MAX_HEALTH;
-        e_charState = CharacterState.E_ALIVE;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    void decreaseHealth(float dmg_value)
+    // Use this for initialization
+    void Start()
     {
-        health -= dmg_value;
-        if (health < 0)
+        pawn = new PlayerPawn();
+        pawn.InitChar();
+        pawn_sprite = GameObject.Find("PlayerHero");
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (pawn_sprite.activeSelf)
         {
-            Mathf.Clamp(health, 0, 1);
-            e_charState = CharacterState.E_DEAD;
+            if (pawn.checkIfDead())
+            {
+                Debug.Log("dd");
+
+                pawn_sprite.SetActive(false);
+            }
         }
     }
 
-    bool checkIfDead()
+    void RecievePlayerChoice()
     {
-        if (Mathf.Approximately(health, 0))
-        {
-            e_charState = CharacterState.E_DEAD;
-            return true;
-        }
-        return false;
-    }
-
-    void resetCharacter()
-    {
-        health = MAX_HEALTH;
-        e_charState = CharacterState.E_ALIVE;
+        Debug.Log("i fucked up!");
+        pawn.decreaseHealth(10);
     }
 }

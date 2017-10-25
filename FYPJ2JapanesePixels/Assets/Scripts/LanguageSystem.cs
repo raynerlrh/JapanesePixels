@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class Test : MonoBehaviour 
+public class LanguageSystem : MonoBehaviour 
 {
     char[] hiragana;
     char[] answers;
@@ -45,13 +45,8 @@ public class Test : MonoBehaviour
 
         optionIndexTaken = new bool[answers.Length];
 
-        //for (int i = 0; i < hiragana.Length; i++)
-        //{
-        //    text.text += hiragana[i] + " ";
-        //}
-
         theLetterIndex = Random.Range(0, hiragana.Length);
-        // get question panel and give it a hiragana character
+        // get question ui and give it a hiragana character
         text.text = System.Convert.ToString(hiragana[theLetterIndex]);
 
         // Display randomized options on buttons
@@ -59,7 +54,7 @@ public class Test : MonoBehaviour
         {
             char theOption = GetRandomizedOption();
             buttons.GetChild(i).GetChild(0).GetComponent<Text>().text = System.Convert.ToString(theOption);
-            buttons.GetChild(i).GetComponent<testButton>().buttonIndex = GetAnswerIndexFromAnswer(theOption);
+            buttons.GetChild(i).GetComponent<LanguageButton>().buttonIndex = GetAnswerIndexFromAnswer(theOption);
         }
     }
 
