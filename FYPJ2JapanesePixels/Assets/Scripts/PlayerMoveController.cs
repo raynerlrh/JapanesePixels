@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour {
+public class PlayerController : MonoBehaviour 
+{
     private float health;
     private const float MAX_HEALTH = 100;
-    enum CharacterState
+
+    public enum CharacterState
     {
         E_ALIVE,
         E_DEAD,
         E_STATUSAFFECTED
     }
+
     public CharacterState e_charState;
 
 	// Use this for initialization
