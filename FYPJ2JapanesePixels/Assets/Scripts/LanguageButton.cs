@@ -1,34 +1,42 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class LanguageButton : MonoBehaviour {
-
-    public LanguageSystem globalBaby;
+public class LanguageButton : MonoBehaviour 
+{
     public int buttonIndex { get; set; }
+    public bool b_ReturnToOriginalPos { get; set; }
 
-	// Use this for initialization
-	void Start () {
-        //Debug.Log(buttonIndex);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    TouchDrag touchDragComponent;
+    Vector3 originalPos;
 
-    public void OnClick()
+    void Start()
     {
-        //Debug.Log(globalBaby.theLetterIndex);
-        //Debug.Log(buttonIndex);
-        if (buttonIndex == globalBaby.theLetterIndex)
+        touchDragComponent = GetComponent<TouchDrag>();
+        originalPos = transform.localPosition;
+    }
+
+    void Update()
+    {
+        if (b_ReturnToOriginalPos)
         {
-            Debug.Log("CORRECT");
+            ReturnToOriginalPosition();
+        }
+    }
+
+    void ReturnToOriginalPosition()
+    {
+        touchDragComponent.Release();
+        
+        Vector3 dir = originalPos - transform.localPosition;
+        float speed = 5f;
+
+        if (dir.sqrMagnitude > 1)
+        {
+            transform.position += dir * Time.deltaTime * speed;
         }
         else
         {
-            Debug.Log("WRONG");
-            GameModeManager.instance.SendMessage("RecievePlayerChoice");
-
+            b_ReturnToOriginalPos = false;
         }
     }
 }
