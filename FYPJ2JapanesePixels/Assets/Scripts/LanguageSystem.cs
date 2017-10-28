@@ -83,4 +83,14 @@ public class LanguageSystem : MonoBehaviour
 
         return 0;
     }
+
+    /// <summary>
+    /// Give a new question in game
+    /// </summary>
+    public void refreshQuestion()
+    {
+        theLetterIndex = Random.Range(0, hiragana.Length);
+        // get question ui and give it a hiragana character
+        text.text = System.Convert.ToString(hiragana[theLetterIndex]);
+    }
 }

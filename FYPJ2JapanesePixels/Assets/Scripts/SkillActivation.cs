@@ -21,11 +21,14 @@ public class SkillActivation : MonoBehaviour
             if (col.gameObject.GetComponent<LanguageButton>().buttonIndex == languageSystem.theLetterIndex)
             {
                 Debug.Log("CORRECT");
+                languageSystem.refreshQuestion();
+                GameModeManager.instance.SendMessage("RecievePlayerChoice", false);
             }
             else
             {
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 Debug.Log("WRONG");
+                GameModeManager.instance.SendMessage("RecievePlayerChoice", true);
             }
         }
     }

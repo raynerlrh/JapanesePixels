@@ -40,16 +40,24 @@ public class PlayerMoveController : MonoBehaviour
         {
             if (pawn.checkIfDead())
             {
-                Debug.Log("dd");
-
                 pawn_sprite.SetActive(false);
             }
         }
     }
 
-    void RecievePlayerChoice()
+    private IEnumerator healthcoroutine(float seconds, float damage)
     {
-        Debug.Log("i fucked up!");
-        pawn.decreaseHealth(10);
+        Debug.Log("dfd");
+        pawn.decreaseHealth(damage);
+        pawn.isHurt = true;
+        yield return new WaitForSeconds(seconds);
+        pawn.isHurt = false;
+
+    }
+
+    public void decreasehealthbytime(float secs, float dmg)
+    {
+        if (!pawn.isHurt)
+            StartCoroutine(healthcoroutine(secs, dmg));
     }
 }

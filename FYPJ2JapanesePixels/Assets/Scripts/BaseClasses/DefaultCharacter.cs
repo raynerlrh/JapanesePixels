@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class DefaultCharacter {
-
+    
     protected float health;
     protected const float MAX_HEALTH = 100;
 
@@ -17,7 +17,7 @@ public class DefaultCharacter {
     public CharacterState e_charState;
 
     // Use this for initialization
-    public void InitChar()
+    public virtual void InitChar()
     {
         health = MAX_HEALTH;
         e_charState = CharacterState.E_ALIVE;
