@@ -18,15 +18,13 @@ public class SkillActivation : MonoBehaviour
     {
         if (col.gameObject.tag == "AnswerOption")
         {
-            LanguageButton button = col.gameObject.GetComponent<LanguageButton>();
-
-            if (button.buttonIndex == languageSystem.theLetterIndex)
+            if (col.gameObject.GetComponent<LanguageButton>().buttonIndex == languageSystem.theLetterIndex)
             {
                 Debug.Log("CORRECT");
             }
             else
             {
-                button.b_ReturnToOriginalPos = true;
+                col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 Debug.Log("WRONG");
             }
         }

@@ -5,17 +5,25 @@ using UnityEngine;
 public class TouchDrag : MonoBehaviour
 {
     Collider2D collider;
+    Vector3 originalPos;
 
     public bool canDrag { get; set; }
+    public bool b_ReturnToOriginalPos { get; set; }
 
     void Start()
     {
         canDrag = true;
+        originalPos = transform.localPosition;
         collider = GetComponent<BoxCollider2D>();
     }
 
 	void Update() 
     {
+        if (b_ReturnToOriginalPos)
+        {
+            ReturnToOriginalPosition();
+        }
+
         if (!canDrag)
             return;
 
@@ -84,12 +92,31 @@ public class TouchDrag : MonoBehaviour
     // Allows other buttons to be dragged
     public void Release()
     {
+        ReturnToOriginalPosition();
+
         for (int i = 0; i < transform.parent.childCount; i++)
         {
             if (transform.parent.GetChild(i) == this.transform)
                 continue;
 
             transform.parent.GetChild(i).GetComponent<TouchDrag>().canDrag = true;
+        }
+    }
+
+    void ReturnToOriginalPosition()
+    {
+        Vector3 dir = originalPos - transform.localPosition;
+        float speed = 5f;
+
+        if (dir.sqrMagnitude > 1)
+        {
+            canDrag = false;
+            transform.position += dir * Time.deltaTime * speed;
+        }
+        else
+        {
+            canDrag = true;
+            b_ReturnToOriginalPos = false;
         }
     }
 }
