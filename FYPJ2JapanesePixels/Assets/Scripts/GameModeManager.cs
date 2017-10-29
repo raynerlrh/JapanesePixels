@@ -91,7 +91,7 @@ public class GameModeManager : MonoBehaviour {
         return reward;
     }
 
-    void RecievePlayerChoice(bool wrong)
+    void ReceivePlayerChoice(bool wrong)
     {
         if (wrong == false)
         {

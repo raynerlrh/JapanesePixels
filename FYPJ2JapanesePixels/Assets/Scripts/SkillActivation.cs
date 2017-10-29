@@ -22,13 +22,13 @@ public class SkillActivation : MonoBehaviour
             {
                 Debug.Log("CORRECT");
                 languageSystem.refreshQuestion();
-                GameModeManager.instance.SendMessage("RecievePlayerChoice", false);
+                GameModeManager.instance.SendMessage("ReceivePlayerChoice", false);
             }
             else
             {
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 Debug.Log("WRONG");
-                GameModeManager.instance.SendMessage("RecievePlayerChoice", true);
+                GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
             }
         }
     }

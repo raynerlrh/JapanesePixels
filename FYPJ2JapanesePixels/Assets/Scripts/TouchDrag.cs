@@ -7,6 +7,7 @@ public class TouchDrag : MonoBehaviour
     Collider2D collider;
     Vector3 originalPos;
 
+    bool b_isDragged;
     public bool canDrag { get; set; }
     public bool b_ReturnToOriginalPos { get; set; }
 
@@ -34,28 +35,23 @@ public class TouchDrag : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             if (collider == Physics2D.OverlapPoint(Input.mousePosition))
-            {
-                Drag();
-            }
+                b_isDragged = true;
         }
         else
-        {
             Release();
-        }
 
 #elif UNITY_ANDROID
         if (Input.touchCount > 0)
         {
             if (collider == Physics2D.OverlapPoint(Input.GetTouch(0).position))
-            {
-                Drag();
-            }
+                b_isDragged = true;
         }
         else
-        {
             Release();
-        }
 #endif
+
+        if (b_isDragged)
+            Drag();
     }
 
     // Make buttons move to cursor/finger position
@@ -110,6 +106,7 @@ public class TouchDrag : MonoBehaviour
 
         if (dir.sqrMagnitude > 1)
         {
+            b_isDragged = false;
             canDrag = false;
             transform.position += dir * Time.deltaTime * speed;
         }

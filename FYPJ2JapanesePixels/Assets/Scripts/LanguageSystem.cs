@@ -89,8 +89,12 @@ public class LanguageSystem : MonoBehaviour
     /// </summary>
     public void refreshQuestion()
     {
-        theLetterIndex = Random.Range(0, hiragana.Length);
-        // get question ui and give it a hiragana character
-        text.text = System.Convert.ToString(hiragana[theLetterIndex]);
+        int newLetterIndex = Random.Range(0, hiragana.Length);
+        while (theLetterIndex != newLetterIndex)
+        {
+            theLetterIndex = newLetterIndex;
+            // get question ui and give it a hiragana character
+            text.text = System.Convert.ToString(hiragana[theLetterIndex]);
+        }
     }
 }
