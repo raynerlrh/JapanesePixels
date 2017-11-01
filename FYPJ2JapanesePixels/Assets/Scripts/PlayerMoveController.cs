@@ -46,7 +46,6 @@ public class PlayerMoveController : MonoBehaviour
         pawn_sprite = GameObject.Find("PlayerHero");
 
         originalTiles = new Tile[4];
-        // use Tile.CreateInstance();
         availableTile = new Tile();
         availableTile.sprite = availableTileSprite;
     }

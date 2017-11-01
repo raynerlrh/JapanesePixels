@@ -20,7 +20,6 @@ public class BossBehaviour : DefaultCharacter
 	
     public void highlightAttackGrid()
     {
-        GameObject highlightMap = GameModeManager.instance.gameGrid.getTilemap(1).gameObject;
         for (int i = 0; i < numMinions; ++i)
         {
             Vector3Int cellpos = GameModeManager.instance.gameGrid.GetTopRightCell();
@@ -28,14 +27,13 @@ public class BossBehaviour : DefaultCharacter
             for (int j = cellpos.x; j >= cellpos.x - 7; --j)
             {
                 Vector3Int highlightCell = new Vector3Int(j, cellpos.y, cellpos.z);
-                GameModeManager.instance.gameGrid.SetTile(highlightMap, highlightCell, TileRefManager.instance.GetTileRef(1));
+                GameModeManager.instance.gameGrid.SetTile(GameGrid.TILEMAP_TYPE.TILEMAP_ENEMY, highlightCell, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
             }
         }
     }
 
     public void dehighlightAttackGrid()
     {
-        GameObject highlightMap = GameModeManager.instance.gameGrid.getTilemap(1).gameObject;
         for (int i = 0; i < numMinions; ++i)
         {
             Vector3Int cellpos = GameModeManager.instance.gameGrid.GetTopRightCell();
@@ -43,7 +41,7 @@ public class BossBehaviour : DefaultCharacter
             for (int j = cellpos.x; j >= cellpos.x - 7; --j)
             {
                 Vector3Int highlightCell = new Vector3Int(j, cellpos.y, cellpos.z);
-                GameModeManager.instance.gameGrid.SetTile(highlightMap, highlightCell, null);
+                GameModeManager.instance.gameGrid.SetTile(GameGrid.TILEMAP_TYPE.TILEMAP_ENEMY, highlightCell, null);
             }
         }
     }

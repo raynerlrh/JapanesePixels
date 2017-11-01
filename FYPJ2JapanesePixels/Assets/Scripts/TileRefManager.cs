@@ -3,9 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class TileRefManager : MonoBehaviour {
+public class TileRefManager : MonoBehaviour 
+{
     public static TileRefManager instance = null;
     public Tile[] tileRefs;
+
+    public enum TILE_TYPE
+    {
+        TILE_GRASS,
+        TILE_WARNING,
+    }
 
     // Only for most foremost operations
     void Awake()
@@ -18,10 +25,11 @@ public class TileRefManager : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
     }
 
-    public Tile GetTileRef(int index)
+    public Tile GetTileRef(TILE_TYPE tileType)
     {
-        if (tileRefs[index] != null)
-            return tileRefs[index];
+        if (tileRefs[(int)tileType] != null)
+            return tileRefs[(int)tileType];
+
         return tileRefs[0]; // if tile cannot be found return default tile
     }
 }
