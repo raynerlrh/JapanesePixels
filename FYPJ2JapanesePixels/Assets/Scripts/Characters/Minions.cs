@@ -2,19 +2,21 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Minions : MonoBehaviour, EnemyPawn<Vector3> {
+public class Minions : MonoBehaviour, EnemyPawn<Vector3> 
+{
     bool isFighting; // is minion fighting?
-	// Use this for initialization
-	void Start () {
+	
+	void Start() 
+    {
         isFighting = false;
 	}
 	
-	// Update is called once per frame
-	void Update () {
+	void Update() 
+    {
         if (!isFighting)
         {
             moveForward(-transform.right);
-            if (transform.position.x < GameModeManager.instance.mapWidthX)
+            if (transform.position.x < GameModeManager.instance.gameGrid.mapWidthX)
             {
                 Destroy(this.gameObject);
             }

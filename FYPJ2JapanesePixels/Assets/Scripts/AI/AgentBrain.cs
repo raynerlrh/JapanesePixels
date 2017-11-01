@@ -33,7 +33,7 @@ public class AgentBrain {
     /// Update cost value of each action.
     /// </summary>
     /// <param name="action">The action choosen by the agent.</param>
-    /// <param name="reward">The reward recieved by the agent from the environment for it's action.</param>
+    /// <param name="reward">The reward received by the agent from the environment for it's action.</param>
     // linear variate/one variable cost function is V(a) = V(a) + alpha * (r - V(a))
     // Notationally, will use Q(s, a) instead of just V(a) if there is 2 variables
     public void UpdatePolicy(int action, float reward)

@@ -70,6 +70,13 @@ public class TouchDrag : MonoBehaviour
         pos.z = transform.position.z;
         transform.position = pos;
 
+        // Limit dragging to only buttons area
+        // temp value until UI is settled
+        if (transform.localPosition.y > 39f)
+        {
+            transform.localPosition = new Vector2(transform.localPosition.x, 39f);
+        }
+
         OnDrag();
     }
 

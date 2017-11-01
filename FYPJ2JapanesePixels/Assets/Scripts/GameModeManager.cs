@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameModeManager : MonoBehaviour {
+public class GameModeManager : MonoBehaviour 
+{
     public static GameModeManager instance = null;
+
     private PlayerPawn mainchar;
-    private Grid world_grid;
-    public Vector2 camTopRight;
+
+    public GameGrid gameGrid { get; set; }
     public LanguageSystem question;
-    public float mapWidthX;
 
     // Only for most foremost operations
     void Awake()
@@ -20,40 +21,20 @@ public class GameModeManager : MonoBehaviour {
 
         DontDestroyOnLoad(gameObject);
     }
-	// Use this for initialization
-	void Start () {
+
+	void Start () 
+    {
+        gameGrid = GetComponent<GameGrid>();
         mainchar = PlayerMoveController.instance.GetPawn;
-        world_grid = GameObject.Find("Grid").GetComponent<Grid>();
-        camTopRight.y = Camera.main.transform.position.y + (Camera.main.orthographicSize);
-        camTopRight.x = (Camera.main.orthographicSize) * Camera.main.aspect;
+
         question = GameObject.Find("Canvas").GetComponent<LanguageSystem>();
         GetComponent<RLEnvironment>().BeginLearning();
-        mapWidthX = GetTopRightCell().x - 7;
-        mapWidthX = GetCellWPOS(new Vector3Int((int)mapWidthX, GetTopRightCell().y, GetTopRightCell().z)).x;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
+	void Update () 
+    {
+        
 	}
-
-    public Vector3 GetTopRightGridWPOS()
-    {
-        Vector3Int cellpos = world_grid.WorldToCell(camTopRight);
-        return world_grid.CellToWorld(cellpos);
-    }
-
-    public Vector3Int GetTopRightCell()
-    {
-        Vector3Int temppos = world_grid.WorldToCell(camTopRight);
-        return new Vector3Int(temppos.x, temppos.y - 1, temppos.z);
-    }
-
-    public Vector3 GetCellWPOS(Vector3Int cellpos)
-    {
-        return world_grid.CellToWorld(cellpos);
-    }
-
 
     /// <summary>
     /// Reward ai's action if it is correct

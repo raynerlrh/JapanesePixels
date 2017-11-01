@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DefaultCharacter {
-    
+public class DefaultCharacter 
+{
     protected float health;
     protected const float MAX_HEALTH = 100;
 

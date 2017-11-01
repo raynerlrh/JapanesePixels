@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyMoveController : MonoBehaviour {
+public class EnemyMoveController : MonoBehaviour 
+{
     public static EnemyMoveController instance = null;
     private GameObject parentEnemy;
     public GameObject GetBossObj
@@ -13,7 +14,8 @@ public class EnemyMoveController : MonoBehaviour {
     public GameObject[] enemyPrefabs;
 
     // For most foremost operations
-    void Awake() {
+    void Awake() 
+    {
         if (instance == null)
             instance = this;
         else if (instance != this)
@@ -22,19 +24,19 @@ public class EnemyMoveController : MonoBehaviour {
         DontDestroyOnLoad(gameObject);
     }
 
-	// Use this for initialization
-	void Start () {
+	void Start() 
+    {
         parentEnemy = GameObject.Find("Enemies");
         currentBoss = new BossBehaviour();
         currentBoss.InitChar();
 	}
 	
-	// Update is called once per frame
-	void Update () {
+	void Update() 
+    {
 		
 	}
 
-    void RecievePlayerChoice(bool wrong = true)
+    void ReceivePlayerChoice(bool wrong = true)
     {
         if (wrong)
         {
