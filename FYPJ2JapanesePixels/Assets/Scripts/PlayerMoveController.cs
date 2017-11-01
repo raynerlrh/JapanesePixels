@@ -74,6 +74,10 @@ public class PlayerMoveController : MonoBehaviour
         // Convert the touch position to cell position
         touchCellPos = gameManager.gameGrid.GetWorldToCellPos(touchPos);
 
+        // Limit player movement to game area
+        if (touchCellPos.y < gameManager.gameGrid.GetMinHeight())
+            return;
+
         if (Input.GetMouseButtonDown(0))
         {
             // Set the selected cell position

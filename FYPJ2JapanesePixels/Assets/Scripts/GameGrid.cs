@@ -8,10 +8,10 @@ public class GameGrid : MonoBehaviour
     // From previous file
     Vector2 camTopRight;
     public float mapWidthX { get; set; }
+    int minGridHeight;
 
     Grid unityGrid;
     Tilemap tileMap;
-    Vector2[] grid;
 
     public Sprite testSprite;
 
@@ -25,11 +25,10 @@ public class GameGrid : MonoBehaviour
         mapWidthX = GetTopRightCell().x - 7;
         mapWidthX = GetCellWPOS(new Vector3Int((int)mapWidthX, GetTopRightCell().y, GetTopRightCell().z)).x;
 
+        minGridHeight = 0;
+
         // Get the tile map
         tileMap = unityGrid.transform.GetChild(0).GetComponent<Tilemap>();
-
-        // create and fill 2d array with grid cells
-        //Debug.Log(GetTopRightCell());
 	}
 	
 	void Update() 
@@ -81,13 +80,20 @@ public class GameGrid : MonoBehaviour
         tileMap.SetTile(cellPos, tile);
     }
 
+    // Doesn't work
     public void SetSpriteAtCellPos(Vector3Int cellPos, Sprite sprite)
     {
         GetTileAtCellPos(cellPos).sprite = sprite;
     }
 
+    // Doesn't work
     public Sprite GetSpriteAtCellPos(Vector3Int cellPos)
     {
         return GetTileAtCellPos(cellPos).sprite;
+    }
+
+    public int GetMinHeight()
+    {
+        return minGridHeight;
     }
 }
