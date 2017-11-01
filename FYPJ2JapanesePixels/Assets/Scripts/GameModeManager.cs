@@ -57,24 +57,19 @@ public class GameModeManager : MonoBehaviour
         //{
         //    act = previousAction;
         //}
-        if (env.brainMemory.getLastAnswer() == n)
+        if (env.brainMemory.getLastAnswer() == n || env.brainMemory.doesBrainContain(n))
         {
             reward = 1;
             question.refreshQuestion();
+            EnemyMoveController.instance.currentBoss.summonMinions = true;
+            EnemyMoveController.instance.currentBoss.highlightAttackGrid();
+            EnemyMoveController.instance.currentBoss.lightAttack();
             //Debug.Log("Guessed correctly 1");
-            //env.resetagent();
-        }
-        else if (env.brainMemory.doesBrainContain(n))
-        {
-            reward = 1;
-            question.refreshQuestion();
-            //Debug.Log("Guessed correctly 2");
             //env.resetagent();
         }
         else if (n == act)
         {
             reward = 1;
-            //Debug.Log("Guessed correctly");
             question.refreshQuestion();
             if (env.brainMemory.GetSize == env.brainMemory.newMaxMemory)
             {
@@ -83,6 +78,9 @@ public class GameModeManager : MonoBehaviour
             }
             else
                 env.brainMemory.storeAnswer(act);
+            EnemyMoveController.instance.currentBoss.summonMinions = true;
+            EnemyMoveController.instance.currentBoss.highlightAttackGrid();
+            EnemyMoveController.instance.currentBoss.lightAttack();
             //env.resetagent();
         }
         else if ((act > previousAction) && (n > act))

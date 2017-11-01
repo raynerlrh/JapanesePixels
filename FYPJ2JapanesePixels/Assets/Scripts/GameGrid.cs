@@ -5,11 +5,12 @@ using UnityEngine.Tilemaps;
 
 public class GameGrid : MonoBehaviour 
 {
-    // From previous file
+    // From previous file // ortho cam top right corner coords
     Vector2 camTopRight;
+    // Left end x coord of tile map
     public float mapWidthX { get; set; }
     int minGridHeight;
-
+    // the grid provided by unity with tilemap
     Grid unityGrid;
     Tilemap tileMap;
 
@@ -19,7 +20,7 @@ public class GameGrid : MonoBehaviour
     {
         unityGrid = GameObject.Find("Grid").GetComponent<Grid>();
 
-        camTopRight.x = (Camera.main.orthographicSize) * Camera.main.aspect;
+        camTopRight.x = (Camera.main.orthographicSize) * Camera.main.aspect; 
         camTopRight.y = Camera.main.transform.position.y + (Camera.main.orthographicSize);
 
         mapWidthX = GetTopRightCell().x - 7;
@@ -27,7 +28,7 @@ public class GameGrid : MonoBehaviour
 
         minGridHeight = 0;
 
-        // Get the tile map
+        // Get the tile map from game scene
         tileMap = unityGrid.transform.GetChild(0).GetComponent<Tilemap>();
 	}
 	
@@ -75,10 +76,34 @@ public class GameGrid : MonoBehaviour
         return (Tile)tileMap.GetTile(cellPos);
     }
 
+    /// <summary>
+    /// Gets tile at certain cell in default tilemap containing environment background
+    /// </summary>
+    /// <param name="cellPos">The cell to set a tile on</param>
+    /// <param name="tile">The tile you want to paint on the cell</param>
     public void SetTile(Vector3Int cellPos, Tile tile)
     {
         tileMap.SetTile(cellPos, tile);
     }
+
+    /// <summary>
+    /// Gets tile at certain cell in specified tilemap
+    /// </summary>
+    /// <param name="map">Tilemap to place the tile</param>
+    public void SetTile(GameObject tileMapObj, Vector3Int cellPos, Tile tile)
+    {
+        tileMapObj.GetComponent<Tilemap>().SetTile(cellPos, tile);
+    }
+
+    /*
+    /// <summary>
+    /// Refreshes tile at certain cell in specified tilemap
+    /// </summary>
+    /// <param name="map">Tilemap to place the tile</param>
+    public void ClearExistingTile(GameObject tileMapObj, Vector3Int cellPos)
+    {
+        tileMapObj.GetComponent<Tilemap>().RefreshTile(cellPos);
+    }*/
 
     // Doesn't work
     public void SetSpriteAtCellPos(Vector3Int cellPos, Sprite sprite)
@@ -95,5 +120,10 @@ public class GameGrid : MonoBehaviour
     public int GetMinHeight()
     {
         return minGridHeight;
+    }
+
+    public Tilemap getTilemap(int index)
+    {
+        return unityGrid.transform.GetChild(1).GetComponent<Tilemap>();
     }
 }

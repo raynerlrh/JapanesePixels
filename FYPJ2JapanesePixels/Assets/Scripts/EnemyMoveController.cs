@@ -36,11 +36,12 @@ public class EnemyMoveController : MonoBehaviour
 		
 	}
 
-    void ReceivePlayerChoice(bool wrong = true)
+    void ReceivePlayerChoice(bool wrong)
     {
         if (wrong)
         {
             currentBoss.summonMinions = true;
+            currentBoss.highlightAttackGrid();
             currentBoss.lightAttack();
         }
     }

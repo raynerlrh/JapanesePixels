@@ -5,7 +5,7 @@ using UnityEngine;
 public class Minions : MonoBehaviour, EnemyPawn<Vector3> 
 {
     bool isFighting; // is minion fighting?
-	
+
 	void Start() 
     {
         isFighting = false;
@@ -47,7 +47,8 @@ public class Minions : MonoBehaviour, EnemyPawn<Vector3>
     {
         if (isFighting)
         {
-            PlayerMoveController.instance.decreasehealthbytime(2, 50);
+            PlayerMoveController.instance.decreasehealthbytime(2, 5);
+            Destroy(this.gameObject);
         }
     }
 
