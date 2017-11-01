@@ -34,7 +34,7 @@ public class EnemyMoveController : MonoBehaviour {
 		
 	}
 
-    void RecievePlayerChoice(bool wrong = true)
+    void ReceivePlayerChoice(bool wrong)
     {
         if (wrong)
         {

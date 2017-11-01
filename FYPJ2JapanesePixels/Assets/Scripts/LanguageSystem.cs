@@ -45,7 +45,7 @@ public class LanguageSystem : MonoBehaviour
 
         optionIndexTaken = new bool[answers.Length];
 
-        theLetterIndex = Random.Range(0, hiragana.Length);
+        theLetterIndex = 0;//Random.Range(0, hiragana.Length);
         // get question ui and give it a hiragana character
         text.text = System.Convert.ToString(hiragana[theLetterIndex]);
 
@@ -89,7 +89,7 @@ public class LanguageSystem : MonoBehaviour
     /// </summary>
     public void refreshQuestion()
     {
-        int newLetterIndex = Random.Range(0, hiragana.Length);
+        int newLetterIndex = Random.Range(0, answers.Length);
         while (theLetterIndex != newLetterIndex)
         {
             theLetterIndex = newLetterIndex;

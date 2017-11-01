@@ -63,7 +63,7 @@ public class TouchDrag : MonoBehaviour
 #if UNITY_EDITOR
         touchPos = Input.mousePosition;
 #elif UNITY_ANDROID
-        touchPos = Input.GetTouch(0).position
+        touchPos = Input.GetTouch(0).position;
 #endif
 
         pos = touchPos;

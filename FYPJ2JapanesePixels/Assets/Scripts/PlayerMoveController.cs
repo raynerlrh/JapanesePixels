@@ -47,7 +47,6 @@ public class PlayerMoveController : MonoBehaviour
 
     private IEnumerator healthcoroutine(float seconds, float damage)
     {
-        Debug.Log("dfd");
         pawn.decreaseHealth(damage);
         pawn.isHurt = true;
         yield return new WaitForSeconds(seconds);
