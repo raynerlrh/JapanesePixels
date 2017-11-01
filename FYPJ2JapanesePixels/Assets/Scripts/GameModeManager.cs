@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameModeManager : MonoBehaviour 
 {
@@ -10,6 +11,9 @@ public class GameModeManager : MonoBehaviour
 
     public GameGrid gameGrid { get; set; }
     public LanguageSystem question;
+
+    private RectTransform t_progbar;
+    private float t_progbarwidth;
 
     // Only for most foremost operations
     void Awake()
@@ -29,6 +33,9 @@ public class GameModeManager : MonoBehaviour
 
         question = GameObject.Find("Canvas").GetComponent<LanguageSystem>();
         GetComponent<RLEnvironment>().BeginLearning();
+
+        t_progbar = GameObject.Find("AIProgressBar").GetComponent<RectTransform>();
+        t_progbarwidth = t_progbar.sizeDelta.x / 100;
 	}
 	
 	void Update () 
@@ -45,28 +52,60 @@ public class GameModeManager : MonoBehaviour
     {
         int reward;
         int n = question.theLetterIndex + 1;
-        if (n == act)
+        RLEnvironment env = GetComponent<RLEnvironment>();
+        //if (Mathf.Abs(n - act) > Mathf.Abs(n - previousAction))
+        //{
+        //    act = previousAction;
+        //}
+        if (env.brainMemory.getLastAnswer() == n)
         {
             reward = 1;
-            Debug.Log("Guessed correctly");
             question.refreshQuestion();
-            GetComponent<RLEnvironment>().resetagent();
+            //Debug.Log("Guessed correctly 1");
+            //env.resetagent();
+        }
+        else if (env.brainMemory.doesBrainContain(n))
+        {
+            reward = 1;
+            question.refreshQuestion();
+            //Debug.Log("Guessed correctly 2");
+            //env.resetagent();
+        }
+        else if (n == act)
+        {
+            reward = 1;
+            //Debug.Log("Guessed correctly");
+            question.refreshQuestion();
+            if (env.brainMemory.GetSize == env.brainMemory.newMaxMemory)
+            {
+                env.brainMemory.forgetAnswer();
+                env.brainMemory.storeAnswer(act);
+            }
+            else
+                env.brainMemory.storeAnswer(act);
+            //env.resetagent();
         }
         else if ((act > previousAction) && (n > act))
         {
             reward = 1;
+            //Debug.Log("+1 confidence");
         }
         else if ((act < previousAction) && (n < act))
         {
             reward = 1;
+            //Debug.Log("+1 confidence");
         }
         else
         {
             reward = -1;
+            env.trialsTrained++;
             //Debug.Log(act);
-            //Debug.Log(n);
         }
         //t_rewards.text = "Total rewards: " + rl_environment.totalRewards.ToString();
+        int g = n - act;
+        if (g < 0)
+            g = -g;
+        t_progbar.sizeDelta = new Vector2(160 - t_progbarwidth * g, t_progbar.sizeDelta.y);
         StartCoroutine(GetComponent<RLEnvironment>().Act());
         //StartCoroutine(delaylearning());
         return reward;
@@ -77,7 +116,6 @@ public class GameModeManager : MonoBehaviour
         if (wrong == false)
         {
             GetComponent<RLEnvironment>().resetagent();
-            Debug.Log("shitt");
         }
     }
 }
