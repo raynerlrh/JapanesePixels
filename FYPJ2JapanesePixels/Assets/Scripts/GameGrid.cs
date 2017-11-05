@@ -10,7 +10,7 @@ public class GameGrid : MonoBehaviour
 
     // Left end x coord of tile map
     public float mapWidthX { get; set; }
-    int minGridHeight;
+    public const int minGridHeight = 0;
 
     // the grid provided by unity with tilemap
     Grid unityGrid;
@@ -22,9 +22,11 @@ public class GameGrid : MonoBehaviour
     {
         TILEMAP_ENVIRONMENT,
         TILEMAP_ENEMY,
+        TILEMAP_PLAYER,
+        TILEMAP_GRIDCELLS,
     }
 
-	void Start() 
+	void Awake() 
     {
         unityGrid = GameObject.Find("Grid").GetComponent<Grid>();
 
@@ -34,17 +36,16 @@ public class GameGrid : MonoBehaviour
         mapWidthX = GetTopRightCell().x - 7;
         mapWidthX = GetCellWPOS(new Vector3Int((int)mapWidthX, GetTopRightCell().y, GetTopRightCell().z)).x;
 
-        minGridHeight = 0;
-
         // Get the tile map from game scene
         tilemap = unityGrid.transform.GetChild(0).GetComponent<Tilemap>();
 	}
 	
 	void Update() 
     {
-        //Vector3 num = GetCellWPOS(GetTopRightCell());
         // the actual position of the top right cell
-        //Debug.Log("x: " + (num.x - (world_grid.cellSize.x / 2)) + " y: " + (num.y + (world_grid.cellSize.y / 2)));
+        Vector3 num = GetCellWPOS(GetTopRightCell());
+        Vector2 actualPos = GetCellToWorld(new Vector3Int(2, 4, 0));
+        //Debug.Log(actualPos);
 
         // number of cells in a row
         float totalGridWidth = (GetTopRightCell().x + 1) * 2;
@@ -74,14 +75,25 @@ public class GameGrid : MonoBehaviour
         return unityGrid.CellToWorld(cellpos);
     }
 
-    public Vector3Int GetWorldToCellPos(Vector3Int worldPos)
+    public Vector3Int GetWorldIntToCellPos(Vector3Int worldPos)
     {
         return unityGrid.WorldToCell(Camera.main.ScreenToWorldPoint(worldPos));
     }
 
-    public Tile GetTileAtCellPos(Vector3Int cellPos)
+    public Vector3Int GetWorldFlToCellPos(Vector3 worldPos)
     {
-        return (Tile)tilemap.GetTile(cellPos);
+        return unityGrid.WorldToCell(worldPos);
+    }
+
+    public Vector2 GetCellToWorld(Vector3Int cellPos)
+    {
+        Vector3 num = unityGrid.CellToWorld(cellPos);
+        return new Vector2(num.x + (unityGrid.cellSize.x / 2), num.y + (unityGrid.cellSize.y / 2));
+    }
+
+    public Tile GetTileAtCellPos(GameGrid.TILEMAP_TYPE tileMapType, Vector3Int cellPos)
+    {
+        return (Tile)GetTilemap(tileMapType).GetTile(cellPos);
     }
 
     /// <summary>
@@ -100,6 +112,10 @@ public class GameGrid : MonoBehaviour
     /// <param name="map">Tilemap to place the tile</param>
     public void SetTile(TILEMAP_TYPE type, Vector3Int cellPos, Tile tile)
     {
+        // temp values
+        if (cellPos.x < -3 || cellPos.x > 3 || cellPos.y < minGridHeight || cellPos.y > 5)
+            return;
+
         GetTilemap(type).SetTile(cellPos, tile);
     }
     
@@ -110,23 +126,6 @@ public class GameGrid : MonoBehaviour
     public void ClearExistingTile(GameObject tileMapObj, Vector3Int cellPos)
     {
         tileMapObj.GetComponent<Tilemap>().RefreshTile(cellPos);
-    }
-
-    // Doesn't work
-    public void SetSpriteAtCellPos(Vector3Int cellPos, Sprite sprite)
-    {
-        GetTileAtCellPos(cellPos).sprite = sprite;
-    }
-
-    // Doesn't work
-    public Sprite GetSpriteAtCellPos(Vector3Int cellPos)
-    {
-        return GetTileAtCellPos(cellPos).sprite;
-    }
-
-    public int GetMinHeight()
-    {
-        return minGridHeight;
     }
 
     Tilemap GetTilemap(TILEMAP_TYPE type)

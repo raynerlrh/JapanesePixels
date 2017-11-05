@@ -24,11 +24,12 @@ public class GameModeManager : MonoBehaviour
             Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
+
+        gameGrid = GetComponent<GameGrid>();
     }
 
 	void Start () 
     {
-        gameGrid = GetComponent<GameGrid>();
         mainchar = PlayerMoveController.instance.GetPawn;
 
         question = GameObject.Find("Canvas").GetComponent<LanguageSystem>();
