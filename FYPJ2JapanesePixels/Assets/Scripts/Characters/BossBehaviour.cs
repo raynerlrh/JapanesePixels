@@ -125,7 +125,7 @@ public class BossBehaviour : DefaultCharacter
     {
         GameGrid grid = GameModeManager.instance.gameGrid;
         Vector3Int playercell = PlayerMoveController.instance.GetPlayerCellPos;
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldToCellPos(EnemyMoveController.instance.GetBossObj.transform.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(EnemyMoveController.instance.GetBossObj.transform.position);
         int cellsAway = grid.GetCellsAwaySquared(mycell, playercell);
         forwardvec = new Vector3Int(mycell.x + 1, mycell.y, mycell.z);
         for (int i = 0; i < 3; ++i )
@@ -157,7 +157,7 @@ public class BossBehaviour : DefaultCharacter
     public bool detectPlayerApprox(int attkradius = 1)
     {
         Vector3Int playercell = PlayerMoveController.instance.GetPlayerCellPos;
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldToCellPos(EnemyMoveController.instance.GetBossObj.transform.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(EnemyMoveController.instance.GetBossObj.transform.position);
         Vector3Int cellsAway = playercell - mycell;
         if (cellsAway.magnitude <= attkradius)
             return true;

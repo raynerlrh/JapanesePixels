@@ -38,7 +38,7 @@ public class Minions : MonoBehaviour, EnemyPawn<Vector3>
             {
                 Destroy(this.gameObject);
             }
-            else if (m_MinionType == MinionType.E_FLAMESKULL && GameModeManager.instance.gameGrid.GetWorldToCellPos(transform.position) == cellDes)
+            else if (m_MinionType == MinionType.E_FLAMESKULL && GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position) == cellDes)
             {
                 Destroy(this.gameObject);
             }

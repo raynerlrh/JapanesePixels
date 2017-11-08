@@ -18,6 +18,8 @@ public class TileRefManager : MonoBehaviour
     {
         TILEMAP_ENVIRONMENT,
         TILEMAP_ENEMY,
+        TILEMAP_PLAYER,
+        TILEMAP_GRIDCELLS,
     }
 
     // Only for most foremost operations
@@ -56,8 +58,13 @@ public class TileRefManager : MonoBehaviour
         GetTilemap(type).SetTile(cellPos, tile);
     }
 
-    Tilemap GetTilemap(TILEMAP_TYPE type)
+    public Tilemap GetTilemap(TILEMAP_TYPE type)
     {
         return GameModeManager.instance.gameGrid.getGrid.transform.GetChild((int)type).GetComponent<Tilemap>();
+    }
+
+    public Tile GetTileAtCellPos(TILEMAP_TYPE tileMapType, Vector3Int cellPos)
+    {
+        return (Tile)GetTilemap(tileMapType).GetTile(cellPos);
     }
 }

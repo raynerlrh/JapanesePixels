@@ -7,6 +7,8 @@ public class GameModeManager : MonoBehaviour
 {
     public static GameModeManager instance = null;
 
+    private PlayerPawn mainchar;
+
     public GameGrid gameGrid { get; set; }
     public LanguageSystem question;
 
@@ -22,11 +24,13 @@ public class GameModeManager : MonoBehaviour
             Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
+
+        gameGrid = GetComponent<GameGrid>();
     }
 
 	void Start () 
     {
-        gameGrid = GetComponent<GameGrid>();
+        mainchar = PlayerMoveController.instance.GetPawn;
 
         question = GameObject.Find("Canvas").GetComponent<LanguageSystem>();
         GetComponent<RLEnvironment>().BeginLearning();
