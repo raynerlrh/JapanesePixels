@@ -15,11 +15,14 @@ public class RLEnvironment : MonoBehaviour {
     public Agent.AgentMemory brainMemory;
     int prevAction;
     public int trialsTrained;
+    public bool pauseAction;
+
 	// Use this for initialization
 	void Start () {
-        act_speed = 0.5f;
+        act_speed = 0.1f;
         prevAction = -1;
         trialsTrained = 0;
+        pauseAction = false;
 	}
 	
 	// Update is called once per frame
@@ -51,15 +54,18 @@ public class RLEnvironment : MonoBehaviour {
     /// </summary>
     public IEnumerator Act()
     {
-        yield return new WaitForSeconds(act_speed); // wait for actSpeed seconds
-        int action = agent.PickAction();
-        if (prevAction == -1)
+        if (!pauseAction)
+        {
+            yield return new WaitForSeconds(act_speed); // wait for actSpeed seconds
+            int action = agent.PickAction();
+            if (prevAction == -1)
+                prevAction = action;
+            //char chosen = action; // 
+            float reward = GameModeManager.instance.GetRewards(action, prevAction);
             prevAction = action;
-        //char chosen = action; // 
-        float reward = GameModeManager.instance.GetRewards(action, prevAction);
-        prevAction = action;
-        total_correct += reward;
-        agent.UpdatePolicy(action, reward);
+            total_correct += reward;
+            agent.UpdatePolicy(action, reward);
+        }
     }
 
     public void resetagent()

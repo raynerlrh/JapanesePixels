@@ -14,15 +14,14 @@ public class GameGrid : MonoBehaviour
 
     // the grid provided by unity with tilemap
     Grid unityGrid;
+    public Grid getGrid
+    {
+        get { return unityGrid; }
+    }
+
     Tilemap tilemap;
 
     public Sprite testSprite;
-
-    public enum TILEMAP_TYPE
-    {
-        TILEMAP_ENVIRONMENT,
-        TILEMAP_ENEMY,
-    }
 
 	void Start() 
     {
@@ -74,9 +73,19 @@ public class GameGrid : MonoBehaviour
         return unityGrid.CellToWorld(cellpos);
     }
 
+    public Vector3 GetCellMiddleWPOS(Vector3Int cellpos)
+    {
+        return unityGrid.GetCellCenterWorld(cellpos);
+    }
+
     public Vector3Int GetWorldToCellPos(Vector3Int worldPos)
     {
         return unityGrid.WorldToCell(Camera.main.ScreenToWorldPoint(worldPos));
+    }
+
+    public Vector3Int GetWorldToCellPos(Vector3 worldPos)
+    {
+        return unityGrid.WorldToCell(worldPos);
     }
 
     public Tile GetTileAtCellPos(Vector3Int cellPos)
@@ -92,15 +101,6 @@ public class GameGrid : MonoBehaviour
     public void SetTile(Vector3Int cellPos, Tile tile)
     {
         tilemap.SetTile(cellPos, tile);
-    }
-
-    /// <summary>
-    /// Gets tile at certain cell in specified tilemap
-    /// </summary>
-    /// <param name="map">Tilemap to place the tile</param>
-    public void SetTile(TILEMAP_TYPE type, Vector3Int cellPos, Tile tile)
-    {
-        GetTilemap(type).SetTile(cellPos, tile);
     }
     
     /// <summary>
@@ -129,8 +129,27 @@ public class GameGrid : MonoBehaviour
         return minGridHeight;
     }
 
-    Tilemap GetTilemap(TILEMAP_TYPE type)
+    public Vector3Int[] GetPerimeter(int radius)
     {
-        return unityGrid.transform.GetChild((int)type).GetComponent<Tilemap>();
+        int width = radius * 2 + 1;
+        Vector3Int[] cells = new Vector3Int[width * width]; // because there are 8 cells surrounding 1 cell in middle
+        Vector3Int startcell = GetWorldToCellPos(EnemyMoveController.instance.GetBossObj.transform.position);
+        startcell = new Vector3Int(startcell.x - radius, startcell.y - radius, startcell.z);
+        int count = 0;
+        for (int w = 0; w < width; ++w)
+        {
+            for (int h = 0; h < width; ++h)
+            {
+                cells[count] = new Vector3Int(startcell.x + w, startcell.y + h, startcell.z);
+                count++;
+            }
+        }
+        return cells;
+    }
+
+    public int GetCellsAwaySquared(Vector3Int pos, Vector3Int des)
+    {
+        Vector3Int cellsAway = des - pos;
+        return cellsAway.sqrMagnitude;
     }
 }

@@ -152,4 +152,12 @@ public class PlayerMoveController : MonoBehaviour
         if (!pawn.isHurt)
             StartCoroutine(healthcoroutine(secs, dmg));
     }
+
+    public Vector3Int GetPlayerCellPos
+    {
+        get
+        {
+            return gameManager.gameGrid.GetWorldToCellPos(pawn_sprite.transform.position);
+        }
+    }
 }

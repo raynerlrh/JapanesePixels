@@ -7,8 +7,6 @@ public class GameModeManager : MonoBehaviour
 {
     public static GameModeManager instance = null;
 
-    private PlayerPawn mainchar;
-
     public GameGrid gameGrid { get; set; }
     public LanguageSystem question;
 
@@ -29,7 +27,6 @@ public class GameModeManager : MonoBehaviour
 	void Start () 
     {
         gameGrid = GetComponent<GameGrid>();
-        mainchar = PlayerMoveController.instance.GetPawn;
 
         question = GameObject.Find("Canvas").GetComponent<LanguageSystem>();
         GetComponent<RLEnvironment>().BeginLearning();
@@ -61,9 +58,7 @@ public class GameModeManager : MonoBehaviour
         {
             reward = 1;
             question.refreshQuestion();
-            EnemyMoveController.instance.currentBoss.summonMinions = true;
-            EnemyMoveController.instance.currentBoss.highlightAttackGrid();
-            EnemyMoveController.instance.currentBoss.lightAttack();
+            EnemyMoveController.instance.currentBoss.doAttack();
             //Debug.Log("Guessed correctly 1");
             //env.resetagent();
         }
@@ -78,9 +73,8 @@ public class GameModeManager : MonoBehaviour
             }
             else
                 env.brainMemory.storeAnswer(act);
-            EnemyMoveController.instance.currentBoss.summonMinions = true;
-            EnemyMoveController.instance.currentBoss.highlightAttackGrid();
-            EnemyMoveController.instance.currentBoss.lightAttack();
+
+            EnemyMoveController.instance.currentBoss.doAttack();
             //env.resetagent();
         }
         else if ((act > previousAction) && (n > act))

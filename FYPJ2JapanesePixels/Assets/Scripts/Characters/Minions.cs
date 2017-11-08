@@ -5,18 +5,47 @@ using UnityEngine;
 public class Minions : MonoBehaviour, EnemyPawn<Vector3> 
 {
     bool isFighting; // is minion fighting?
+    public DefaultCharacter char_stat { get; set; }
+    public Vector3Int cellDes;
+
+    public enum MinionType
+    {
+        E_SKELETON,
+        E_FLAMESKULL
+    }
+
+    public MinionType m_MinionType;
 
 	void Start() 
     {
         isFighting = false;
+        char_stat = new DefaultCharacter();
+        if (m_MinionType == MinionType.E_SKELETON)
+            char_stat.InitChar(20);
+        else
+            char_stat.InitChar(30);
 	}
 	
 	void Update() 
     {
         if (!isFighting)
         {
-            moveForward(-transform.right);
+            if (m_MinionType == MinionType.E_SKELETON)
+                moveForward(-transform.right);
+            else if (m_MinionType == MinionType.E_FLAMESKULL)
+                moveForward(-transform.up);
             if (transform.position.x < GameModeManager.instance.gameGrid.mapWidthX)
+            {
+                Destroy(this.gameObject);
+            }
+            else if (m_MinionType == MinionType.E_FLAMESKULL && GameModeManager.instance.gameGrid.GetWorldToCellPos(transform.position) == cellDes)
+            {
+                Destroy(this.gameObject);
+            }
+        }
+        else
+        {
+            if (char_stat.checkIfDead())
             {
                 Destroy(this.gameObject);
             }
@@ -39,16 +68,20 @@ public class Minions : MonoBehaviour, EnemyPawn<Vector3>
     void OnCollisionEnter2D(Collision2D collide)
     {
         isFighting = true;
+        if (m_MinionType == MinionType.E_FLAMESKULL)
+        {
+            PlayerMoveController.instance.GetPawn.decreaseHealth(20);
+            Destroy(this.gameObject);
+        }
     }
 
     
     // detect if minion is fighting
     void OnCollisionStay2D(Collision2D obj)
     {
-        if (isFighting)
+        if (isFighting && m_MinionType == MinionType.E_SKELETON)
         {
             PlayerMoveController.instance.decreasehealthbytime(2, 5);
-            Destroy(this.gameObject);
         }
     }
 

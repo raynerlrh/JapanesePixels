@@ -5,20 +5,22 @@ using UnityEngine;
 public class DefaultCharacter 
 {
     protected float health;
-    protected const float MAX_HEALTH = 100;
+    protected float MAX_HEALTH = 100;
 
     public enum CharacterState
     {
         E_ALIVE,
         E_DEAD,
-        E_STATUSAFFECTED
+        E_STATUSAFFECTED,
+        E_MAX
     }
 
     public CharacterState e_charState;
 
     // Use this for initialization
-    public virtual void InitChar()
+    public virtual void InitChar(float maxhealthval = 100)
     {
+        MAX_HEALTH = maxhealthval;
         health = MAX_HEALTH;
         e_charState = CharacterState.E_ALIVE;
     }
@@ -35,7 +37,7 @@ public class DefaultCharacter
 
     public bool checkIfDead()
     {
-        if (Mathf.Approximately(health, 0))
+        if (Mathf.Approximately(health, 0) || health < 0)
         {
             e_charState = CharacterState.E_DEAD;
             return true;

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SkillActivation : MonoBehaviour 
+public class SkillActivation : MonoBehaviour
 {
     public LanguageSystem languageSystem;
+    // The char being targeted so that attacks are focused on target
+    private DefaultCharacter attackTarget;
 
     public enum SKILL_TYPE
     {
@@ -30,6 +32,19 @@ public class SkillActivation : MonoBehaviour
                 Debug.Log("WRONG");
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
             }
+        }
+    }
+    
+    void OnCollisionStay2D(Collision2D obj)
+    {
+        if (obj.gameObject.layer == 8)
+        {
+            if (attackTarget == null)
+                attackTarget = obj.gameObject.GetComponent<Minions>().char_stat;
+            attackTarget.decreaseHealth(10);
+
+            if (attackTarget.checkIfDead())
+                attackTarget = null;
         }
     }
 }

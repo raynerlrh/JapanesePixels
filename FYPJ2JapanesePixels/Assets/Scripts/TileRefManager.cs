@@ -14,6 +14,12 @@ public class TileRefManager : MonoBehaviour
         TILE_WARNING,
     }
 
+    public enum TILEMAP_TYPE
+    {
+        TILEMAP_ENVIRONMENT,
+        TILEMAP_ENEMY,
+    }
+
     // Only for most foremost operations
     void Awake()
     {
@@ -31,5 +37,27 @@ public class TileRefManager : MonoBehaviour
             return tileRefs[(int)tileType];
 
         return tileRefs[0]; // if tile cannot be found return default tile
+    }
+
+    public void EraseTiles(Vector3Int[] tileList)
+    {
+        for (int i = 0; i < tileList.Length; ++i)
+        {
+            SetTile(TILEMAP_TYPE.TILEMAP_ENEMY, tileList[i], null);
+        }
+    }
+
+    /// <summary>
+    /// Gets tile at certain cell in specified tilemap
+    /// </summary>
+    /// <param name="map">Tilemap to place the tile</param>
+    public void SetTile(TILEMAP_TYPE type, Vector3Int cellPos, Tile tile)
+    {
+        GetTilemap(type).SetTile(cellPos, tile);
+    }
+
+    Tilemap GetTilemap(TILEMAP_TYPE type)
+    {
+        return GameModeManager.instance.gameGrid.getGrid.transform.GetChild((int)type).GetComponent<Tilemap>();
     }
 }
