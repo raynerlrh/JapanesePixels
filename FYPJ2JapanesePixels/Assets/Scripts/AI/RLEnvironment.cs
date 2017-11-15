@@ -7,22 +7,29 @@ using System.IO;
 /// <summary>
 /// Trains agent with rewards for correct actions
 /// </summary>
-public class RLEnvironment : MonoBehaviour {
-    float total_correct;
-    int num_things; // how many skills can the ai use? Ignore the name, it is the number that matters
-    float act_speed;
-    AgentBrain agent;
-    public Agent.AgentMemory brainMemory;
-    int prevAction;
+
+public struct EnvVars
+{
+    public float total_correct;
+    public int num_things; // how many skills can the ai use? Ignore the name, it is the number that matters
+    public float act_speed;
+    public int prevAction;
     public int trialsTrained;
     public bool pauseAction;
+}
+
+public class RLEnvironment : MonoBehaviour {
+    public EnvVars envVars;
+    AgentBrain agent;
+    public Agent.AgentMemory brainMemory;
+    public Coroutine mainRoutine;
 
 	// Use this for initialization
 	void Start () {
-        act_speed = 0.1f;
-        prevAction = -1;
-        trialsTrained = 0;
-        pauseAction = false;
+        envVars.act_speed = 0.1f;
+        envVars.prevAction = -1;
+        envVars.trialsTrained = 0;
+        envVars.pauseAction = false;
 	}
 	
 	// Update is called once per frame
@@ -39,13 +46,13 @@ public class RLEnvironment : MonoBehaviour {
     /// </summary>
     public void BeginLearning()
     {
-        total_correct = 0;
-        num_things = 48; // how many things to learn, in this case is 48 hiragana characters
+        envVars.total_correct = 0;
+        envVars.num_things = 48; // how many things to learn, in this case is 48 hiragana characters
         bool optimistic = true;
-        agent = new AgentBrain(num_things, optimistic);
+        agent = new AgentBrain(envVars.num_things, optimistic);
         //ReadString(ref agent.value_table);
         brainMemory = new Agent.AgentMemory(5);
-        StartCoroutine(Act());
+        mainRoutine = StartCoroutine(Act());
     }
 
     /// <summary>
@@ -54,16 +61,16 @@ public class RLEnvironment : MonoBehaviour {
     /// </summary>
     public IEnumerator Act()
     {
-        if (!pauseAction)
+        if (!envVars.pauseAction)
         {
-            yield return new WaitForSeconds(act_speed); // wait for actSpeed seconds
+            yield return new WaitForSeconds(envVars.act_speed); // wait for actSpeed seconds
             int action = agent.PickAction();
-            if (prevAction == -1)
-                prevAction = action;
+            if (envVars.prevAction == -1)
+                envVars.prevAction = action;
             //char chosen = action; // 
-            float reward = GameModeManager.instance.GetRewards(action, prevAction);
-            prevAction = action;
-            total_correct += reward;
+            float reward = GameModeManager.instance.GetRewards(action, envVars.prevAction);
+            envVars.prevAction = action;
+            envVars.total_correct += reward;
             agent.UpdatePolicy(action, reward);
         }
     }
@@ -71,7 +78,7 @@ public class RLEnvironment : MonoBehaviour {
     public void resetagent()
     {
         bool optimistic = true;
-        agent.ResetAgent(num_things, optimistic);
+        agent.ResetAgent(envVars.num_things, optimistic);
     }
 
     [MenuItem("Tools/Write file")]
@@ -97,7 +104,7 @@ public class RLEnvironment : MonoBehaviour {
 
     public void eventPressHandle()
     {
-        Debug.Log("WOW! " + trialsTrained);
+        Debug.Log("WOW! " + envVars.trialsTrained);
     }
 
     [MenuItem("Tools/Read file")]

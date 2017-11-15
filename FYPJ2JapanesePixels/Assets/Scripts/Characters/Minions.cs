@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Minions : MonoBehaviour, EnemyPawn<Vector3> 
+public class Minions : MonoBehaviour
 {
     bool isFighting; // is minion fighting?
     public DefaultCharacter char_stat { get; set; }
@@ -11,7 +11,8 @@ public class Minions : MonoBehaviour, EnemyPawn<Vector3>
     public enum MinionType
     {
         E_SKELETON,
-        E_FLAMESKULL
+        E_FLAMESKULL,
+        E_PROJECTILE
     }
 
     public MinionType m_MinionType;
@@ -30,7 +31,7 @@ public class Minions : MonoBehaviour, EnemyPawn<Vector3>
     {
         if (!isFighting)
         {
-            if (m_MinionType == MinionType.E_SKELETON)
+            if (m_MinionType == MinionType.E_SKELETON || m_MinionType == MinionType.E_PROJECTILE)
                 moveForward(-transform.right);
             else if (m_MinionType == MinionType.E_FLAMESKULL)
                 moveForward(-transform.up);
@@ -68,7 +69,7 @@ public class Minions : MonoBehaviour, EnemyPawn<Vector3>
     void OnCollisionEnter2D(Collision2D collide)
     {
         isFighting = true;
-        if (m_MinionType == MinionType.E_FLAMESKULL)
+        if (m_MinionType == MinionType.E_FLAMESKULL || m_MinionType == MinionType.E_PROJECTILE)
         {
             PlayerMoveController.instance.GetPawn.decreaseHealth(20);
             Destroy(this.gameObject);

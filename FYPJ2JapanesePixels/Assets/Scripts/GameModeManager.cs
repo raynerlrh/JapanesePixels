@@ -3,17 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameModeManager : MonoBehaviour 
+public struct UIProp
+{
+    public float t_progbarwidth;
+}
+
+public class GameModeManager : MonoBehaviour
 {
     public static GameModeManager instance = null;
-
-    private PlayerPawn mainchar;
 
     public GameGrid gameGrid { get; set; }
     public LanguageSystem question;
 
     private RectTransform t_progbar;
-    private float t_progbarwidth;
+
+    UIProp aiprogress;
 
     // Only for most foremost operations
     void Awake()
@@ -28,21 +32,20 @@ public class GameModeManager : MonoBehaviour
         gameGrid = GetComponent<GameGrid>();
     }
 
-	void Start () 
+    void Start()
     {
-        mainchar = PlayerMoveController.instance.GetPawn;
 
         question = GameObject.Find("Canvas").GetComponent<LanguageSystem>();
         GetComponent<RLEnvironment>().BeginLearning();
 
         t_progbar = GameObject.Find("AIProgressBar").GetComponent<RectTransform>();
-        t_progbarwidth = t_progbar.sizeDelta.x / 100;
-	}
-	
-	void Update () 
+        aiprogress.t_progbarwidth = t_progbar.sizeDelta.x / 100;
+    }
+
+    void Update()
     {
-        
-	}
+
+    }
 
     /// <summary>
     /// Reward ai's action if it is correct
@@ -94,14 +97,14 @@ public class GameModeManager : MonoBehaviour
         else
         {
             reward = -1;
-            env.trialsTrained++;
+            env.envVars.trialsTrained++;
             //Debug.Log(act);
         }
         //t_rewards.text = "Total rewards: " + rl_environment.totalRewards.ToString();
         int g = n - act;
         if (g < 0)
             g = -g;
-        t_progbar.sizeDelta = new Vector2(160 - t_progbarwidth * g, t_progbar.sizeDelta.y);
+        t_progbar.sizeDelta = new Vector2(160 - aiprogress.t_progbarwidth * g, t_progbar.sizeDelta.y);
         StartCoroutine(GetComponent<RLEnvironment>().Act());
         //StartCoroutine(delaylearning());
         return reward;

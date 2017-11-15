@@ -10,7 +10,7 @@ public class EnemyMoveController : MonoBehaviour
     {
         get { return parentEnemy.transform.GetChild(0).gameObject; }
     }
-    public BossBehaviour currentBoss;
+    public Boss.BossBehaviour currentBoss;
     public GameObject[] enemyPrefabs;
 
     // For most foremost operations
@@ -27,7 +27,7 @@ public class EnemyMoveController : MonoBehaviour
 	void Start() 
     {
         parentEnemy = GameObject.Find("Enemies");
-        currentBoss = new BossBehaviour();
+        currentBoss = new Boss.BossBehaviour();
         currentBoss.InitChar();
 	}
 	

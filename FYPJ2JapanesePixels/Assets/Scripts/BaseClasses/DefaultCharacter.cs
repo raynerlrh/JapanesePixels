@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DefaultCharacter 
+public struct HealthSystem
 {
-    protected float health;
-    protected float MAX_HEALTH = 100;
+    public float health;
+    public float MAX_HEALTH;
+    public bool isHurt;
+}
 
+public class DefaultCharacter
+{
+    public HealthSystem hpSys;
     public enum CharacterState
     {
         E_ALIVE,
@@ -20,24 +25,24 @@ public class DefaultCharacter
     // Use this for initialization
     public virtual void InitChar(float maxhealthval = 100)
     {
-        MAX_HEALTH = maxhealthval;
-        health = MAX_HEALTH;
+        hpSys.MAX_HEALTH = maxhealthval;
+        hpSys.health = hpSys.MAX_HEALTH;
         e_charState = CharacterState.E_ALIVE;
     }
 
     public void decreaseHealth(float dmg_value)
     {
-        health -= dmg_value;
-        if (health < 0)
+        hpSys.health -= dmg_value;
+        if (hpSys.health < 0)
         {
-            Mathf.Clamp(health, 0, 1);
+            Mathf.Clamp(hpSys.health, 0, 1);
             e_charState = CharacterState.E_DEAD;
         }
     }
 
     public bool checkIfDead()
     {
-        if (Mathf.Approximately(health, 0) || health < 0)
+        if (Mathf.Approximately(hpSys.health, 0) || hpSys.health < 0)
         {
             e_charState = CharacterState.E_DEAD;
             return true;
@@ -47,7 +52,7 @@ public class DefaultCharacter
 
     public void resetCharacter()
     {
-        health = MAX_HEALTH;
+        hpSys.health = hpSys.MAX_HEALTH;
         e_charState = CharacterState.E_ALIVE;
     }
 }

@@ -6,9 +6,9 @@ using UnityEngine.Tilemaps;
 public class PlayerMoveController : MonoBehaviour
 {
     public static PlayerMoveController instance = null;
-    private PlayerPawn pawn; // main character, can be an array of pawns for each character
+    private DefaultCharacter pawn; // main character, can be an array of pawns for each character
     private GameObject pawn_sprite; // can be an array of sprites for each character
-    public PlayerPawn GetPawn
+    public DefaultCharacter GetPawn
     {
         get
         {
@@ -52,7 +52,7 @@ public class PlayerMoveController : MonoBehaviour
     {
         gameGrid = GameModeManager.instance.gameGrid;
 
-        pawn = new PlayerPawn();
+        pawn = new DefaultCharacter();
         pawn.InitChar();
         pawn_sprite = GameObject.Find("PlayerHero");
 
@@ -207,14 +207,14 @@ public class PlayerMoveController : MonoBehaviour
     private IEnumerator healthcoroutine(float seconds, float damage)
     {
         pawn.decreaseHealth(damage);
-        pawn.isHurt = true;
+        pawn.hpSys.isHurt = true;
         yield return new WaitForSeconds(seconds);
-        pawn.isHurt = false;
+        pawn.hpSys.isHurt = false;
     }
 
     public void decreasehealthbytime(float secs, float dmg)
     {
-        if (!pawn.isHurt)
+        if (!pawn.hpSys.isHurt)
             StartCoroutine(healthcoroutine(secs, dmg));
     }
 
