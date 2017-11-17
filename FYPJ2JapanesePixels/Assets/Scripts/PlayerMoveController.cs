@@ -34,6 +34,7 @@ public class PlayerMoveController : MonoBehaviour
     Vector2 targetTilePos;
 
     int numMovesMade;
+    public bool b_answeredCorrectly { get; set; }
     bool b_shownCrossTiles;
     bool b_reachedTarget;
 
@@ -75,7 +76,9 @@ public class PlayerMoveController : MonoBehaviour
                 pawn_sprite.SetActive(false);
             }
 
-            UpdateInput();
+            if (b_answeredCorrectly)
+                UpdateInput();
+
             UpdateMovement();
         }
     }
@@ -105,7 +108,11 @@ public class PlayerMoveController : MonoBehaviour
     void UpdateInput()
     {
         if (NoMovesLeft())
+        {
+            SetCrossTiles(originalTile);
+            b_answeredCorrectly = false;
             return;
+        }
 
 #if UNITY_EDITOR
         touchPos = new Vector3Int((int)Input.mousePosition.x, (int)Input.mousePosition.y, (int)Input.mousePosition.z);
@@ -115,10 +122,6 @@ public class PlayerMoveController : MonoBehaviour
 
         // Convert the touch position to cell position
         touchCellPos = gameGrid.GetWorldIntToCellPos(touchPos);
-        
-        // Limit player movement to game area
-        if (touchCellPos.y < GameGrid.minGridHeight)
-            return;
 
         if (!b_shownCrossTiles)
         {
@@ -126,24 +129,22 @@ public class PlayerMoveController : MonoBehaviour
             playerCellPos = gameGrid.GetWorldFlToCellPos(playerPos);
 
             // Set the available tile sprites
-            gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(0), availableTile);
-            gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(1), availableTile);
-            gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(2), availableTile);
-            gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(3), availableTile);
+            SetCrossTiles(availableTile);
 
             b_shownCrossTiles = true;
         }
         else
         {
+            // Limit player movement to game area
+            if (touchCellPos.y < GameGrid.minGridHeight)
+                return;
+
             if (Input.GetMouseButtonDown(0))
             {
                 // Reset tiles if player does not move
                 if (touchCellPos == playerCellPos)
                 {
-                    gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(0), originalTile);
-                    gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(1), originalTile);
-                    gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(2), originalTile);
-                    gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(3), originalTile);
+                    SetCrossTiles(originalTile);
                 }
                 else if (TouchedAvailableTiles())
                 {
@@ -168,6 +169,14 @@ public class PlayerMoveController : MonoBehaviour
                 }
             }
         }
+    }
+
+    void SetCrossTiles(Tile _tile)
+    {
+        gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(0), _tile);
+        gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(1), _tile);
+        gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(2), _tile);
+        gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, GetCrossTilesPosInOrder(3), _tile);
     }
 
     bool TouchedAvailableTiles()
@@ -198,9 +207,20 @@ public class PlayerMoveController : MonoBehaviour
         }
     }
 
-    bool NoMovesLeft()
+    public void MadeMove()
+    {
+        numMovesMade++;
+    }
+
+    public bool NoMovesLeft()
     {
         return (numMovesMade >= MAX_MOVES);
+    }
+
+    public void ResetNumMovesWhenNoneLeft()
+    {
+        if (NoMovesLeft())
+            numMovesMade = 0;
     }
 
     // why all these here
