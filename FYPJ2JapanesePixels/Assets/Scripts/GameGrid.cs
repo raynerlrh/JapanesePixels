@@ -21,8 +21,6 @@ public class GameGrid : MonoBehaviour
 
     Tilemap tilemap;
 
-    public Sprite testSprite;
-
 	void Awake() 
     {
         unityGrid = GameObject.Find("Grid").GetComponent<Grid>();

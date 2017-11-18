@@ -2486,8 +2486,8 @@ RectTransform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 962474969}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 134, y: 211, z: 0}
-  m_LocalScale: {x: 0.41875, y: 0.41875, z: 0.41875}
+  m_LocalPosition: {x: 111.5, y: 178.5, z: 0}
+  m_LocalScale: {x: 0.3484375, y: 0.3484375, z: 0.3484375}
   m_Children:
   - {fileID: 1448953643}
   - {fileID: 991107293}
@@ -2687,6 +2687,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1500
   buttons: {fileID: 1304366892}
+  skillType: 0
 --- !u!1 &1041319609
 GameObject:
   m_ObjectHideFlags: 0
@@ -2739,6 +2740,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 1500
   buttons: {fileID: 1304366892}
+  skillType: 1
 --- !u!114 &1041319612
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3746,6 +3748,7 @@ GameObject:
   - component: {fileID: 1345140541}
   - component: {fileID: 1345140542}
   - component: {fileID: 1345140540}
+  - component: {fileID: 1345140547}
   - component: {fileID: 1345140543}
   - component: {fileID: 1345140544}
   - component: {fileID: 1345140545}
@@ -3846,6 +3849,17 @@ MonoBehaviour:
   tileRefs:
   - {fileID: 11400000, guid: ea4ab3a239e871d4488f72fffb7749db, type: 2}
   - {fileID: 11400000, guid: 38fb3d88cbdc4d34481e2a55c181ef90, type: 2}
+--- !u!114 &1345140547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1345140539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec4a2d6a516a7ce43b7218a7b23db311, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1390859033
 GameObject:
   m_ObjectHideFlags: 0

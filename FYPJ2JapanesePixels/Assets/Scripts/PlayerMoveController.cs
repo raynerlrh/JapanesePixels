@@ -110,6 +110,7 @@ public class PlayerMoveController : MonoBehaviour
         if (NoMovesLeft())
         {
             SetCrossTiles(originalTile);
+            b_shownCrossTiles = false;
             b_answeredCorrectly = false;
             return;
         }
