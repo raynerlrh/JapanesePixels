@@ -27,19 +27,29 @@ public class PlayerSkillController : MonoBehaviour
 
     void Update()
     {
+        for (int i = 0; i < defensiveSkills.Length; i++)
+        {
+            if (defensiveSkills[i].b_needsUpdate)
+                defensiveSkills[i].Update();
+        }
 
+        for (int i = 0; i < offensiveSkills.Length; i++)
+        {
+            if (offensiveSkills[i].b_needsUpdate)
+                offensiveSkills[i].Update();
+        }
     }
 
     void LoadSkills() // going to load skills from some file later
     {
         for (int i = 0; i < defensiveSkills.Length; i++)
         {
-            defensiveSkills[i] = new TestPlayerSkill();
+            defensiveSkills[i] = new HealSkill();
         }
 
         for (int i = 0; i < offensiveSkills.Length; i++)
         {
-            offensiveSkills[i] = new TestPlayerSkill();
+            offensiveSkills[i] = new ShurikenAttack();
         }
     }
 }

@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - AnswerOption
+  - PlayerAttack
   layers:
   - Default
   - TransparentFX

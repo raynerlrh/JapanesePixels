@@ -16,7 +16,7 @@ public class PlayerMoveController : MonoBehaviour
         }
     }
 
-    const int MAX_MOVES = 5;
+    public const int MAX_MOVES = 5;
     GameGrid gameGrid;
 
     [SerializeField]

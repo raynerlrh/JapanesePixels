@@ -13,6 +13,11 @@ public class SkillButton : MonoBehaviour
         PlayerMoveController.instance.MadeMove();
     }
 
+    void Update()
+    {
+        //attachedSkill.Update();
+    }
+
     public void SetSkill(PlayerSkill _skill)
     {
         attachedSkill = _skill;

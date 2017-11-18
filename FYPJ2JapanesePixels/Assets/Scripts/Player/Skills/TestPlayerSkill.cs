@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TestPlayerSkill : PlayerSkill 
 {
+    public bool b_needsUpdate { get; set; }
     public string skillName { get; set; }
 
     public TestPlayerSkill()
@@ -14,5 +15,11 @@ public class TestPlayerSkill : PlayerSkill
     public void ExecuteSkill()
     {
         Debug.Log("Executed Skill: " + skillName);
+    }
+
+    public void Update()
+    {
+        if (!b_needsUpdate)
+            return;
     }
 }
