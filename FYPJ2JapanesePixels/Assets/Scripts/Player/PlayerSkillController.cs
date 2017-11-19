@@ -52,4 +52,25 @@ public class PlayerSkillController : MonoBehaviour
             offensiveSkills[i] = new ShurikenAttack();
         }
     }
+
+    public bool CanPerformSkill(PlayerSkill _skill)
+    {
+        // Check health stuff first
+        if (_skill.skillName == "Heal")
+        {
+            float playerHealth = PlayerMoveController.instance.GetPawn.charStat.hpSys.health;
+            if (playerHealth == PlayerMoveController.instance.GetPawn.charStat.hpSys.MAX_HEALTH)
+                return false;
+        }
+
+        PlayerMoveController playerMove = PlayerMoveController.instance;
+
+        if ((playerMove.numMovesMade + _skill.numMoves) <= PlayerMoveController.MAX_MOVES)
+        {
+            playerMove.numMovesMade += _skill.numMoves;
+            return true;
+        }
+
+        return false;
+    }
 }

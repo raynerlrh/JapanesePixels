@@ -30,6 +30,10 @@ public class SkillActivation : MonoBehaviour
                 PlayerMoveController.instance.b_answeredCorrectly = true;
                 PlayerMoveController.instance.ResetNumMovesWhenNoneLeft();
 
+                // Turn on player movement grid
+                TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(true);
+
+                // Display respective skill menu
                 if (skillType == SKILL_TYPE.TYPE_DEFENSIVE)
                     defensiveMenu.gameObject.SetActive(true);
                 else
@@ -37,6 +41,9 @@ public class SkillActivation : MonoBehaviour
             }
             else
             {
+                // Turn off player movement grid
+                TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
+
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
             }

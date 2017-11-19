@@ -23,7 +23,7 @@ public class GameGrid : MonoBehaviour
 
 	void Awake() 
     {
-        unityGrid = GameObject.Find("Grid").GetComponent<Grid>();
+        unityGrid = GetComponent<Grid>();
 
         camTopRight.x = (Camera.main.orthographicSize) * Camera.main.aspect; 
         camTopRight.y = Camera.main.transform.position.y + (Camera.main.orthographicSize);
@@ -37,6 +37,7 @@ public class GameGrid : MonoBehaviour
 	
 	void Update() 
     {
+// Temp references
         // the actual position of the top right cell
         Vector3 num = GetCellWPOS(GetTopRightCell());
         Vector2 actualPos = GetCellToWorld(new Vector3Int(2, 4, 0));

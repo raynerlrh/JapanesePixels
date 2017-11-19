@@ -30,14 +30,14 @@ public class SkillMenu : MonoBehaviour
         {
             for (int i = 0; i < transform.childCount; i++)
             {
-                transform.GetChild(i).GetComponent<SkillButton>().SetSkill(playerSkills.defensiveSkills[i]);
+                transform.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.defensiveSkills[i]);
             }
         }
         else
         {
             for (int i = 0; i < transform.childCount; i++)
             {
-                transform.GetChild(i).GetComponent<SkillButton>().SetSkill(playerSkills.offensiveSkills[i]);
+                transform.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.offensiveSkills[i]);
             }
         }
     }

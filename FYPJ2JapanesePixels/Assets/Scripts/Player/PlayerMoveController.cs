@@ -33,7 +33,7 @@ public class PlayerMoveController : MonoBehaviour
     Vector2 playerPos;
     Vector2 targetTilePos;
 
-    int numMovesMade;
+    public int numMovesMade { get; set; }
     public bool b_answeredCorrectly { get; set; }
     bool b_shownCrossTiles;
     bool b_reachedTarget;
@@ -143,7 +143,7 @@ public class PlayerMoveController : MonoBehaviour
                 // Reset tiles if player does not move
                 if (touchCellPos == playerCellPos)
                 {
-                    SetCrossTiles(originalTile);
+                    //SetCrossTiles(originalTile);
                 }
                 else if (TouchedAvailableTiles())
                 {
@@ -204,11 +204,6 @@ public class PlayerMoveController : MonoBehaviour
             default:
                 return new Vector3Int(0, 0, 0);
         }
-    }
-
-    public void MadeMove()
-    {
-        numMovesMade++;
     }
 
     public bool NoMovesLeft()
