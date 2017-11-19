@@ -33,6 +33,12 @@ public class TileRefManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    void Start()
+    {
+        // Turn off player movement grid at the start
+        GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
+    }
+
     public Tile GetTileRef(TILE_TYPE tileType)
     {
         if (tileRefs[(int)tileType] != null)
@@ -60,7 +66,7 @@ public class TileRefManager : MonoBehaviour
 
     public Tilemap GetTilemap(TILEMAP_TYPE type)
     {
-        return GameModeManager.instance.gameGrid.getGrid.transform.GetChild((int)type).GetComponent<Tilemap>();
+        return GameModeManager.instance.gameGrid.transform.GetChild((int)type).GetComponent<Tilemap>();
     }
 
     public Tile GetTileAtCellPos(TILEMAP_TYPE tileMapType, Vector3Int cellPos)

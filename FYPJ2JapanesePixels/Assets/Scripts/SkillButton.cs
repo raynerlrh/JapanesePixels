@@ -9,8 +9,15 @@ public class SkillButton : MonoBehaviour
 
     public void OnPress()
     {
-        attachedSkill.ExecuteSkill();
-        PlayerMoveController.instance.MadeMove();
+        if (PlayerSkillController.instance.CanPerformSkill(attachedSkill))
+        {
+            attachedSkill.ExecuteSkill();
+        }
+        else
+        {
+            // Show text on screen "Not enough moves"
+            Debug.Log("Cannot perform: " + attachedSkill.skillName);
+        }
     }
 
     void Update()
@@ -18,7 +25,7 @@ public class SkillButton : MonoBehaviour
         //attachedSkill.Update();
     }
 
-    public void SetSkill(PlayerSkill _skill)
+    public void AttachSkill(PlayerSkill _skill)
     {
         attachedSkill = _skill;
         SetButtonText();

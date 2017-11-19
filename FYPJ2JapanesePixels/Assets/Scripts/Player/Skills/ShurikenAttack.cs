@@ -6,6 +6,8 @@ using UnityEngine;
 public class ShurikenAttack : PlayerSkill 
 {
     public bool b_needsUpdate { get; set; }
+    public int numMoves { get; set; }
+    public int damage { get; set; }
     public string skillName { get; set; }
 
     GameObject shurikenPrefab;
@@ -14,10 +16,14 @@ public class ShurikenAttack : PlayerSkill
     int attackCellDist = 3;
     int totalAttackDist;
     int startingPos;
+    float shurikenSpeed = 3f;
 
     public ShurikenAttack()
     {
         skillName = "Shuriken Attack";
+        numMoves = 1;
+        damage = 10;
+
         shurikenPrefab = (GameObject)Resources.Load("Prefabs/Shuriken", typeof(GameObject));
         shurikenClone = new GameObject[PlayerMoveController.MAX_MOVES];
     }
@@ -53,7 +59,7 @@ public class ShurikenAttack : PlayerSkill
             if (shurikenClone[i] == null)
                 continue;
 
-            shurikenClone[i].transform.position += Vector3.right * Time.deltaTime;
+            shurikenClone[i].transform.position += Vector3.right * shurikenSpeed *  Time.deltaTime;
 
             Vector3Int shurikenCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(shurikenClone[i].transform.position);
 

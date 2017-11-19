@@ -29,7 +29,7 @@ public class GameModeManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
 
-        gameGrid = GetComponent<GameGrid>();
+        gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
     }
 
     void Start()
