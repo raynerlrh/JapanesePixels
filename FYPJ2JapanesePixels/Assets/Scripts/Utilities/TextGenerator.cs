@@ -25,7 +25,7 @@ public class TextGenerator : MonoBehaviour {
 		animate();
 	}
 
-    public void GenerateText(string printTxt, bool is3d, Vector3 spawnPos, int scale =  5, float yOffset = 1, bool isDestroy = true)
+    public void GenerateText(string printTxt, bool is3d, Vector3 spawnPos, int scale =  5, float yOffset = 1, bool isDestroy = true, Color? col = null)
     {
         Vector3 pos = new Vector3(spawnPos.x, spawnPos.y + yOffset, spawnPos.z);
 
@@ -43,6 +43,8 @@ public class TextGenerator : MonoBehaviour {
             txt.gameObject.SetActive(true);
             //txt.horizontalOverflow = HorizontalWrapMode.Overflow;
             //txt.verticalOverflow = VerticalWrapMode.Overflow;
+            if (col != null)
+                txt.color = col.Value;
             if (isDestroy)
             {
                 destroyRefs.Add(txt.gameObject);

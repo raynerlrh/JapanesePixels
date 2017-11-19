@@ -18,6 +18,14 @@ public class TouchDrag : MonoBehaviour
         collider = GetComponent<BoxCollider2D>();
     }
 
+    void OnDisable()
+    {
+        canDrag = true;
+        b_isDragged = false;
+        b_ReturnToOriginalPos = false;
+        transform.localPosition = originalPos;
+    }
+
 	void Update() 
     {
         if (b_ReturnToOriginalPos)

@@ -16,25 +16,37 @@ public class SkillActivation : MonoBehaviour
 
     public SKILL_TYPE skillType;
 
+    public SkillMenu defensiveMenu;
+    public SkillMenu offensiveMenu;
+
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.tag == "AnswerOption")
         {
             if (col.gameObject.GetComponent<LanguageButton>().buttonIndex == languageSystem.theLetterIndex)
             {
-                Debug.Log("CORRECT");
                 languageSystem.refreshQuestion();
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", false);
+                PlayerMoveController.instance.b_answeredCorrectly = true;
+                PlayerMoveController.instance.ResetNumMovesWhenNoneLeft();
+
+                if (skillType == SKILL_TYPE.TYPE_DEFENSIVE)
+                    defensiveMenu.gameObject.SetActive(true);
+                else
+                    offensiveMenu.gameObject.SetActive(true);
             }
             else
             {
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
-                Debug.Log("WRONG");
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
             }
         }
     }
     
+    /// <summary>
+    /// Auto attack upon collision with enemy
+    /// </summary>
+    /// <param name="obj"></param>
     void OnCollisionStay2D(Collision2D obj)
     {
         if (obj.gameObject.layer == 8)

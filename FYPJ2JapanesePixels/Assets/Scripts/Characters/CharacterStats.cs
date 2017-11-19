@@ -17,8 +17,10 @@ public class CharacterStats : MonoBehaviour {
     public float attackVal;
     public float defVal;
 
-    public GameObject hpBar;
-    public UIProp hpProp; 
+    private GameObject hpBar;
+    private GameObject defBar;
+    public UIProp hpProp;
+    public UIProp defProp; 
 	// Use this for initialization
 	void Start () {
         attackVal *= AttackMultiplier;
@@ -26,6 +28,8 @@ public class CharacterStats : MonoBehaviour {
         {
             hpBar = GameObject.Instantiate(transform.GetChild(0).GetChild(0), transform.GetChild(0), false).gameObject;
             hpBar.SetActive(true);
+            defBar = GameObject.Instantiate(transform.GetChild(0).GetChild(1), transform.GetChild(0), false).gameObject;
+            defBar.SetActive(true);
         }
 	}
 	
@@ -35,6 +39,11 @@ public class CharacterStats : MonoBehaviour {
         {
             //print("f " + hpProp.t_progbarwidth + " g " + hpSys.health);
             hpBar.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(hpProp.t_progbarwidth * hpSys.health, hpBar.transform.GetComponent<RectTransform>().sizeDelta.y);
+        }
+        if (defBar != null)
+        {
+            //print("f " + hpProp.t_progbarwidth + " g " + hpSys.health);
+            defBar.transform.GetComponent<RectTransform>().sizeDelta = new Vector2(defProp.t_progbarwidth * defVal, defBar.transform.GetComponent<RectTransform>().sizeDelta.y);
         }
     }
 
@@ -77,13 +86,23 @@ public class CharacterStats : MonoBehaviour {
         GetComponent<TextGenerator>().GenerateText(remainder.ToString(), true, transform.position);
         if (hpSys.health < 0)
         {
-            Mathf.Clamp(hpSys.health, 0, 1);
+            hpSys.health = 0;
         }
+    }
+
+    public void increaseHealth(float upvalue)
+    {
+        hpSys.health += upvalue;
+        if (hpSys.health > hpSys.MAX_HEALTH)
+            hpSys.health = hpSys.MAX_HEALTH;
+        GetComponent<TextGenerator>().GenerateText(upvalue.ToString(), true, transform.position, 5, 1, true, Color.green);
     }
 
     public void updateDefStat()
     {
         // multiply 0.01f == divide 100
         defVal = DefenseMultiplier * hpSys.MAX_HEALTH;
+        if (defBar != null)
+            defProp.t_progbarwidth = defBar.transform.GetComponent<RectTransform>().sizeDelta.x / defVal;
     }
 }

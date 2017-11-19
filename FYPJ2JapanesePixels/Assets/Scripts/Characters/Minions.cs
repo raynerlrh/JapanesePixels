@@ -7,6 +7,7 @@ public class Minions : MonoBehaviour
     bool isFighting; // is minion fighting?
     public DefaultCharacter character { get; set; }
     public Vector3Int cellDes;
+    public Vector3 direction;
 
     public enum MinionType
     {
@@ -26,10 +27,21 @@ public class Minions : MonoBehaviour
             character.InitChar(20);
             character.charStat.attackVal = 5f;
         }
+        else if (m_MinionType == MinionType.E_FLAMESKULL)
+        {
+            character.InitChar(30);
+            character.charStat.attackVal = 20f;
+        }
         else
         {
             character.InitChar(30);
             character.charStat.attackVal = 20f;
+            if (cellDes.x > GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position).x)
+            {
+                direction = transform.right;
+            }
+            else
+                direction = -transform.right;
         }
 	}
 	
@@ -37,10 +49,14 @@ public class Minions : MonoBehaviour
     {
         if (!isFighting)
         {
-            if (m_MinionType == MinionType.E_SKELETON || m_MinionType == MinionType.E_PROJECTILE)
+            if (m_MinionType == MinionType.E_SKELETON)
                 moveForward(-transform.right);
             else if (m_MinionType == MinionType.E_FLAMESKULL)
                 moveForward(-transform.up);
+            else if (m_MinionType == MinionType.E_PROJECTILE)
+            {
+                moveForward(direction);
+            }
             if (transform.position.x < GameModeManager.instance.gameGrid.mapWidthX)
             {
                 Destroy(this.gameObject);
@@ -50,7 +66,7 @@ public class Minions : MonoBehaviour
                 Destroy(this.gameObject);
             }
         }
-        else
+        //else
         {
             if (character.checkIfDead())
             {
@@ -97,5 +113,13 @@ public class Minions : MonoBehaviour
     void OnCollisionExit2D(Collision2D obj)
     {
         isFighting = false;
+    }
+
+    void OnTriggerEnter2D(Collider2D collided)
+    {
+        if (collided.gameObject.tag.Equals("PlayerAttack"))
+        {
+            character.charStat.decreaseHealth(collided.gameObject.GetComponent<ObjectStats>().damage);
+        }
     }
 }

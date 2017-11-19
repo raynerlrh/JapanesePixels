@@ -114,7 +114,8 @@ public class GameModeManager : MonoBehaviour
     {
         if (wrong == false)
         {
-            GetComponent<RLEnvironment>().resetagent();
+            //GetComponent<RLEnvironment>().resetagent();
+            question.text.fontSize = 0;
         }
     }
 }

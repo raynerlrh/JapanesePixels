@@ -101,7 +101,7 @@ namespace Boss
                 {
                     Vector3Int cellpos = GameModeManager.instance.gameGrid.GetTopRightCell();
                     cellpos = new Vector3Int(cellpos.x, cellpos.y - i * 2, cellpos.z);
-                    Vector3 temp = GameModeManager.instance.gameGrid.GetCellWPOS(cellpos);
+                    Vector3 temp = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(cellpos);
                     GameObject summon = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[0], EnemyMoveController.instance.GetBossObj.transform, false);
                     summon.transform.position = temp;
                     dehighlightTimer.executeFunction();
@@ -130,6 +130,8 @@ namespace Boss
             GameObject summon = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[1], EnemyMoveController.instance.GetBossObj.transform, false);
             summon.SetActive(true);
             summon.GetComponent<Minions>().m_MinionType = Minions.MinionType.E_PROJECTILE;
+            summon.GetComponent<Minions>().cellDes = targetPos;
+            summon.transform.position = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(initialPos);
         }
 
         /// <summary>
@@ -215,7 +217,7 @@ namespace Boss
             }
             else if (e_battleState == BattleState.E_MEDIUMATTACK)
             {
-                if (detectPlayerApprox(3))// EnemyMoveController.instance.currentBoss.detectPlayer(2))
+                if (detectPlayerApprox(2))// EnemyMoveController.instance.currentBoss.detectPlayer(2))
                 {
                     highlightAttackGrid(GameModeManager.instance.gameGrid.GetPerimeter(2));
                     mediumAttack();
@@ -271,6 +273,16 @@ namespace Boss
             {
                 e_battleState = BattleState.E_HEAVYATTACK;
                 return true;
+            }
+        }
+
+        void OnTriggerEnter2D(Collider2D collided)
+        {
+            if (collided.gameObject.tag == "PlayerAttack")
+            {
+                GetComponent<CharacterStats>().decreaseHealth(collided.gameObject.GetComponent<ObjectStats>().damage);
+                Destroy(collided.gameObject);
+                //GetComponent<CharacterStats>()
             }
         }
     }

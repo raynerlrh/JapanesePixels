@@ -315,6 +315,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageSystem: {fileID: 962474970}
   skillType: 1
+  defensiveMenu: {fileID: 0}
+  offensiveMenu: {fileID: 0}
 --- !u!1 &130148967
 GameObject:
   m_ObjectHideFlags: 0
@@ -387,7 +389,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
-  m_SortingLayerID: 214691061
+  m_SortingLayerID: 1680719133
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!224 &130148971
@@ -894,6 +896,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageSystem: {fileID: 0}
   skillType: 1
+  defensiveMenu: {fileID: 0}
+  offensiveMenu: {fileID: 0}
 --- !u!114 &388202982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2828,6 +2832,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageSystem: {fileID: 962474970}
   skillType: 0
+  defensiveMenu: {fileID: 0}
+  offensiveMenu: {fileID: 0}
 --- !u!1 &1098219032
 GameObject:
   m_ObjectHideFlags: 0
@@ -3138,7 +3144,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf2743d7a42991b4d8a0e62c77ee5c8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testSprite: {fileID: 0}
 --- !u!114 &1345140546
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4856,7 +4861,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
-  m_SortingLayerID: 214691061
+  m_SortingLayerID: 1680719133
   m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!1 &2093503850
