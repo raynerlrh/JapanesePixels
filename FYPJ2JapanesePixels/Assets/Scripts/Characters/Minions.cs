@@ -5,7 +5,7 @@ using UnityEngine;
 public class Minions : MonoBehaviour
 {
     bool isFighting; // is minion fighting?
-    public DefaultCharacter char_stat { get; set; }
+    public DefaultCharacter character { get; set; }
     public Vector3Int cellDes;
 
     public enum MinionType
@@ -20,11 +20,17 @@ public class Minions : MonoBehaviour
 	void Start() 
     {
         isFighting = false;
-        char_stat = new DefaultCharacter();
+        character = gameObject.AddComponent<DefaultCharacter>();
         if (m_MinionType == MinionType.E_SKELETON)
-            char_stat.InitChar(20);
+        {
+            character.InitChar(20);
+            character.charStat.attackVal = 5f;
+        }
         else
-            char_stat.InitChar(30);
+        {
+            character.InitChar(30);
+            character.charStat.attackVal = 20f;
+        }
 	}
 	
 	void Update() 
@@ -46,7 +52,7 @@ public class Minions : MonoBehaviour
         }
         else
         {
-            if (char_stat.checkIfDead())
+            if (character.checkIfDead())
             {
                 Destroy(this.gameObject);
             }
@@ -71,7 +77,8 @@ public class Minions : MonoBehaviour
         isFighting = true;
         if (m_MinionType == MinionType.E_FLAMESKULL || m_MinionType == MinionType.E_PROJECTILE)
         {
-            PlayerMoveController.instance.GetPawn.decreaseHealth(20);
+            CharacterStats stat = PlayerMoveController.instance.GetPawn.charStat;
+            stat.decreaseHealth(character.charStat.attackVal);
             Destroy(this.gameObject);
         }
     }
@@ -82,7 +89,7 @@ public class Minions : MonoBehaviour
     {
         if (isFighting && m_MinionType == MinionType.E_SKELETON)
         {
-            PlayerMoveController.instance.decreasehealthbytime(2, 5);
+            PlayerMoveController.instance.decreasehealthbytime(2, character.charStat.attackVal);
         }
     }
 

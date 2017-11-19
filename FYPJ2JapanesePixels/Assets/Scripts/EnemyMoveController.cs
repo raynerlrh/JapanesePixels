@@ -27,7 +27,7 @@ public class EnemyMoveController : MonoBehaviour
 	void Start() 
     {
         parentEnemy = GameObject.Find("Enemies");
-        currentBoss = new Boss.BossBehaviour();
+        currentBoss = GetBossObj.GetComponent<Boss.BossBehaviour>();
         currentBoss.InitChar();
 	}
 	
@@ -37,9 +37,9 @@ public class EnemyMoveController : MonoBehaviour
 
     void ReceivePlayerChoice(bool wrong)
     {
-        if (wrong)
-        {
-            EnemyMoveController.instance.currentBoss.doAttack();
-        }
+        //if (wrong)
+        //{
+        //    EnemyMoveController.instance.currentBoss.doAttack();
+        //}
     }
 }

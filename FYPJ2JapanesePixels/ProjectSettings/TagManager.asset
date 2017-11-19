@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - AnswerOption
+  - 2DCanvas
+  - 3DCanvas
   layers:
   - Default
   - TransparentFX
@@ -15,7 +17,7 @@ TagManager:
   - 
   - 
   - Enemy
-  - 
+  - 3DUI
   - 
   - 
   - 
@@ -47,4 +49,7 @@ TagManager:
     locked: 0
   - name: Focus
     uniqueID: 1896150105
+    locked: 0
+  - name: AboveAll
+    uniqueID: 214691061
     locked: 0

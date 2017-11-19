@@ -51,11 +51,9 @@ public class PlayerMoveController : MonoBehaviour
     void Start()
     {
         gameGrid = GameModeManager.instance.gameGrid;
-
-        pawn = new DefaultCharacter();
-        pawn.InitChar();
         pawn_sprite = GameObject.Find("PlayerHero");
-
+        pawn = pawn_sprite.AddComponent<DefaultCharacter>();
+        pawn.InitChar();
         // Set the player at the starting cell
         Vector2 startingPos = gameGrid.GetCellToWorld(new Vector3Int(-3, 0, 0));
         pawn_sprite.transform.position = new Vector3(startingPos.x, startingPos.y, 0);
@@ -206,15 +204,15 @@ public class PlayerMoveController : MonoBehaviour
     // why all these here
     private IEnumerator healthcoroutine(float seconds, float damage)
     {
-        pawn.decreaseHealth(damage);
-        pawn.hpSys.isHurt = true;
+        pawn.charStat.decreaseHealth(damage);
+        pawn.charStat.hpSys.isHurt = true;
         yield return new WaitForSeconds(seconds);
-        pawn.hpSys.isHurt = false;
+        pawn.charStat.hpSys.isHurt = false;
     }
 
     public void decreasehealthbytime(float secs, float dmg)
     {
-        if (!pawn.hpSys.isHurt)
+        if (!pawn.charStat.hpSys.isHurt)
             StartCoroutine(healthcoroutine(secs, dmg));
     }
 

@@ -2,16 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct HealthSystem
-{
-    public float health;
-    public float MAX_HEALTH;
-    public bool isHurt;
-}
 
-public class DefaultCharacter
+
+public class DefaultCharacter : MonoBehaviour
 {
-    public HealthSystem hpSys;
     public enum CharacterState
     {
         E_ALIVE,
@@ -21,28 +15,24 @@ public class DefaultCharacter
     }
 
     public CharacterState e_charState;
+    public CharacterStats charStat;
+
+    void Update()
+    {
+       
+    }
 
     // Use this for initialization
     public virtual void InitChar(float maxhealthval = 100)
     {
-        hpSys.MAX_HEALTH = maxhealthval;
-        hpSys.health = hpSys.MAX_HEALTH;
         e_charState = CharacterState.E_ALIVE;
-    }
-
-    public void decreaseHealth(float dmg_value)
-    {
-        hpSys.health -= dmg_value;
-        if (hpSys.health < 0)
-        {
-            Mathf.Clamp(hpSys.health, 0, 1);
-            e_charState = CharacterState.E_DEAD;
-        }
+        charStat = GetComponent<CharacterStats>();
+        charStat.setHealth(maxhealthval);
     }
 
     public bool checkIfDead()
     {
-        if (Mathf.Approximately(hpSys.health, 0) || hpSys.health < 0)
+        if (Mathf.Approximately(charStat.hpSys.health, 0) || charStat.hpSys.health < 0)
         {
             e_charState = CharacterState.E_DEAD;
             return true;
@@ -52,7 +42,7 @@ public class DefaultCharacter
 
     public void resetCharacter()
     {
-        hpSys.health = hpSys.MAX_HEALTH;
+        charStat.hpSys.health = charStat.hpSys.MAX_HEALTH;
         e_charState = CharacterState.E_ALIVE;
     }
 }

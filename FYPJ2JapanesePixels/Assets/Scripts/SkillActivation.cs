@@ -40,8 +40,8 @@ public class SkillActivation : MonoBehaviour
         if (obj.gameObject.layer == 8)
         {
             if (attackTarget == null)
-                attackTarget = obj.gameObject.GetComponent<Minions>().char_stat;
-            attackTarget.decreaseHealth(10);
+                attackTarget = obj.gameObject.GetComponent<Minions>().character;
+            attackTarget.charStat.decreaseHealth(10);
 
             if (attackTarget.checkIfDead())
                 attackTarget = null;
