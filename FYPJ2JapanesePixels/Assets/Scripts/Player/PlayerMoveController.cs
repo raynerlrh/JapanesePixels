@@ -108,6 +108,7 @@ public class PlayerMoveController : MonoBehaviour
         if (NoMovesLeft())
         {
             SetCrossTiles(originalTile);
+            TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
             b_shownCrossTiles = false;
             b_answeredCorrectly = false;
             return;
