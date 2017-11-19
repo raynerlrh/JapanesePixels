@@ -37,6 +37,7 @@ public class PlayerMoveController : MonoBehaviour
     public bool b_answeredCorrectly { get; set; }
     bool b_shownCrossTiles;
     bool b_reachedTarget;
+    bool b_touchedScreen;
 
     // Only for most foremost operations
     void Awake()
@@ -116,8 +117,10 @@ public class PlayerMoveController : MonoBehaviour
 
 #if UNITY_EDITOR
         touchPos = new Vector3Int((int)Input.mousePosition.x, (int)Input.mousePosition.y, (int)Input.mousePosition.z);
+        b_touchedScreen = Input.GetMouseButtonDown(0);
 #elif UNITY_ANDROID
         touchPos = new Vector3Int((int)Input.GetTouch(0).position.x, (int)Input.GetTouch(0).position.y, (int)Input.GetTouch(0).position.z);
+        b_touchedScreen = (Input.touchCount > 0);
 #endif
 
         // Convert the touch position to cell position
@@ -139,7 +142,7 @@ public class PlayerMoveController : MonoBehaviour
             if (touchCellPos.y < GameGrid.minGridHeight)
                 return;
 
-            if (Input.GetMouseButtonDown(0))
+            if (b_touchedScreen)
             {
                 // Reset tiles if player does not move
                 if (touchCellPos == playerCellPos)
