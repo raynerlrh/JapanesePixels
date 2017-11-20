@@ -16,6 +16,7 @@ namespace Boss
         TimerRoutine dehighlightTimer;
         TimerRoutine dehighlightTimer2;
         TimerRoutine bossCooldown;
+        public float waitTime = 2;
 
         public enum BattleState
         {
@@ -39,7 +40,7 @@ namespace Boss
             dehighlightTimer2.initTimer(3);
             dehighlightTimer2.executedFunction = dehighlight;
             bossCooldown = EnemyMoveController.instance.gameObject.AddComponent<TimerRoutine>();
-            bossCooldown.initTimer(4);
+            bossCooldown.initTimer(waitTime);
             bossCooldown.executedFunction = unPause;
             e_battleState = BattleState.E_NOTDECIDED;
         }

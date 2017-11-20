@@ -12,13 +12,13 @@ public struct EnvVars
 {
     public float total_correct;
     public int num_things; // how many skills can the ai use? Ignore the name, it is the number that matters
-    public float act_speed;
     public int prevAction;
     public int trialsTrained;
     public bool pauseAction;
 }
 
 public class RLEnvironment : MonoBehaviour {
+    public float act_speed = 0.4f;
     public EnvVars envVars;
     AgentBrain agent;
     public Agent.AgentMemory brainMemory;
@@ -26,7 +26,6 @@ public class RLEnvironment : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        envVars.act_speed = 0.4f;
         envVars.prevAction = -1;
         envVars.trialsTrained = 0;
         envVars.pauseAction = false;
@@ -63,7 +62,7 @@ public class RLEnvironment : MonoBehaviour {
     {
         if (!envVars.pauseAction)
         {
-            yield return new WaitForSeconds(envVars.act_speed); // wait for actSpeed seconds
+            yield return new WaitForSeconds(act_speed); // wait for actSpeed seconds
             int action = agent.PickAction();
             if (envVars.prevAction == -1)
                 envVars.prevAction = action;
