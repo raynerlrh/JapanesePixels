@@ -46,7 +46,7 @@ public class PlayerMoveController : MonoBehaviour
         else if (instance != this)
             Destroy(gameObject);
 
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 
     void Start()
@@ -71,7 +71,7 @@ public class PlayerMoveController : MonoBehaviour
         {
             if (pawn.checkIfDead())
             {
-                
+                GameModeManager.instance.showDeathScreen();
             }
 
             if (b_answeredCorrectly)
@@ -116,7 +116,7 @@ public class PlayerMoveController : MonoBehaviour
 #if UNITY_EDITOR
         touchPos = new Vector3Int((int)Input.mousePosition.x, (int)Input.mousePosition.y, (int)Input.mousePosition.z);
 #elif UNITY_ANDROID
-        touchPos = new Vector3Int((int)Input.GetTouch(0).position.x, (int)Input.GetTouch(0).position.y, (int)Input.GetTouch(0).position.z);
+        touchPos = new Vector3Int((int)Input.GetTouch(0).position.x, (int)Input.GetTouch(0).position.y, 0);
 #endif
 
         // Convert the touch position to cell position

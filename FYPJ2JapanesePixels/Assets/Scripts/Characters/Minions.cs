@@ -24,7 +24,7 @@ public class Minions : MonoBehaviour
         character = gameObject.AddComponent<DefaultCharacter>();
         if (m_MinionType == MinionType.E_SKELETON)
         {
-            character.InitChar(20);
+            character.InitChar(40);
             character.charStat.attackVal = 5f;
         }
         else if (m_MinionType == MinionType.E_FLAMESKULL)
@@ -120,6 +120,7 @@ public class Minions : MonoBehaviour
         if (collided.gameObject.tag.Equals("PlayerAttack"))
         {
             character.charStat.decreaseHealth(collided.gameObject.GetComponent<ObjectStats>().damage);
+            Destroy(collided.gameObject);
         }
     }
 }

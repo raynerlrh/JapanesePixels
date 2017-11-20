@@ -30,7 +30,7 @@ namespace Boss
         public override void InitChar(float maxhealthval = 100)
         {
             base.InitChar(maxhealthval);
-            special.numMinions = 4;
+            special.numMinions = 3;
             special.summonMinions = false;
             dehighlightTimer = EnemyMoveController.instance.gameObject.AddComponent<TimerRoutine>();
             dehighlightTimer.initTimer(2);
@@ -283,6 +283,15 @@ namespace Boss
                 GetComponent<CharacterStats>().decreaseHealth(collided.gameObject.GetComponent<ObjectStats>().damage);
                 Destroy(collided.gameObject);
                 //GetComponent<CharacterStats>()
+            }
+        }
+
+        void Update()
+        {
+            if (checkIfDead())
+            {
+                GameModeManager.instance.showWinScreen();
+                gameObject.SetActive(false);
             }
         }
     }

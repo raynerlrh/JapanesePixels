@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public struct UIProp
 {
@@ -19,6 +19,11 @@ public class GameModeManager : MonoBehaviour
 
     UIProp aiprogress;
 
+    [SerializeField]
+    public GameObject DeathscreenUI;
+    [SerializeField]
+    public GameObject WinscreenUI;
+
     // Only for most foremost operations
     void Awake()
     {
@@ -27,7 +32,7 @@ public class GameModeManager : MonoBehaviour
         else if (instance != this)
             Destroy(gameObject);
 
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
 
         gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
     }
@@ -117,5 +122,27 @@ public class GameModeManager : MonoBehaviour
             //GetComponent<RLEnvironment>().resetagent();
             question.text.fontSize = 0;
         }
+    }
+
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void showDeathScreen()
+    {
+        DeathscreenUI.SetActive(true);
+        //if (Time.timeScale == 1)
+        {
+            //Time.timeScale = 0.25f;
+            //Time.fixedDeltaTime = Time.timeScale * 0.02f;
+        }
+    }
+
+    public void showWinScreen()
+    {
+        WinscreenUI.SetActive(true);
+        //Time.timeScale = 0.25f;
+        //Time.fixedDeltaTime = Time.timeScale * 0.02f;
     }
 }

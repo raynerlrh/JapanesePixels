@@ -1,8 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
-using System.IO;
+//using UnityEditor;
+//using System.IO;
 
 /// <summary>
 /// Trains agent with rewards for correct actions
@@ -81,6 +81,7 @@ public class RLEnvironment : MonoBehaviour {
         agent.ResetAgent(envVars.num_things, optimistic);
     }
 
+    /*
     [MenuItem("Tools/Write file")]
     static void WriteString(float[] copyarr)
     {
@@ -119,5 +120,5 @@ public class RLEnvironment : MonoBehaviour {
             writearr[i] = float.Parse(reader.ReadLine());
         }
         reader.Close();
-    }
+    }*/
 }

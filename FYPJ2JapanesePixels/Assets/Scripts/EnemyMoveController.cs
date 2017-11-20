@@ -21,14 +21,14 @@ public class EnemyMoveController : MonoBehaviour
         else if (instance != this)
             Destroy(gameObject);
 
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
     }
 
 	void Start() 
     {
         parentEnemy = GameObject.Find("Enemies");
         currentBoss = GetBossObj.GetComponent<Boss.BossBehaviour>();
-        currentBoss.InitChar();
+        currentBoss.InitChar(250);
 	}
 	
 	void Update() 
