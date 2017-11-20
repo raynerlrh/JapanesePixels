@@ -28,7 +28,7 @@ public class EnemyMoveController : MonoBehaviour
     {
         parentEnemy = GameObject.Find("Enemies");
         currentBoss = GetBossObj.GetComponent<Boss.BossBehaviour>();
-        currentBoss.InitChar(250);
+        currentBoss.InitChar(200);
 	}
 	
 	void Update() 

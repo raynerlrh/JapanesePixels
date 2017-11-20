@@ -7,9 +7,9 @@ public class ShurikenAttack : PlayerSkill
 {
     public bool b_needsUpdate { get; set; }
     public int numMoves { get; set; }
+    public int cellsAffected { get; set; }
     public float damage { get; set; }
     public string skillName { get; set; }
-    public int cellsAffected { get; set; }
 
     GameObject shurikenPrefab;
     GameObject[] shurikenClone;
@@ -25,6 +25,7 @@ public class ShurikenAttack : PlayerSkill
         damage = 10;
 
         shurikenPrefab = (GameObject)Resources.Load("Prefabs/Shuriken", typeof(GameObject));
+        shurikenPrefab.GetComponent<ObjectStats>().damage = damage;
         shurikenClone = new GameObject[PlayerMoveController.MAX_MOVES];
         cellsAffected = 3;
     }
@@ -54,12 +55,12 @@ public class ShurikenAttack : PlayerSkill
     {
         if (NoShurikensActive())
             b_needsUpdate = false;
-
+        
         for (int i = 0; i < shurikenClone.Length; i++)
         {
             if (shurikenClone[i] == null)
                 continue;
-
+            
             shurikenClone[i].transform.position += Vector3.right * shurikenSpeed *  Time.deltaTime;
 
             Vector3Int shurikenCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(shurikenClone[i].transform.position);

@@ -24,7 +24,7 @@ public class Minions : MonoBehaviour
         character = gameObject.AddComponent<DefaultCharacter>();
         if (m_MinionType == MinionType.E_SKELETON)
         {
-            character.InitChar(40);
+            character.InitChar(30);
             character.charStat.attackVal = 5f;
         }
         else if (m_MinionType == MinionType.E_FLAMESKULL)

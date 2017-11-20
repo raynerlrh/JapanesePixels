@@ -26,7 +26,7 @@ public class RLEnvironment : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        envVars.act_speed = 0.1f;
+        envVars.act_speed = 0.4f;
         envVars.prevAction = -1;
         envVars.trialsTrained = 0;
         envVars.pauseAction = false;

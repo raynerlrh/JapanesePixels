@@ -37,6 +37,7 @@ public class PlayerMoveController : MonoBehaviour
     public bool b_answeredCorrectly { get; set; }
     bool b_shownCrossTiles;
     bool b_reachedTarget;
+    bool b_touchedScreen;
 
     // Only for most foremost operations
     void Awake()
@@ -59,6 +60,7 @@ public class PlayerMoveController : MonoBehaviour
         Vector2 startingPos = gameGrid.GetCellToWorld(new Vector3Int(-3, 0, 0));
         pawn_sprite.transform.position = new Vector3(startingPos.x, startingPos.y, 0);
         playerPos = pawn_sprite.transform.position;
+        numMovesMade = 0;
 
         originalTile = new Tile();
         availableTile = new Tile();
@@ -105,9 +107,12 @@ public class PlayerMoveController : MonoBehaviour
 
     void UpdateInput()
     {
+        //Debug.Log(numMovesMade);
+
         if (NoMovesLeft())
         {
             SetCrossTiles(originalTile);
+            TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
             b_shownCrossTiles = false;
             b_answeredCorrectly = false;
             return;
@@ -115,10 +120,19 @@ public class PlayerMoveController : MonoBehaviour
 
 #if UNITY_EDITOR
         touchPos = new Vector3Int((int)Input.mousePosition.x, (int)Input.mousePosition.y, (int)Input.mousePosition.z);
+        b_touchedScreen = Input.GetMouseButtonDown(0);
+        
 #elif UNITY_ANDROID
-        touchPos = new Vector3Int((int)Input.GetTouch(0).position.x, (int)Input.GetTouch(0).position.y, 0);
-#endif
+        if (Input.touchCount > 0)
+        {
+            //Debug.Log(Input.touchCount);
+            touchPos = new Vector3Int((int)Input.GetTouch(0).position.x, (int)Input.GetTouch(0).position.y, 0);
 
+            b_touchedScreen = (Input.GetTouch(0).tapCount == 1);
+        }
+        else
+            b_touchedScreen = false;
+#endif
         // Convert the touch position to cell position
         touchCellPos = gameGrid.GetWorldIntToCellPos(touchPos);
 
@@ -138,7 +152,7 @@ public class PlayerMoveController : MonoBehaviour
             if (touchCellPos.y < GameGrid.minGridHeight)
                 return;
 
-            if (Input.GetMouseButtonDown(0))
+            if (b_touchedScreen)
             {
                 // Reset tiles if player does not move
                 if (touchCellPos == playerCellPos)
@@ -156,9 +170,10 @@ public class PlayerMoveController : MonoBehaviour
                             if (!NoMovesLeft())
                             {
                                 targetTilePos = gameGrid.GetCellToWorld(tilePos);
-                                numMovesMade++;
+                                numMovesMade = 1;
                                 gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, tilePos, availableTile);
                                 b_reachedTarget = false;
+                                //Debug.Log(numMovesMade);
                                 continue;
                             }
                         }

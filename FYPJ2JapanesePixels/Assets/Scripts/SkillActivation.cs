@@ -38,6 +38,8 @@ public class SkillActivation : MonoBehaviour
                     defensiveMenu.gameObject.SetActive(true);
                 else
                     offensiveMenu.gameObject.SetActive(true);
+
+                GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(1, 1);
             }
             else
             {
@@ -46,6 +48,7 @@ public class SkillActivation : MonoBehaviour
 
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
+                GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(0, 1);
             }
         }
     }

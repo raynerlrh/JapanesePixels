@@ -39,7 +39,7 @@ namespace Boss
             dehighlightTimer2.initTimer(3);
             dehighlightTimer2.executedFunction = dehighlight;
             bossCooldown = EnemyMoveController.instance.gameObject.AddComponent<TimerRoutine>();
-            bossCooldown.initTimer(2);
+            bossCooldown.initTimer(4);
             bossCooldown.executedFunction = unPause;
             e_battleState = BattleState.E_NOTDECIDED;
         }
