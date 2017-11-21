@@ -49,6 +49,7 @@ public class SkillActivation : MonoBehaviour
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(0, 1);
+                //languageSystem.text.gameObject.GetComponent<LanguageButton>().highlightCorrect();
             }
         }
     }
@@ -63,7 +64,7 @@ public class SkillActivation : MonoBehaviour
         {
             if (attackTarget == null)
                 attackTarget = obj.gameObject.GetComponent<Minions>().character;
-            attackTarget.charStat.decreaseHealth(10);
+            attackTarget.charStat.decreaseHealth(GetComponent<CharacterStats>().attackVal);
 
             if (attackTarget.checkIfDead())
                 attackTarget = null;

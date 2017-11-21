@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-
 public class DefaultCharacter : MonoBehaviour
 {
     public enum CharacterState

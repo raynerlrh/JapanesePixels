@@ -23,7 +23,6 @@ public class CharacterStats : MonoBehaviour {
     public UIProp defProp; 
 	// Use this for initialization
 	void Start () {
-        attackVal *= AttackMultiplier;
         if (transform.childCount > 0 && transform.GetChild(0).gameObject.layer == 9)
         {
             hpBar = GameObject.Instantiate(transform.GetChild(0).GetChild(0), transform.GetChild(0), false).gameObject;
@@ -31,6 +30,7 @@ public class CharacterStats : MonoBehaviour {
             defBar = GameObject.Instantiate(transform.GetChild(0).GetChild(1), transform.GetChild(0), false).gameObject;
             defBar.SetActive(true);
         }
+        updateAttkStat();
 	}
 	
 	// Update is called once per frame
@@ -104,5 +104,16 @@ public class CharacterStats : MonoBehaviour {
         defVal = DefenseMultiplier * hpSys.MAX_HEALTH;
         if (defBar != null)
             defProp.t_progbarwidth = defBar.transform.GetComponent<RectTransform>().sizeDelta.x / defVal;
+    }
+
+    public void updateAttkStat()
+    {
+        attackVal *= AttackMultiplier;
+        Inventory ivt = GetComponent<Inventory>();
+        if (ivt)
+        {
+            if (ivt.getEquipment)
+                attackVal += ivt.getEquipment.GetComponent<ObjectStats>().damage;
+        }
     }
 }

@@ -51,6 +51,7 @@ public class PlayerSkillController : MonoBehaviour
         {
             offensiveSkills[i] = new ShurikenAttack();
         }
+        offensiveSkills[1] = new DefaultAttack();
     }
 
     public bool CanPerformSkill(PlayerSkill _skill)
