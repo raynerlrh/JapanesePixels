@@ -3,6 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+public struct MovementStats
+{
+    public float moveSpeed;
+    public bool isMoving;
+    public Vector3 destinatePos;
+
+    public MovementStats(float movespd = 2f, bool startMoving = false)
+    {
+        moveSpeed = movespd;
+        isMoving = startMoving;
+        destinatePos = Vector3.zero;
+    }
+}
+
 public class PlayerMoveController : MonoBehaviour
 {
     public static PlayerMoveController instance = null;
@@ -39,6 +53,9 @@ public class PlayerMoveController : MonoBehaviour
     bool b_reachedTarget;
     bool b_touchedScreen;
 
+    private MovementStats moveStat;
+    private Rigidbody2D body;
+
     // Only for most foremost operations
     void Awake()
     {
@@ -65,6 +82,9 @@ public class PlayerMoveController : MonoBehaviour
         originalTile = new Tile();
         availableTile = new Tile();
         availableTile.sprite = availableTileSprite;
+        moveStat = new MovementStats(25f);
+        body = pawn_sprite.GetComponent<Rigidbody2D>();
+        body.gravityScale = 0.0f;
     }
 
     void Update()
@@ -75,11 +95,28 @@ public class PlayerMoveController : MonoBehaviour
             {
                 GameModeManager.instance.showDeathScreen();
             }
-
             if (b_answeredCorrectly)
                 UpdateInput();
 
             UpdateMovement();
+        }
+        //if (hasInteract())
+        //{
+        //    moveStat.destinatePos = GetTouchWPos();
+        //    moveStat.isMoving = true;
+        //}
+    }
+
+    void FixedUpdate()
+    {
+        if (moveStat.isMoving)
+        {
+            bool reached = UpdateFreeMovement(moveStat.destinatePos);
+            if (reached)
+            {
+                moveStat.isMoving = false;
+                //b_answeredCorrectly = false;
+            }
         }
     }
 
@@ -103,6 +140,53 @@ public class PlayerMoveController : MonoBehaviour
                 }
             }
         }
+    }
+
+    bool UpdateFreeMovement(Vector3 destination)
+    {
+        Vector3 wpos = pawn_sprite.transform.position;
+        float dist = Vector2.Distance(wpos, destination);
+        float speed = (moveStat.moveSpeed * (1 / dist) * Time.deltaTime);
+        if (dist > speed * 0.5f)
+        {
+            Vector2 direction = (destination - wpos).normalized;
+            body.MovePosition((Vector2)pawn_sprite.transform.position + direction * speed);
+        }
+        else
+            return true;
+        return false;
+    }
+
+    public Vector3 GetTouchWPos()
+    {
+#if UNITY_EDITOR
+        Vector3 temp = new Vector3(Input.mousePosition.x, Input.mousePosition.y, pawn_sprite.transform.position.z);
+        return Camera.main.ScreenToWorldPoint(temp);
+#elif UNITY_ANDROID
+        if (Input.touchCount > 0)
+        {
+            if (Input.GetTouch(0).phase.Equals(TouchPhase.Began))
+            {
+                return Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
+            }
+        }
+#endif
+        return Vector3.zero;
+    }
+
+    public bool hasInteract()
+    {
+#if UNITY_EDITOR
+        if (Input.GetMouseButtonDown(0))
+            return true;
+
+#elif UNITY_ANDROID
+        if (Input.touchCount > 0)
+        {
+        return true;
+        }
+#endif
+        return false;
     }
 
     void UpdateInput()
