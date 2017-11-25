@@ -2,17 +2,39 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct CamSettings
+{
+    public float yOffset;
+    public enum CamMode
+    {
+        E_PCENTERED,
+        E_OFFSET,
+    }
+    public CamMode mode;
+}
+
 public class CameraController : MonoBehaviour {
     public GameObject zoomTarget;
-    private float yOffset;
+    private CamSettings settings;
+    Vector3 pos;
+
 	// Use this for initialization
 	void Start () {
-        yOffset = Camera.main.orthographicSize;
+        settings.yOffset = Camera.main.orthographicSize;
+        settings.mode = CamSettings.CamMode.E_PCENTERED;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        Vector3 pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y - yOffset * 0.5f, transform.position.z);
+        if (settings.mode == CamSettings.CamMode.E_OFFSET)
+            pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y - settings.yOffset * 0.5f, transform.position.z);
+        else
+            pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y, transform.position.z);
         transform.position = pos;
 	}
+
+    public void switchMode(CamSettings.CamMode cameraMode)
+    {
+        settings.mode = cameraMode;
+    }
 }

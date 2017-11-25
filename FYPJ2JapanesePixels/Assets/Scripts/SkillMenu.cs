@@ -60,6 +60,8 @@ public class SkillMenu : MonoBehaviour
                 gameObject.SetActive(false);
 
             GameModeManager.instance.question.text.fontSize = 200;
+            Camera.main.GetComponent<CameraController>().switchMode(CamSettings.CamMode.E_PCENTERED);
+            PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_NONCOMBAT;
         }
         else
         {

@@ -9,6 +9,7 @@ TagManager:
   - 3DCanvas
   - 2DCanvas
   - InventoryItem
+  - Interactable
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - 3DUI
   - SolidObject
   - IgnoredByAll
-  - 
+  - Tilemap
   - 
   - 
   - 

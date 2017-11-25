@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.EventSystems;
 
 public struct MovementStats
 {
@@ -56,6 +57,16 @@ public class PlayerMoveController : MonoBehaviour
     private MovementStats moveStat;
     private Rigidbody2D body;
 
+    public enum PlayState
+    {
+        E_NONCOMBAT,
+        E_COMBAT
+    }
+    public LayerMask masker;
+
+    public PlayState e_playstate;
+    public bool isOver;
+
     // Only for most foremost operations
     void Awake()
     {
@@ -85,6 +96,8 @@ public class PlayerMoveController : MonoBehaviour
         moveStat = new MovementStats(25f);
         body = pawn_sprite.GetComponent<Rigidbody2D>();
         body.gravityScale = 0.0f;
+        e_playstate = PlayState.E_NONCOMBAT;
+        isOver = false;
     }
 
     void Update()
@@ -95,16 +108,23 @@ public class PlayerMoveController : MonoBehaviour
             {
                 GameModeManager.instance.showDeathScreen();
             }
-            if (b_answeredCorrectly)
-                UpdateInput();
 
-            UpdateMovement();
+            if (e_playstate.Equals(PlayState.E_COMBAT))
+            {
+                if (b_answeredCorrectly)
+                    UpdateInput();
+
+                UpdateMovement();
+            }
+            else
+            {
+                if (hasInteract())
+                {
+                    moveStat.destinatePos = GetTouchWPos();
+                    moveStat.isMoving = true;
+                }
+            }
         }
-        //if (hasInteract())
-        //{
-        //    moveStat.destinatePos = GetTouchWPos();
-        //    moveStat.isMoving = true;
-        //}
     }
 
     void FixedUpdate()
@@ -177,8 +197,24 @@ public class PlayerMoveController : MonoBehaviour
     public bool hasInteract()
     {
 #if UNITY_EDITOR
-        if (Input.GetMouseButtonDown(0))
-            return true;
+        if (Input.GetMouseButtonDown(0) && !isOver)
+        {
+            //if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject(-1) == false) // doesnt work
+            {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                // = LayerMask.NameToLayer("Tilemap");
+                Vector3 t = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                Vector3 fword = new Vector3(t.x, t.y, 5);
+                Vector3 origin = new Vector3(t.x, t.y, -10);
+                Vector3 dir = (fword - origin).normalized;
+                if (Physics2D.Raycast(origin, dir, Mathf.Infinity, 1 << LayerMask.NameToLayer("Tilemap")))
+                {
+                    //, Mathf.Infinity, LayerMask.NameToLayer("Tilemap")
+                    Debug.DrawRay(origin, 100 * dir, Color.blue, Mathf.Infinity);
+                    return true;
+                }
+            }
+        }
 
 #elif UNITY_ANDROID
         if (Input.touchCount > 0)
@@ -187,6 +223,19 @@ public class PlayerMoveController : MonoBehaviour
         }
 #endif
         return false;
+    }
+
+    public void disableInteraction()
+    {
+        //Debug.Log("tt");
+        isOver = true;
+    }
+
+    public void enableInteraction()
+    {
+
+        //Debug.Log("ttf");
+        isOver = false;
     }
 
     void UpdateInput()

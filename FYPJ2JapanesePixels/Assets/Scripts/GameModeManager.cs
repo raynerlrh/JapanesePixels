@@ -42,9 +42,13 @@ public class GameModeManager : MonoBehaviour
 
         question = GameObject.Find("Canvas").GetComponent<LanguageSystem>();
         GetComponent<RLEnvironment>().BeginLearning();
-
-        t_progbar = GameObject.Find("AIProgressBar").GetComponent<RectTransform>();
-        aiprogress.t_progbarwidth = t_progbar.sizeDelta.x / 100;
+        GameObject progressBar = GameObject.Find("AIProgressBar");
+        if (progressBar)
+        {
+            t_progbar = progressBar.GetComponent<RectTransform>();
+            //if (aiprogress)
+            aiprogress.t_progbarwidth = t_progbar.sizeDelta.x / 100;
+        }
     }
 
     void Update()
@@ -109,7 +113,8 @@ public class GameModeManager : MonoBehaviour
         int g = n - act;
         if (g < 0)
             g = -g;
-        t_progbar.sizeDelta = new Vector2(160 - aiprogress.t_progbarwidth * g, t_progbar.sizeDelta.y);
+        if (t_progbar)
+            t_progbar.sizeDelta = new Vector2(160 - aiprogress.t_progbarwidth * g, t_progbar.sizeDelta.y);
         StartCoroutine(GetComponent<RLEnvironment>().Act());
         //StartCoroutine(delaylearning());
         return reward;
@@ -121,6 +126,7 @@ public class GameModeManager : MonoBehaviour
         {
             //GetComponent<RLEnvironment>().resetagent();
             question.text.fontSize = 0;
+            Camera.main.GetComponent<CameraController>().switchMode(CamSettings.CamMode.E_OFFSET);
         }
     }
 

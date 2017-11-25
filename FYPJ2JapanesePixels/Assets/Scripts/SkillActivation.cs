@@ -32,7 +32,7 @@ public class SkillActivation : MonoBehaviour
 
                 // Turn on player movement grid
                 TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(true);
-
+                PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
                 // Display respective skill menu
                 if (skillType == SKILL_TYPE.TYPE_DEFENSIVE)
                     defensiveMenu.gameObject.SetActive(true);
@@ -63,7 +63,13 @@ public class SkillActivation : MonoBehaviour
         if (obj.gameObject.layer == 8)
         {
             if (attackTarget == null)
-                attackTarget = obj.gameObject.GetComponent<Minions>().character;
+            {
+                if (obj.gameObject.GetComponent<Minions>())
+                    attackTarget = obj.gameObject.GetComponent<Minions>().character;
+                else
+                    attackTarget = obj.gameObject.GetComponent<DefaultCharacter>();
+
+            }
             attackTarget.charStat.decreaseHealth(GetComponent<CharacterStats>().attackVal);
 
             if (attackTarget.checkIfDead())
