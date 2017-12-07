@@ -32,7 +32,7 @@ public class SkillActivation : MonoBehaviour
 
                 // Turn on player movement grid
                 TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(true);
-                PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
+                //PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
                 // Display respective skill menu
                 if (skillType == SKILL_TYPE.TYPE_DEFENSIVE)
                     defensiveMenu.gameObject.SetActive(true);

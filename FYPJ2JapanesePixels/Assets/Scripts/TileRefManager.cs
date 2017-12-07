@@ -20,6 +20,7 @@ public class TileRefManager : MonoBehaviour
         TILEMAP_ENEMY,
         TILEMAP_PLAYER,
         TILEMAP_GRIDCELLS,
+        TILEMAP_SOLIDWALL,
     }
 
     // Only for most foremost operations
