@@ -5,4 +5,10 @@ using UnityEngine;
 public class ObjectStats : MonoBehaviour 
 {
     public float damage;
+    
+    protected void DestroySelf()
+    {
+        Destroy(this.gameObject);
+    }
+
 }
