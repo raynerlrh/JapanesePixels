@@ -12,7 +12,8 @@ public class ShurikenAttack : PlayerSkill
     public string skillName { get; set; }
 
     GameObject shurikenPrefab;
-    GameObject[] shurikenClone;
+    //GameObject[] shurikenClone;
+    List<GameObject> shurikenClone;
 
     int totalAttackDist;
     int startingPos;
@@ -24,15 +25,15 @@ public class ShurikenAttack : PlayerSkill
         numMoves = 1;
         damage = 10;
 
+        shurikenClone = new List<GameObject>();
         shurikenPrefab = (GameObject)Resources.Load("Prefabs/Shuriken", typeof(GameObject));
         shurikenPrefab.GetComponent<ObjectStats>().damage = damage;
-        shurikenClone = new GameObject[PlayerMoveController.MAX_MOVES];
         cellsAffected = 3;
     }
 
     public void ExecuteSkill()
     {
-        //Debug.Log("Executed Skill: " + skillName);
+        Debug.Log("Executed Skill: " + skillName);
 
         b_needsUpdate = true;
 
@@ -55,8 +56,8 @@ public class ShurikenAttack : PlayerSkill
     {
         if (NoShurikensActive())
             b_needsUpdate = false;
-        
-        for (int i = 0; i < shurikenClone.Length; i++)
+
+        for (int i = 0; i < shurikenClone.Count; i++)
         {
             if (shurikenClone[i] == null)
                 continue;
@@ -72,19 +73,14 @@ public class ShurikenAttack : PlayerSkill
 
     void InstantiateInactiveShuriken(Vector2 playerPos)
     {
-        for (int i = 0; i < shurikenClone.Length; i++)
-        {
-            if (shurikenClone[i] == null)
-            {
-                shurikenClone[i] = GameObject.Instantiate(shurikenPrefab, playerPos, Quaternion.identity);
-                return;
-            }
-        }
+        GameObject _shuriken = GameObject.Instantiate(shurikenPrefab, playerPos, Quaternion.identity);
+
+        shurikenClone.Add(_shuriken);
     }
 
     bool NoShurikensActive()
     {
-        for (int i = 0; i < shurikenClone.Length; i++)
+        for (int i = 0; i < shurikenClone.Count; i++)
         {
             if (shurikenClone[i] != null)
                 return false;

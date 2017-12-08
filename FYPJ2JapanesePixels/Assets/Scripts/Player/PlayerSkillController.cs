@@ -57,18 +57,18 @@ public class PlayerSkillController : MonoBehaviour
     public bool CanPerformSkill(PlayerSkill _skill)
     {
         // Check health stuff first
-        //if (_skill.skillName == "Heal")
-        //{
-        //    float playerHealth = PlayerMoveController.instance.GetPawn.charStat.hpSys.health;
-        //    if (playerHealth == PlayerMoveController.instance.GetPawn.charStat.hpSys.MAX_HEALTH)
-        //        return true;// return false;
-        //}
+        if (_skill.skillName == "Heal")
+        {
+            float playerHealth = PlayerMoveController.instance.GetPawn.charStat.hpSys.health;
+            if (playerHealth == PlayerMoveController.instance.GetPawn.charStat.hpSys.MAX_HEALTH)
+                return false;
+        }
 
         PlayerMoveController playerMove = PlayerMoveController.instance;
 
-        if ((playerMove.numMovesMade + _skill.numMoves) <= PlayerMoveController.MAX_MOVES)
+        if ((playerMove.numAvailableMoves - _skill.numMoves) >= 0)
         {
-            playerMove.numMovesMade += _skill.numMoves;
+            playerMove.numAvailableMoves -= _skill.numMoves;
             return true;
         }
 

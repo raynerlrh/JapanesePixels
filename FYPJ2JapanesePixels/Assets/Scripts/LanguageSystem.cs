@@ -3,24 +3,42 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
+[System.Serializable]
+public class Quiz
+{
+    public LanguageData languageData;
+}
+
+[System.Serializable]
+public class LanguageData
+{
+    public Question[] questions;
+}
+
+[System.Serializable]
+public class Question
+{
+    public QuestionData[] questionData;
+}
+
+[System.Serializable]
+public class QuestionData
+{
+    public string symbol;
+    public string letter;
+}
+
 public class LanguageSystem : MonoBehaviour 
 {
-    public struct Group
-    {
-        public string jap;
-        public string[] letters;
-    }
+    Quiz _quiz;
 
-    Dictionary<int, Group> hiraganaMap;
-    Group activeGroup;
-    int activeGroupIndex;
+    int activeQuestionGroupIndex;
+    int activeQuestionIndex;
 
     int numPlays; // a temp condition for prototype
 
-    public Text text;
+    public Text questionText;
     public Transform buttons;
-
-    public int theLetterIndex { get; set; }
 
     bool[] optionIndexTaken;
 
@@ -29,19 +47,53 @@ public class LanguageSystem : MonoBehaviour
 
     void Start()
     {
-        hiraganaMap = new Dictionary<int, Group>();
-        LoadHiragana();
+        string url = "http://fyp2-japanese-pixels.appspot.com/jp_hiragana";
+        WWW www = new WWW(url);
+        StartCoroutine(WaitForRequest(www));
+    }
 
-        optionIndexTaken = new bool[activeGroup.letters.Length];
+    IEnumerator WaitForRequest(WWW www)
+    {
+        yield return www;
 
-        DisplayQuiz();
+        // check for errors
+        if (www.error == null)
+        {
+            _quiz = JsonUtility.FromJson<Quiz>(www.text);
+
+            activeQuestionGroupIndex = 0; // start from aiueo
+            activeQuestionIndex = Random.Range(0, GetActiveQuestionGroup().questionData.Length);
+            optionIndexTaken = new bool[GetActiveQuestionGroup().questionData.Length];
+
+            DisplayQuiz();
+
+            Debug.Log("WWW Ok!");
+        }
+        else
+        {
+            Debug.Log("WWW Error: " + www.error);
+        }
+    }
+
+    Question GetActiveQuestionGroup()
+    {
+        return _quiz.languageData.questions[activeQuestionGroupIndex];
+    }
+
+    QuestionData GetActiveQuestion()
+    {
+        return _quiz.languageData.questions[activeQuestionGroupIndex].questionData[activeQuestionIndex];
+    }
+
+    public int GetQuestionIndex()
+    {
+        return activeQuestionIndex;
     }
 
     void DisplayQuiz()
     {
-        theLetterIndex = 0;//Random.Range(0, hiragana.Length);
         // get question ui and give it a hiragana character
-        text.text = System.Convert.ToString(activeGroup.jap[theLetterIndex]);
+        questionText.text = System.Convert.ToString(GetActiveQuestion().symbol);
 
         // Display randomized options on buttons
         for (int i = 0; i < buttons.transform.childCount; i++)
@@ -64,8 +116,8 @@ public class LanguageSystem : MonoBehaviour
         while (!firstOptionShown || optionIndexTaken[theOptionIndex])
         {
             firstOptionShown = true;
-            theOptionIndex = Random.Range(0, activeGroup.letters.Length);
-            option = activeGroup.letters[theOptionIndex];
+            theOptionIndex = Random.Range(0, GetActiveQuestionGroup().questionData.Length);
+            option = GetActiveQuestionGroup().questionData[theOptionIndex].letter;
         }
 
         optionIndexTaken[theOptionIndex] = true;
@@ -74,98 +126,13 @@ public class LanguageSystem : MonoBehaviour
 
     int GetAnswerIndexFromAnswer(string ans)
     {
-        for (int i = 0; i < activeGroup.letters.Length; i++)
+        for (int i = 0; i < GetActiveQuestionGroup().questionData.Length; i++)
         {
-            if (activeGroup.letters[i] == ans)
+            if (GetActiveQuestion().letter == ans)
                 return i;
         }
 
         return 0;
-    }
-
-    // Temp definition
-    void LoadHiragana()
-    {
-        int numChar;
-
-        Group h_0 = new Group();
-        Group h_1 = new Group();
-        Group h_2 = new Group();
-
-        numChar = 5;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_0.jap += System.Convert.ToChar(System.Convert.ToInt32('あ') + (i + i));
-        }
-        h_0.letters = new[] {"a", "i", "u", "e", "o"};
-
-        numChar = 5;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_1.jap += System.Convert.ToChar(System.Convert.ToInt32('か') + (i + i));
-        }
-        h_1.letters = new[] { "ka", "ki", "ku", "ke", "ko" };
-
-        numChar = 5;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_2.jap += System.Convert.ToChar(System.Convert.ToInt32('さ') + (i + i));
-        }
-        h_2.letters = new[] { "sa", "shi", "su", "se", "so" };
-
-        /*numChar = 5;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_3 += System.Convert.ToChar(System.Convert.ToInt32('た') + (i + i));
-            //h_3 += System.Convert.ToChar(System.Convert.ToInt32('た') + 9);
-        }
-
-        numChar = 5;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_4 += System.Convert.ToChar(System.Convert.ToInt32('な') + (i + i));
-        }
-
-        numChar = 5;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_5 += System.Convert.ToChar(System.Convert.ToInt32('は') + (i + i));
-        }
-
-        numChar = 5;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_6 += System.Convert.ToChar(System.Convert.ToInt32('ま') + (i + i));
-        }
-
-        numChar = 3;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_7 += System.Convert.ToChar(System.Convert.ToInt32('や') + (i + i));
-        }
-
-        numChar = 5;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_8 += System.Convert.ToChar(System.Convert.ToInt32('ら') + (i + i));
-        }
-
-        numChar = 2;
-        for (int i = 0; i < numChar; ++i)
-        {
-            h_9 += System.Convert.ToChar(System.Convert.ToInt32('わ') + (i + i));
-        }*/
-
-        hiraganaMap.Add(0, h_0);
-        hiraganaMap.Add(1, h_1);
-        hiraganaMap.Add(2, h_2);
-
-        activeGroupIndex = 0; // start from aiueo
-        hiraganaMap.TryGetValue(activeGroupIndex, out activeGroup);
-
-        //Group test;
-        //myMap.TryGetValue(0, out test);
-        //Debug.Log(test.letters[0]);
     }
 
     /// <summary>
@@ -173,33 +140,35 @@ public class LanguageSystem : MonoBehaviour
     /// </summary>
     public void refreshQuestion()
     {
-        //if (numPlays >= 5)
-        //{
-        //    activeGroupIndex++;
-        //    if (activeGroupIndex > 2)
-        //        activeGroupIndex = 0;
+        // Change hiragana group
+        if (numPlays >= 5)
+        {
+            activeQuestionGroupIndex++;
+            if (activeQuestionGroupIndex > 2)
+                activeQuestionGroupIndex = 0;
 
-        //    hiraganaMap.TryGetValue(activeGroupIndex, out activeGroup);
-           
-        //    firstOptionShown = false;
-        //    theOptionIndex = 0;
-        //    for (int i = 0; i < optionIndexTaken.Length; i++)
-        //    {
-        //        optionIndexTaken[i] = false;
-        //    }
+            firstOptionShown = false;
+            theOptionIndex = 0;
+            //for (int i = 0; i < optionIndexTaken.Length; i++)
+            //{
+            //    optionIndexTaken[i] = false;
+            //}
 
-        //    DisplayQuiz();
+            optionIndexTaken = new bool[GetActiveQuestionGroup().questionData.Length];
 
-        //    numPlays = 0;
-        //}
+            DisplayQuiz();
 
-        int newLetterIndex = Random.Range(0, activeGroup.letters.Length);
-        while (theLetterIndex != newLetterIndex)
+            numPlays = 0;
+        }
+        
+        int newQuestionIndex = Random.Range(0, GetActiveQuestionGroup().questionData.Length);
+        while (activeQuestionIndex != newQuestionIndex)
         {
             numPlays++;
-            theLetterIndex = newLetterIndex;
+            activeQuestionIndex = newQuestionIndex;
+
             // get question ui and give it a hiragana character
-            text.text = System.Convert.ToString(activeGroup.jap[theLetterIndex]);
+            questionText.text = System.Convert.ToString(GetActiveQuestion().symbol);
         }
     }
 }

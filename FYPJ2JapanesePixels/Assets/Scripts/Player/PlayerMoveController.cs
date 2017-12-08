@@ -31,7 +31,7 @@ public class PlayerMoveController : MonoBehaviour
         }
     }
 
-    public const int MAX_MOVES = 5;
+    //public const int MAX_MOVES = 5;
     GameGrid gameGrid;
 
     [SerializeField]
@@ -48,7 +48,7 @@ public class PlayerMoveController : MonoBehaviour
     Vector2 playerPos;
     Vector2 targetTilePos;
 
-    public int numMovesMade { get; set; }
+    public int numAvailableMoves { get; set; }
     public bool b_answeredCorrectly { get; set; }
     bool b_shownCrossTiles;
     bool b_reachedTarget;
@@ -88,7 +88,6 @@ public class PlayerMoveController : MonoBehaviour
         Vector2 startingPos = gameGrid.GetCellToWorld(new Vector3Int(-3, 0, 0));
         pawn_sprite.transform.position = new Vector3(startingPos.x, startingPos.y, 0);
         playerPos = pawn_sprite.transform.position;
-        numMovesMade = 0;
 
         originalTile = new Tile();
         availableTile = new Tile();
@@ -102,27 +101,27 @@ public class PlayerMoveController : MonoBehaviour
 
     void Update()
     {
-        if (pawn_sprite.activeSelf)
+        if (!pawn_sprite.activeSelf)
+            return;
+
+        if (pawn.checkIfDead())
         {
-            if (pawn.checkIfDead())
-            {
-                GameModeManager.instance.showDeathScreen();
-            }
+            GameModeManager.instance.showDeathScreen();
+        }
 
-            if (e_playstate.Equals(PlayState.E_COMBAT))
-            {
-                if (b_answeredCorrectly)
-                    UpdateInput();
+        if (e_playstate.Equals(PlayState.E_COMBAT))
+        {
+            if (b_answeredCorrectly)
+                UpdateInput();
 
-                UpdateMovement();
-            }
-            else
+            UpdateMovement();
+        }
+        else
+        {
+            if (hasInteract())
             {
-                if (hasInteract())
-                {
-                    moveStat.destinatePos = GetTouchWPos();
-                    moveStat.isMoving = true;
-                }
+                moveStat.destinatePos = GetTouchWPos();
+                moveStat.isMoving = true;
             }
         }
     }
@@ -191,7 +190,6 @@ public class PlayerMoveController : MonoBehaviour
             }
         }
 #endif
-        return Vector3.zero;
     }
 
     public bool hasInteract()
@@ -240,8 +238,6 @@ public class PlayerMoveController : MonoBehaviour
 
     void UpdateInput()
     {
-        //Debug.Log(numMovesMade);
-
         if (NoMovesLeft())
         {
             SetCrossTiles(originalTile);
@@ -303,10 +299,9 @@ public class PlayerMoveController : MonoBehaviour
                             if (!NoMovesLeft())
                             {
                                 targetTilePos = gameGrid.GetCellToWorld(tilePos);
-                                numMovesMade = 1;
+                                numAvailableMoves--;
                                 gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, tilePos, availableTile);
                                 b_reachedTarget = false;
-                                //Debug.Log(numMovesMade);
                                 continue;
                             }
                         }
@@ -356,13 +351,7 @@ public class PlayerMoveController : MonoBehaviour
 
     public bool NoMovesLeft()
     {
-        return (numMovesMade >= MAX_MOVES);
-    }
-
-    public void ResetNumMovesWhenNoneLeft()
-    {
-        if (NoMovesLeft())
-            numMovesMade = 0;
+        return (numAvailableMoves > 0);
     }
 
     // why all these here

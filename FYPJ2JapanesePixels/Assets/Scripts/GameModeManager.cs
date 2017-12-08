@@ -64,7 +64,7 @@ public class GameModeManager : MonoBehaviour
     public int GetRewards(int act, int previousAction)
     {
         int reward;
-        int n = question.theLetterIndex + 1;
+        int n = question.GetQuestionIndex() + 1;
         RLEnvironment env = GetComponent<RLEnvironment>();
         //if (Mathf.Abs(n - act) > Mathf.Abs(n - previousAction))
         //{
@@ -125,7 +125,7 @@ public class GameModeManager : MonoBehaviour
         if (wrong == false)
         {
             //GetComponent<RLEnvironment>().resetagent();
-            question.text.fontSize = 0;
+            //question.text.fontSize = 0;
             Camera.main.GetComponent<CameraController>().switchMode(CamSettings.CamMode.E_OFFSET);
         }
     }

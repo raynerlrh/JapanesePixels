@@ -1,16 +1,18 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SkillMenu : MonoBehaviour 
 {
     public float speed;
     public GameObject buttons;
+    public Transform defensiveSkills;
+    public Transform offensiveSkills;
+    public Text availableMovesText;
 
     Vector2 originalPos;
     bool disabled;
-
-    public SkillActivation.SKILL_TYPE skillType;
 
     void Awake()
     {
@@ -26,19 +28,13 @@ public class SkillMenu : MonoBehaviour
         PlayerSkillController playerSkills = PlayerSkillController.instance;
 
         // Set skills 
-        if (skillType == SkillActivation.SKILL_TYPE.TYPE_DEFENSIVE)
+        for (int i = 0; i < defensiveSkills.childCount; i++)
         {
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.defensiveSkills[i]);
-            }
+            defensiveSkills.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.defensiveSkills[i]);
         }
-        else
+        for (int i = 0; i < offensiveSkills.childCount; i++)
         {
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.offensiveSkills[i]);
-            }
+            offensiveSkills.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.offensiveSkills[i]);
         }
     }
 
@@ -51,19 +47,21 @@ public class SkillMenu : MonoBehaviour
 
     void Update()
     {
+        availableMovesText.text = PlayerMoveController.instance.numAvailableMoves.ToString();
+
         // Menu animations
-        if (PlayerMoveController.instance.NoMovesLeft())
-        {
-            transform.localPosition = Vector2.MoveTowards(transform.localPosition, originalPos, speed * Time.deltaTime);
+        //if (PlayerMoveController.instance.NoMovesLeft())
+        //{
+        //    transform.localPosition = Vector2.MoveTowards(transform.localPosition, originalPos, speed * Time.deltaTime);
 
-            if (transform.localPosition == new Vector3(originalPos.x, originalPos.y, transform.localPosition.z))
-                gameObject.SetActive(false);
+        //    if (transform.localPosition == new Vector3(originalPos.x, originalPos.y, transform.localPosition.z))
+        //        gameObject.SetActive(false);
 
-            GameModeManager.instance.question.text.fontSize = 200;
-            Camera.main.GetComponent<CameraController>().switchMode(CamSettings.CamMode.E_PCENTERED);
-            PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_NONCOMBAT;
-        }
-        else
+        //    GameModeManager.instance.question.text.fontSize = 200;
+        //    Camera.main.GetComponent<CameraController>().switchMode(CamSettings.CamMode.E_PCENTERED);
+        //    PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_NONCOMBAT;
+        //}
+        //else
         {
             transform.localPosition = Vector2.MoveTowards(transform.localPosition, new Vector2(0, transform.localPosition.y), speed * Time.deltaTime);
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SkillActivation : MonoBehaviour
 {
@@ -8,36 +9,25 @@ public class SkillActivation : MonoBehaviour
     // The char being targeted so that attacks are focused on target
     private DefaultCharacter attackTarget;
 
-    public enum SKILL_TYPE
-    {
-        TYPE_DEFENSIVE,
-        TYPE_OFFENSIVE,
-    }
-
-    public SKILL_TYPE skillType;
-
-    public SkillMenu defensiveMenu;
-    public SkillMenu offensiveMenu;
+    public SkillMenu skillMenu;
+    public GameObject quizElements;
+    public Text availableMovesText;
 
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.tag == "AnswerOption")
         {
-            if (col.gameObject.GetComponent<LanguageButton>().buttonIndex == languageSystem.theLetterIndex)
+            if (col.gameObject.GetComponent<LanguageButton>().buttonIndex == languageSystem.GetQuestionIndex())
             {
                 languageSystem.refreshQuestion();
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", false);
                 PlayerMoveController.instance.b_answeredCorrectly = true;
-                PlayerMoveController.instance.ResetNumMovesWhenNoneLeft();
+                PlayerMoveController.instance.numAvailableMoves++;
+                availableMovesText.text = PlayerMoveController.instance.numAvailableMoves.ToString();
 
                 // Turn on player movement grid
                 TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(true);
                 PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
-                // Display respective skill menu
-                if (skillType == SKILL_TYPE.TYPE_DEFENSIVE)
-                    defensiveMenu.gameObject.SetActive(true);
-                else
-                    offensiveMenu.gameObject.SetActive(true);
 
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(1, 1);
             }
@@ -49,7 +39,7 @@ public class SkillActivation : MonoBehaviour
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(0, 1);
-                //languageSystem.text.gameObject.GetComponent<LanguageButton>().highlightCorrect();
+                col.gameObject.GetComponent<LanguageButton>().highlightCorrect();
             }
         }
     }
@@ -75,5 +65,13 @@ public class SkillActivation : MonoBehaviour
             if (attackTarget.checkIfDead())
                 attackTarget = null;
         }
+    }
+
+    public void DisplaySkillMenu()
+    {
+        skillMenu.gameObject.SetActive(true);
+
+        // Turn off quiz elements
+        quizElements.SetActive(false);
     }
 }
