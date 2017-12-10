@@ -12,7 +12,7 @@ public class DefaultAttack : PlayerSkill {
 
     public DefaultAttack()
     {
-        skillName = "Drop bomb";
+        skillName = "Default Attack: Drop bomb";
         numMoves = 1;
         b_needsUpdate = false;
     }

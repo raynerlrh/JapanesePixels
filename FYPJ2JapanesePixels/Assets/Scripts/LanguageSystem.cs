@@ -45,7 +45,7 @@ public class LanguageSystem : MonoBehaviour
     bool firstOptionShown;
     int theOptionIndex;
 
-    void Start()
+    void Awake()
     {
         string url = "http://fyp2-japanese-pixels.appspot.com/jp_hiragana";
         WWW www = new WWW(url);
@@ -67,7 +67,8 @@ public class LanguageSystem : MonoBehaviour
 
             DisplayQuiz();
 
-            Debug.Log("WWW Ok!");
+            Debug.Log("WWW OK!");
+            //gameObject.SetActive(false);
         }
         else
         {
@@ -90,7 +91,7 @@ public class LanguageSystem : MonoBehaviour
         return activeQuestionIndex;
     }
 
-    void DisplayQuiz()
+    void DisplayQuiz(bool b_changedQuestionGroup = true)
     {
         // get question ui and give it a hiragana character
         questionText.text = System.Convert.ToString(GetActiveQuestion().symbol);
@@ -98,14 +99,17 @@ public class LanguageSystem : MonoBehaviour
         // Display randomized options on buttons
         for (int i = 0; i < buttons.transform.childCount; i++)
         {
-            // Get unused options
-            string theOption = GetRandomizedOption();
+            if (b_changedQuestionGroup)
+            {
+                // Get unused options
+                string theOption = GetRandomizedOption();
 
-            // Set the option text
-            buttons.GetChild(i).GetChild(0).GetComponent<Text>().text = theOption; //System.Convert.ToString(theOption);
-            
-            // Set the button index
-            buttons.GetChild(i).GetComponent<LanguageButton>().buttonIndex = GetAnswerIndexFromAnswer(theOption);
+                // Set the option text on buttons
+                buttons.GetChild(i).GetChild(0).GetComponent<Text>().text = theOption;
+            }
+
+            // Set the button with the correct answer
+            SetAnswerButton(GetActiveQuestion().letter);
         }
     }
 
@@ -124,15 +128,24 @@ public class LanguageSystem : MonoBehaviour
         return option;
     }
 
-    int GetAnswerIndexFromAnswer(string ans)
+    void SetAnswerButton(string ans)
     {
         for (int i = 0; i < GetActiveQuestionGroup().questionData.Length; i++)
         {
-            if (GetActiveQuestion().letter == ans)
-                return i;
+            if (buttons.GetChild(i).GetChild(0).GetComponent<Text>().text == ans)
+            {
+                buttons.GetChild(i).GetComponent<LanguageButton>().b_answer = true;
+                return;
+            }
         }
+    }
 
-        return 0;
+    void ResetAnswerButton()
+    {
+        for (int i = 0; i < GetActiveQuestionGroup().questionData.Length; i++)
+        {
+            buttons.GetChild(i).GetComponent<LanguageButton>().b_answer = false;
+        }
     }
 
     /// <summary>
@@ -141,7 +154,7 @@ public class LanguageSystem : MonoBehaviour
     public void refreshQuestion()
     {
         // Change hiragana group
-        if (numPlays >= 5)
+        if (numPlays >= 15)
         {
             activeQuestionGroupIndex++;
             if (activeQuestionGroupIndex > 2)
@@ -149,15 +162,9 @@ public class LanguageSystem : MonoBehaviour
 
             firstOptionShown = false;
             theOptionIndex = 0;
-            //for (int i = 0; i < optionIndexTaken.Length; i++)
-            //{
-            //    optionIndexTaken[i] = false;
-            //}
-
             optionIndexTaken = new bool[GetActiveQuestionGroup().questionData.Length];
 
             DisplayQuiz();
-
             numPlays = 0;
         }
         
@@ -167,8 +174,10 @@ public class LanguageSystem : MonoBehaviour
             numPlays++;
             activeQuestionIndex = newQuestionIndex;
 
-            // get question ui and give it a hiragana character
-            questionText.text = System.Convert.ToString(GetActiveQuestion().symbol);
+            // Reset bools
+            ResetAnswerButton();
+
+            DisplayQuiz(false);
         }
     }
 }

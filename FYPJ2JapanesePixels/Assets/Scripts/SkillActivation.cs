@@ -9,21 +9,19 @@ public class SkillActivation : MonoBehaviour
     // The char being targeted so that attacks are focused on target
     private DefaultCharacter attackTarget;
 
-    public SkillMenu skillMenu;
-    public GameObject quizElements;
-    public Text availableMovesText;
-
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.tag == "AnswerOption")
         {
-            if (col.gameObject.GetComponent<LanguageButton>().buttonIndex == languageSystem.GetQuestionIndex())
+            //Debug.Log("answer: " + languageSystem.GetQuestionIndex());
+            if (col.gameObject.GetComponent<LanguageButton>().b_answer)
             {
+                col.gameObject.GetComponent<LanguageButton>().highlightCorrect();
                 languageSystem.refreshQuestion();
+
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", false);
                 PlayerMoveController.instance.b_answeredCorrectly = true;
                 PlayerMoveController.instance.numAvailableMoves++;
-                availableMovesText.text = PlayerMoveController.instance.numAvailableMoves.ToString();
 
                 // Turn on player movement grid
                 TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(true);
@@ -39,7 +37,6 @@ public class SkillActivation : MonoBehaviour
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(0, 1);
-                col.gameObject.GetComponent<LanguageButton>().highlightCorrect();
             }
         }
     }
@@ -65,13 +62,5 @@ public class SkillActivation : MonoBehaviour
             if (attackTarget.checkIfDead())
                 attackTarget = null;
         }
-    }
-
-    public void DisplaySkillMenu()
-    {
-        skillMenu.gameObject.SetActive(true);
-
-        // Turn off quiz elements
-        quizElements.SetActive(false);
     }
 }

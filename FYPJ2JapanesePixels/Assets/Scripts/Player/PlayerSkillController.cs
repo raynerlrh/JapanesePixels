@@ -15,29 +15,11 @@ public class PlayerSkillController : MonoBehaviour
             instance = this;
         else if (instance != this)
             Destroy(gameObject);
-    }
 
-    void Start()
-    {
         defensiveSkills = new PlayerSkill[3];
         offensiveSkills = new PlayerSkill[3];
 
         LoadSkills();
-    }
-
-    void Update()
-    {
-        for (int i = 0; i < defensiveSkills.Length; i++)
-        {
-            if (defensiveSkills[i].b_needsUpdate)
-                defensiveSkills[i].Update();
-        }
-
-        for (int i = 0; i < offensiveSkills.Length; i++)
-        {
-            if (offensiveSkills[i].b_needsUpdate)
-                offensiveSkills[i].Update();
-        }
     }
 
     void LoadSkills() // going to load skills from some file later
@@ -51,6 +33,7 @@ public class PlayerSkillController : MonoBehaviour
         {
             offensiveSkills[i] = new ShurikenAttack();
         }
+
         offensiveSkills[1] = new DefaultAttack();
     }
 

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class LanguageButton : MonoBehaviour 
 {
-    public int buttonIndex { get; set; }
+    public bool b_answer { get; set; }
     public float ShowAnswerHowLong = 5;
     private TimerRoutine resetColourTime;
     private Color originalColour;

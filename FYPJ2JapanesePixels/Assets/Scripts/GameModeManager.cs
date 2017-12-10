@@ -39,8 +39,6 @@ public class GameModeManager : MonoBehaviour
 
     void Start()
     {
-
-        question = GameObject.Find("Canvas").GetComponent<LanguageSystem>();
         GetComponent<RLEnvironment>().BeginLearning();
         GameObject progressBar = GameObject.Find("AIProgressBar");
         if (progressBar)
