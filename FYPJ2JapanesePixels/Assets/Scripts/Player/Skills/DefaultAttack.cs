@@ -22,13 +22,7 @@ public class DefaultAttack : PlayerSkill {
         damage = PlayerMoveController.instance.GetPawn.GetComponent<CharacterStats>().attackVal;
         Transform playerTrans = PlayerMoveController.instance.GetPawn.gameObject.transform;
         Vector3Int playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
-        playerPos.Set(playerPos.x + 1, playerPos.y, playerPos.z);
-        bool passThrough = false;
-        if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, playerPos))
-        {
-            playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
-            passThrough = true;
-        }
+        bool passThrough = true;
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(playerPos);
         GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, playerTrans.rotation);
         if (passThrough)

@@ -28,7 +28,7 @@ public class RLEnvironment : MonoBehaviour {
 	void Start () {
         envVars.prevAction = -1;
         envVars.trialsTrained = 0;
-        envVars.pauseAction = false;
+        envVars.pauseAction = true;
 	}
 	
 	// Update is called once per frame

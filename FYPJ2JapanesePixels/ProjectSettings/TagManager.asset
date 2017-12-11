@@ -25,8 +25,8 @@ TagManager:
   - IgnoredByAll
   - Tilemap
   - Wall
-  - 
-  - 
+  - Player
+  - NPC
   - 
   - 
   - 

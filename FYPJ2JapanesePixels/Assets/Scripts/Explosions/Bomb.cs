@@ -50,8 +50,9 @@ public class Bomb : ObjectStats {
 
             //}
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
-            GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
-            bomb.SetActive(true);
+            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
+            flame.GetComponent<Flame>().damage = damage;
+            flame.SetActive(true);
         }
 
         for (int x = -1; x >= -effectRange; --x)
@@ -63,8 +64,9 @@ public class Bomb : ObjectStats {
                 break;
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
-            GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
-            bomb.SetActive(true);
+            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
+            flame.GetComponent<Flame>().damage = damage;
+            flame.SetActive(true);
         }
 
         for (int y = 0; y <= effectRange; ++y)
@@ -76,8 +78,9 @@ public class Bomb : ObjectStats {
                 break;
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
-            GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
-            bomb.SetActive(true);
+            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
+            flame.GetComponent<Flame>().damage = damage;
+            flame.SetActive(true);
         }
 
         for (int y = -1; y >= -effectRange; --y)
@@ -87,14 +90,15 @@ public class Bomb : ObjectStats {
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, spawnCell))
                 break;
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
-            GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
-            bomb.SetActive(true);
+            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
+            flame.GetComponent<Flame>().damage = damage;
+            flame.SetActive(true);
         }
     }
 
     void OnTriggerEnter2D(Collider2D obj)
     {
-        if (obj.gameObject.layer == 10 && hasMoved)
+        if  ((obj.gameObject.layer == 14 || obj.gameObject.layer == 15) && hasMoved )
             GetComponent<Collider2D>().isTrigger = false;
         else
             hasMoved = false;
