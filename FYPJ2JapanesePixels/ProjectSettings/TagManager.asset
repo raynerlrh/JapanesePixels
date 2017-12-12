@@ -26,8 +26,8 @@ TagManager:
   - Tilemap
   - Wall
   - Player
-  - NPC
-  - 
+  - Computer
+  - ComputerTrigger
   - 
   - 
   - 

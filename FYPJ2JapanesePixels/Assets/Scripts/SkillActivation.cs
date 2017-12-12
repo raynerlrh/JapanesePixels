@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SkillActivation : MonoBehaviour
 {
@@ -8,48 +9,35 @@ public class SkillActivation : MonoBehaviour
     // The char being targeted so that attacks are focused on target
     private DefaultCharacter attackTarget;
 
-    public enum SKILL_TYPE
-    {
-        TYPE_DEFENSIVE,
-        TYPE_OFFENSIVE,
-    }
-
-    public SKILL_TYPE skillType;
-
-    public SkillMenu defensiveMenu;
-    public SkillMenu offensiveMenu;
-
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.tag == "AnswerOption")
         {
-            if (col.gameObject.GetComponent<LanguageButton>().buttonIndex == languageSystem.theLetterIndex)
+            //Debug.Log("answer: " + languageSystem.GetQuestionIndex());
+            if (col.gameObject.GetComponent<LanguageButton>().b_answer)
             {
                 languageSystem.refreshQuestion();
+
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", false);
                 PlayerMoveController.instance.b_answeredCorrectly = true;
-                PlayerMoveController.instance.ResetNumMovesWhenNoneLeft();
+                PlayerMoveController.instance.numAvailableMoves++;
 
                 // Turn on player movement grid
                 TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(true);
-                //PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
-                // Display respective skill menu
-                if (skillType == SKILL_TYPE.TYPE_DEFENSIVE)
-                    defensiveMenu.gameObject.SetActive(true);
-                else
-                    offensiveMenu.gameObject.SetActive(true);
+                PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
 
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(1, 1);
+                col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
             }
             else
             {
+                languageSystem.theAnswerButton.highlightCorrect();
                 // Turn off player movement grid
                 TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
 
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(0, 1);
-                //languageSystem.text.gameObject.GetComponent<LanguageButton>().highlightCorrect();
             }
         }
     }

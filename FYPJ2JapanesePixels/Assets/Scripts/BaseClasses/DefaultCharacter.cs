@@ -15,11 +15,6 @@ public class DefaultCharacter : MonoBehaviour
     public CharacterState e_charState;
     public CharacterStats charStat;
 
-    void Update()
-    {
-       
-    }
-
     // Use this for initialization
     public virtual void InitChar(float maxhealthval = 100)
     {

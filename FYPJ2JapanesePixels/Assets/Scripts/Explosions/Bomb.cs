@@ -51,7 +51,7 @@ public class Bomb : ObjectStats {
             //}
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
-            flame.GetComponent<Flame>().damage = damage;
+            flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
         }
 
@@ -65,7 +65,7 @@ public class Bomb : ObjectStats {
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
-            flame.GetComponent<Flame>().damage = damage;
+            flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
         }
 
@@ -79,7 +79,7 @@ public class Bomb : ObjectStats {
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
-            flame.GetComponent<Flame>().damage = damage;
+            flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
         }
 
@@ -91,7 +91,7 @@ public class Bomb : ObjectStats {
                 break;
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
-            flame.GetComponent<Flame>().damage = damage;
+            flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
         }
     }

@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class LanguageButton : MonoBehaviour 
 {
-    public int buttonIndex { get; set; }
+    public bool b_answer { get; set; }
     public float ShowAnswerHowLong = 5;
     private TimerRoutine resetColourTime;
     private Color originalColour;
@@ -12,7 +12,7 @@ public class LanguageButton : MonoBehaviour
     {
         originalColour = GetComponent<Image>().color;
         resetColourTime = gameObject.AddComponent<TimerRoutine>();
-        resetColourTime.initTimer(ShowAnswerHowLong);
+        resetColourTime.initTimer(2);
         resetColourTime.executedFunction = resetColour;
     }
 
@@ -33,6 +33,12 @@ public class LanguageButton : MonoBehaviour
     public void highlightCorrect()
     {
         GetComponent<Image>().color = Color.green;
+        resetColourTime.executeFunction();
+    }
+
+    public void highlightWrong()
+    {
+        GetComponent<Image>().color = Color.red;
         resetColourTime.executeFunction();
     }
 }

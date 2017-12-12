@@ -15,29 +15,11 @@ public class PlayerSkillController : MonoBehaviour
             instance = this;
         else if (instance != this)
             Destroy(gameObject);
-    }
 
-    void Start()
-    {
         defensiveSkills = new PlayerSkill[3];
         offensiveSkills = new PlayerSkill[3];
 
         LoadSkills();
-    }
-
-    void Update()
-    {
-        for (int i = 0; i < defensiveSkills.Length; i++)
-        {
-            if (defensiveSkills[i].b_needsUpdate)
-                defensiveSkills[i].Update();
-        }
-
-        for (int i = 0; i < offensiveSkills.Length; i++)
-        {
-            if (offensiveSkills[i].b_needsUpdate)
-                offensiveSkills[i].Update();
-        }
     }
 
     void LoadSkills() // going to load skills from some file later
@@ -51,24 +33,25 @@ public class PlayerSkillController : MonoBehaviour
         {
             offensiveSkills[i] = new ShurikenAttack();
         }
+
         offensiveSkills[1] = new DefaultAttack();
     }
 
     public bool CanPerformSkill(PlayerSkill _skill)
     {
         // Check health stuff first
-        //if (_skill.skillName == "Heal")
-        //{
-        //    float playerHealth = PlayerMoveController.instance.GetPawn.charStat.hpSys.health;
-        //    if (playerHealth == PlayerMoveController.instance.GetPawn.charStat.hpSys.MAX_HEALTH)
-        //        return true;// return false;
-        //}
+        if (_skill.skillName == "Heal")
+        {
+            float playerHealth = PlayerMoveController.instance.GetPawn.charStat.hpSys.health;
+            if (playerHealth == PlayerMoveController.instance.GetPawn.charStat.hpSys.MAX_HEALTH)
+                return false;
+        }
 
         PlayerMoveController playerMove = PlayerMoveController.instance;
 
-        if ((playerMove.numMovesMade + _skill.numMoves) <= PlayerMoveController.MAX_MOVES)
+        if ((playerMove.numAvailableMoves - _skill.numMoves) >= 0)
         {
-            playerMove.numMovesMade += _skill.numMoves;
+            playerMove.numAvailableMoves -= _skill.numMoves;
             return true;
         }
 

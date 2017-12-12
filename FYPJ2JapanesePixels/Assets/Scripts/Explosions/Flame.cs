@@ -4,17 +4,10 @@ using UnityEngine;
 
 public class Flame : ObjectStats {
     TimerRoutine burnout;
-    float damage;
-    public float SetDamage
-    {
-        set {
-            damage = value;
-        }
-    }
 	// Use this for initialization
 	void Start () {
         burnout = gameObject.AddComponent<TimerRoutine>();
-        burnout.initTimer(3);
+        burnout.initTimer(0.3f);
         burnout.executedFunction = DestroySelf;
         burnout.executeFunction();
 	}

@@ -16,13 +16,14 @@ public class SkillButton : MonoBehaviour
         else
         {
             // Show text on screen "Not enough moves"
-            //Debug.Log("Cannot perform: " + attachedSkill.skillName);
+            Debug.Log("Cannot perform: " + attachedSkill.skillName);
         }
     }
 
     void Update()
     {
-        //attachedSkill.Update();
+        if (attachedSkill.b_needsUpdate)
+            attachedSkill.Update();
     }
 
     public void AttachSkill(PlayerSkill _skill)
@@ -33,6 +34,6 @@ public class SkillButton : MonoBehaviour
 
     void SetButtonText()
     {
-        transform.GetChild(0).GetComponent<Text>().text = attachedSkill.skillName;
+        //transform.GetChild(0).GetComponent<Text>().text = attachedSkill.skillName;
     }
 }

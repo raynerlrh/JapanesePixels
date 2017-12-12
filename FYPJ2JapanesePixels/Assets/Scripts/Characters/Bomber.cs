@@ -27,55 +27,50 @@ public class Bomber : MonoBehaviour {
         col = gameObject.AddComponent<BoxCollider2D>();
         col.size = new Vector2(0.3f, 0.3f * sightRange);
         col.isTrigger = true;
+        transform.parent.GetComponent<DefaultCharacter>().InitChar();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        float dist = Vector2.Distance(transform.position, guide.transform.position);
+        float dist = Vector2.Distance(transform.parent.position, guide.transform.position);
         float speed = (movement.speed * Time.deltaTime);
         if (dist > speed)
         {
-            Vector2 direction = (guide.transform.position - transform.position).normalized;
-            GetComponent<Rigidbody2D>().MovePosition((Vector2)transform.position + direction * speed);
+            Vector2 direction = (guide.transform.position - transform.parent.position).normalized;
+            transform.parent.GetComponent<Rigidbody2D>().MovePosition((Vector2)transform.parent.position + direction * speed);
         }
         else
             guide.GetComponent<BomberGuide>().canProceed = true;
 
-        //if (detectPlayerApprox(bombRange - 1)) // check for collided obj
-        //{
-        //    if (xyAxisCheck())
-        //    {
-        //        if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, findPlayerDir()) == null)
-        //        {
-        //            if (canDrop)
-        //            {
-        //                dropBomb();
-        //                delay.executeFunction();
-        //                canDrop = false;
-        //            }
-        //        }
-        //    }
-        //}
+        if (transform.parent.GetComponent<DefaultCharacter>().checkIfDead())
+        {
+            Destroy(transform.parent.gameObject);
+        }
+
 	}
 
     void OnTriggerStay2D(Collider2D obj)
     {
-        if (!obj.Equals(gameObject))
-        if (detectPlayerApprox(sightRange)) // check for collided obj
+        if (!obj.Equals(transform.parent.gameObject))
         {
-            if (xyAxisCheck())
+            Vector3Int otherBomber = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(obj.transform.position);
+            if (detectPlayerApprox(otherBomber, sightRange)) // check for collided obj
             {
-                if (obj.gameObject.layer == 14)
+                if (xyAxisCheck(otherBomber))
                 {
-                    //if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, findPlayerDir()) == null)
-                    if (XYObstacleCheck(3) == false)
-                    if (canDrop)
+                    if (obj.gameObject.layer == 14)
                     {
-                        dropBomb();
-                        delay.executeFunction();
-                        canDrop = false;
+                        //if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, findPlayerDir()) == null)
+                        
+                        if (XYObstacleCheck(otherBomber, 3) == false)
+                            if (canDrop)
+                            {
+                                dropBomb();
+                                delay.executeFunction();
+                                canDrop = false;
+                            }
+                        guide.GetComponent<BomberGuide>().setDirection(findNextDirection(otherBomber));
                     }
-                    guide.GetComponent<BomberGuide>().setDirection(findNextDirection(PlayerMoveController.instance.GetPlayerCellPos));
                 }
             }
         }
@@ -84,9 +79,9 @@ public class Bomber : MonoBehaviour {
 
     private void dropBomb()
     {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(mycell); //guide.GetComponent<BomberGuide>().convertDirToVec3()
-        GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.localRotation);
+        GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.parent.localRotation);
         //bool passThrough = false;
         //if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, playerPos))
         //{
@@ -105,21 +100,19 @@ public class Bomber : MonoBehaviour {
     }
 
     // Approximately detect if player is in bomb range
-    private bool detectPlayerApprox(int range = 1)
+    private bool detectPlayerApprox(Vector3Int targetcell, int range = 1)
     {
-        Vector3Int playercell = PlayerMoveController.instance.GetPlayerCellPos;
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
-        Vector3Int cellsAway = playercell - mycell;
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        Vector3Int cellsAway = targetcell - mycell;
         if (cellsAway.magnitude <= range)
             return true;
         return false;
     }
 
-    private bool xyAxisCheck()
+    private bool xyAxisCheck(Vector3Int targetcell)
     {
-        Vector3Int playercell = PlayerMoveController.instance.GetPlayerCellPos;
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
-        if (playercell.x == mycell.x || playercell.y == mycell.y)
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        if (targetcell.x == mycell.x || targetcell.y == mycell.y)
         {
             return true;
         }
@@ -129,7 +122,7 @@ public class Bomber : MonoBehaviour {
     // closest cell to the player is not a wall
     public Vector3Int findPlayerDir()
     {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3Int modified = mycell;
         Vector3Int targetcell = PlayerMoveController.instance.GetPlayerCellPos;
 
@@ -155,7 +148,7 @@ public class Bomber : MonoBehaviour {
     public int findNextDirection(Vector3Int targetcell)
     {
 
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3Int modified = mycell;
         for (int i = 0; i < 4; i++)
         {
@@ -181,16 +174,15 @@ public class Bomber : MonoBehaviour {
         return (int)cellsAway.magnitude;
     }
 
-    private bool XYObstacleCheck(int range)
+    private bool XYObstacleCheck(Vector3Int targetcell, int range)
     {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3Int modified;
-        Vector3Int playercell = PlayerMoveController.instance.GetPlayerCellPos;
-        Vector3Int des = playercell - mycell;
+        Vector3Int des = targetcell - mycell;
         bool block = false;
         for (int i = 0; i <= range; ++i)
         {
-            mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+            mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
             modified = mycell;
             if (des.x < 0)
                 modified.Set(mycell.x - i, mycell.y, mycell.z);
@@ -200,7 +192,7 @@ public class Bomber : MonoBehaviour {
                 modified.Set(mycell.x, mycell.y - i, mycell.z);
             else if (des.y > 0)
                 modified.Set(mycell.x, mycell.y + i, mycell.z);
-            if (playercell == modified)
+            if (targetcell == modified)
                 break;
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
             {

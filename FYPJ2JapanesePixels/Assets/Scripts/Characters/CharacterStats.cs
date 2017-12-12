@@ -83,7 +83,8 @@ public class CharacterStats : MonoBehaviour {
             //GetComponent<TextGenerator>().GenerateText(remainder.ToString(), true, transform.position);
         }
         hpSys.health -= remainder;
-        GetComponent<TextGenerator>().GenerateText(remainder.ToString(), true, transform.position);
+        if (GetComponent<TextGenerator>())
+            GetComponent<TextGenerator>().GenerateText(remainder.ToString(), true, transform.position);
         if (hpSys.health < 0)
         {
             hpSys.health = 0;
