@@ -37,6 +37,9 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField]
     Sprite availableTileSprite;
 
+    [SerializeField]
+    Dpad dpad;
+
     Tile originalTile;
     Tile availableTile;
 
@@ -109,25 +112,26 @@ public class PlayerMoveController : MonoBehaviour
             GameModeManager.instance.showDeathScreen();
         }
 
-        if (e_playstate.Equals(PlayState.E_COMBAT))
+        //if (e_playstate.Equals(PlayState.E_COMBAT))
         {
             if (b_answeredCorrectly)
-                UpdateInput();
+                ;// UpdateInput();
 
             UpdateMovement();
         }
-        else
-        {
-            if (hasInteract())
-            {
-                moveStat.destinatePos = GetTouchWPos();
-                moveStat.isMoving = true;
-            }
-        }
+        //else
+        //{
+        //    if (hasInteract())
+        //    {
+        //        moveStat.destinatePos = GetTouchWPos();
+        //        moveStat.isMoving = true;
+        //    }
+        //}
     }
 
     void FixedUpdate()
     {
+        return;
         if (moveStat.isMoving)
         {
             bool reached = UpdateFreeMovement(moveStat.destinatePos);
@@ -142,6 +146,9 @@ public class PlayerMoveController : MonoBehaviour
     void UpdateMovement()
     {
         playerPos = pawn_sprite.transform.position;
+        playerCellPos = gameGrid.GetWorldFlToCellPos(playerPos);
+
+        Move(dpad.moveDir);
 
         if (targetTilePos != Vector2.zero)
         {
@@ -158,6 +165,34 @@ public class PlayerMoveController : MonoBehaviour
                     b_reachedTarget = true;
                 }
             }
+        }
+    }
+
+    void Move(Dpad.MOVE_DIR _moveDir)
+    {
+        switch (_moveDir)
+        {
+            case Dpad.MOVE_DIR.UP:
+                targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x, playerCellPos.y + 1, playerCellPos.z));
+                break;
+            case Dpad.MOVE_DIR.DOWN:
+                targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x, playerCellPos.y - 1, playerCellPos.z));
+                break;
+            case Dpad.MOVE_DIR.LEFT:
+                targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x - 1, playerCellPos.y, playerCellPos.z));
+                break;
+            case Dpad.MOVE_DIR.RIGHT:
+                targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x + 1, playerCellPos.y, playerCellPos.z));
+                break;
+        }
+
+        // Move to target cell
+        if (_moveDir != Dpad.MOVE_DIR.NONE)
+        {
+            Vector2 direction = (targetTilePos - playerPos).normalized;
+            float speed = 5f;
+
+            body.MovePosition((Vector2)pawn_sprite.transform.position + direction * speed);
         }
     }
 
@@ -373,7 +408,7 @@ public class PlayerMoveController : MonoBehaviour
     {
         get
         {
-            return GameModeManager.instance.gameGrid.GetWorldFlToCellPos(pawn_sprite.transform.position);
+            return gameGrid.GetWorldFlToCellPos(playerPos);
         }
     }
 }
