@@ -37,6 +37,9 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField]
     Sprite availableTileSprite;
 
+    [SerializeField]
+    Dpad dpad;
+
     Tile originalTile;
     Tile availableTile;
 
@@ -48,13 +51,15 @@ public class PlayerMoveController : MonoBehaviour
     Vector2 playerPos;
     Vector2 targetTilePos;
 
+    Animator p_animator;
+
     public int numAvailableMoves { get; set; }
     public bool b_answeredCorrectly { get; set; }
     bool b_shownCrossTiles;
     bool b_reachedTarget;
     bool b_touchedScreen;
 
-    private MovementStats moveStat;
+    public MovementStats moveStat;
     private Rigidbody2D body;
 
     public enum PlayState
@@ -92,11 +97,12 @@ public class PlayerMoveController : MonoBehaviour
         originalTile = new Tile();
         availableTile = new Tile();
         availableTile.sprite = availableTileSprite;
-        moveStat = new MovementStats(25f);
+        moveStat = new MovementStats(5f);
         body = pawn_sprite.GetComponent<Rigidbody2D>();
         body.gravityScale = 0.0f;
         e_playstate = PlayState.E_NONCOMBAT;
         isOver = false;
+        p_animator = pawn_sprite.transform.GetChild(2).GetChild(0).GetComponent<Animator>();
     }
 
     void Update()
@@ -109,55 +115,104 @@ public class PlayerMoveController : MonoBehaviour
             GameModeManager.instance.showDeathScreen();
         }
 
-        if (e_playstate.Equals(PlayState.E_COMBAT))
+        //if (e_playstate.Equals(PlayState.E_COMBAT))
         {
-            if (b_answeredCorrectly)
-                UpdateInput();
+            //if (b_answeredCorrectly)
+                // UpdateInput();
 
             UpdateMovement();
         }
-        else
-        {
-            if (hasInteract())
-            {
-                moveStat.destinatePos = GetTouchWPos();
-                moveStat.isMoving = true;
-            }
-        }
+        //else
+        //{
+        //    if (hasInteract())
+        //    {
+        //        moveStat.destinatePos = GetTouchWPos();
+        //        moveStat.isMoving = true;
+        //    }
+        //}
     }
 
     void FixedUpdate()
     {
-        if (moveStat.isMoving)
-        {
-            bool reached = UpdateFreeMovement(moveStat.destinatePos);
-            if (reached)
-            {
-                moveStat.isMoving = false;
-                //b_answeredCorrectly = false;
-            }
-        }
+        //return;
+        //if (moveStat.isMoving)
+        //{
+        //    bool reached = UpdateFreeMovement(moveStat.destinatePos);
+        //    if (reached)
+        //    {
+        //        moveStat.isMoving = false;
+        //        //b_answeredCorrectly = false;
+        //    }
+        //}
     }
 
     void UpdateMovement()
     {
         playerPos = pawn_sprite.transform.position;
+        playerCellPos = gameGrid.GetWorldFlToCellPos(playerPos);
 
-        if (targetTilePos != Vector2.zero)
+        Move(dpad.moveDir);
+        RenderAnim();
+
+        //if (targetTilePos != Vector2.zero)
+        //{
+        //    if (playerPos != targetTilePos)
+        //    {
+        //        pawn_sprite.transform.position = Vector2.MoveTowards(playerPos, targetTilePos, Time.deltaTime);
+        //    }
+        //    else
+        //    {
+        //        if (!b_reachedTarget)
+        //        {
+        //            gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, gameGrid.GetWorldFlToCellPos(playerPos), originalTile);
+        //            b_shownCrossTiles = false;
+        //            b_reachedTarget = true;
+        //        }
+        //    }
+        //}
+    }
+
+    void RenderAnim()
+    {
+        if (dpad.moveDir == Dpad.MOVE_DIR.LEFT)
         {
-            if (playerPos != targetTilePos)
-            {
-                pawn_sprite.transform.position = Vector2.MoveTowards(playerPos, targetTilePos, Time.deltaTime);
-            }
-            else
-            {
-                if (!b_reachedTarget)
-                {
-                    gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, gameGrid.GetWorldFlToCellPos(playerPos), originalTile);
-                    b_shownCrossTiles = false;
-                    b_reachedTarget = true;
-                }
-            }
+            p_animator.transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (dpad.moveDir == Dpad.MOVE_DIR.RIGHT)
+        {
+            p_animator.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else if (dpad.moveDir == Dpad.MOVE_DIR.DOWN)
+        {
+        }
+
+        p_animator.SetFloat("NormalizeSpd", (int)dpad.moveDir);
+    }
+
+    void Move(Dpad.MOVE_DIR _moveDir)
+    {
+        switch (_moveDir)
+        {
+            case Dpad.MOVE_DIR.UP:
+                targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x, playerCellPos.y + 1, playerCellPos.z));
+                break;
+            case Dpad.MOVE_DIR.DOWN:
+                targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x, playerCellPos.y - 1, playerCellPos.z));
+                break;
+            case Dpad.MOVE_DIR.LEFT:
+                targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x - 1, playerCellPos.y, playerCellPos.z));
+                break;
+            case Dpad.MOVE_DIR.RIGHT:
+                targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x + 1, playerCellPos.y, playerCellPos.z));
+                break;
+        }
+
+        // Move to target cell
+        if (_moveDir != Dpad.MOVE_DIR.NONE)
+        {
+            Vector2 direction = (targetTilePos - playerPos).normalized;
+
+            body.MovePosition((Vector2)pawn_sprite.transform.position + direction * (moveStat.moveSpeed * Time.deltaTime));
         }
     }
 
@@ -373,7 +428,7 @@ public class PlayerMoveController : MonoBehaviour
     {
         get
         {
-            return GameModeManager.instance.gameGrid.GetWorldFlToCellPos(pawn_sprite.transform.position);
+            return gameGrid.GetWorldFlToCellPos(playerPos);
         }
     }
 }
