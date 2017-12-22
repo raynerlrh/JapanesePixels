@@ -37,7 +37,7 @@ public class TileRefManager : MonoBehaviour
     void Start()
     {
         // Turn off player movement grid at the start
-        GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
+        //GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
     }
 
     public Tile GetTileRef(TILE_TYPE tileType)

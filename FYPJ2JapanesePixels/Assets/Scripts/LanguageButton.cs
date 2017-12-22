@@ -12,17 +12,13 @@ public class LanguageButton : MonoBehaviour
     {
         originalColour = GetComponent<Image>().color;
         resetColourTime = gameObject.AddComponent<TimerRoutine>();
-        resetColourTime.initTimer(2);
+        resetColourTime.initTimer(0.8f);
         resetColourTime.executedFunction = resetColour;
     }
 
-    void Update()
+    void OnDisable()
     {
-        //if (transform.localPosition.y > 39f)
-        //{
-        //    transform.localPosition = new Vector2(transform.localPosition.x, 39f);
-        //    Debug.Log(gameObject.name + " OUT, " + transform.localPosition.y);
-        //}
+        resetColour();
     }
 
     void resetColour()

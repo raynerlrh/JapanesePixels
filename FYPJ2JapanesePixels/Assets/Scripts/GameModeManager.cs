@@ -13,7 +13,7 @@ public class GameModeManager : MonoBehaviour
     public static GameModeManager instance = null;
 
     public GameGrid gameGrid { get; set; }
-    public LanguageSystem question;
+    public LanguageSystem languageSystem;
 
     private RectTransform t_progbar;
 
@@ -23,6 +23,16 @@ public class GameModeManager : MonoBehaviour
     public GameObject DeathscreenUI;
     [SerializeField]
     public GameObject WinscreenUI;
+
+    public enum GAME_STATE
+    {
+        PRE_GAME,
+        IN_GAME,
+        PAUSED_GAME,
+        GAME_OVER,
+    }
+
+    public GAME_STATE gameState { get; set; }
 
     // Only for most foremost operations
     void Awake()
@@ -35,6 +45,8 @@ public class GameModeManager : MonoBehaviour
         //DontDestroyOnLoad(gameObject);
 
         gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
+
+        gameState = GAME_STATE.PRE_GAME;
     }
 
     void Start()
@@ -62,7 +74,7 @@ public class GameModeManager : MonoBehaviour
     public int GetRewards(int act, int previousAction)
     {
         int reward;
-        int n = question.GetQuestionIndex() + 1;
+        int n = languageSystem.GetQuestionIndex() + 1;
         RLEnvironment env = GetComponent<RLEnvironment>();
         //if (Mathf.Abs(n - act) > Mathf.Abs(n - previousAction))
         //{
@@ -71,7 +83,7 @@ public class GameModeManager : MonoBehaviour
         if (env.brainMemory.getLastAnswer() == n || env.brainMemory.doesBrainContain(n))
         {
             reward = 1;
-            question.refreshQuestion();
+            //languageSystem.RefreshQuestion(); // removed for now
             EnemyMoveController.instance.currentBoss.doAttack();
             //Debug.Log("Guessed correctly 1");
             //env.resetagent();
@@ -79,7 +91,7 @@ public class GameModeManager : MonoBehaviour
         else if (n == act)
         {
             reward = 1;
-            question.refreshQuestion();
+            //languageSystem.RefreshQuestion(); // removed for now
             if (env.brainMemory.GetSize == env.brainMemory.newMaxMemory)
             {
                 env.brainMemory.forgetAnswer();

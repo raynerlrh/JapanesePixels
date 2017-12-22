@@ -46,7 +46,7 @@ public class PlayerMoveController : MonoBehaviour
     Vector3Int touchPos;
     Vector3Int touchCellPos;
     //Vector3Int selectedCellPos;
-    Vector3Int playerCellPos;
+    public Vector3Int playerCellPos { get; set; }
 
     Vector2 playerPos;
     Vector2 targetTilePos;

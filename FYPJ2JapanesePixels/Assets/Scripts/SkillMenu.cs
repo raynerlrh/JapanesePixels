@@ -5,8 +5,7 @@ using UnityEngine.UI;
 
 public class SkillMenu : MonoBehaviour 
 {
-    public Transform defensiveSkills;
-    public Transform offensiveSkills;
+    public Transform skillButtons;
     public Text availableMovesText;
 
     void Start()
@@ -14,13 +13,9 @@ public class SkillMenu : MonoBehaviour
         PlayerSkillController playerSkills = PlayerSkillController.instance;
 
         // Set skills 
-        for (int i = 0; i < defensiveSkills.childCount; i++)
+        for (int i = 0; i < skillButtons.childCount; i++)
         {
-            defensiveSkills.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.defensiveSkills[i]);
-        }
-        for (int i = 0; i < offensiveSkills.childCount; i++)
-        {
-            offensiveSkills.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.offensiveSkills[i]);
+            skillButtons.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.skills[i]);
         }
     }
 
