@@ -51,13 +51,15 @@ public class PlayerMoveController : MonoBehaviour
     Vector2 playerPos;
     Vector2 targetTilePos;
 
+    Animator p_animator;
+
     public int numAvailableMoves { get; set; }
     public bool b_answeredCorrectly { get; set; }
     bool b_shownCrossTiles;
     bool b_reachedTarget;
     bool b_touchedScreen;
 
-    private MovementStats moveStat;
+    public MovementStats moveStat;
     private Rigidbody2D body;
 
     public enum PlayState
@@ -95,11 +97,12 @@ public class PlayerMoveController : MonoBehaviour
         originalTile = new Tile();
         availableTile = new Tile();
         availableTile.sprite = availableTileSprite;
-        moveStat = new MovementStats(25f);
+        moveStat = new MovementStats(5f);
         body = pawn_sprite.GetComponent<Rigidbody2D>();
         body.gravityScale = 0.0f;
         e_playstate = PlayState.E_NONCOMBAT;
         isOver = false;
+        p_animator = pawn_sprite.transform.GetChild(2).GetChild(0).GetComponent<Animator>();
     }
 
     void Update()
@@ -114,8 +117,8 @@ public class PlayerMoveController : MonoBehaviour
 
         //if (e_playstate.Equals(PlayState.E_COMBAT))
         {
-            if (b_answeredCorrectly)
-                ;// UpdateInput();
+            //if (b_answeredCorrectly)
+                // UpdateInput();
 
             UpdateMovement();
         }
@@ -131,16 +134,16 @@ public class PlayerMoveController : MonoBehaviour
 
     void FixedUpdate()
     {
-        return;
-        if (moveStat.isMoving)
-        {
-            bool reached = UpdateFreeMovement(moveStat.destinatePos);
-            if (reached)
-            {
-                moveStat.isMoving = false;
-                //b_answeredCorrectly = false;
-            }
-        }
+        //return;
+        //if (moveStat.isMoving)
+        //{
+        //    bool reached = UpdateFreeMovement(moveStat.destinatePos);
+        //    if (reached)
+        //    {
+        //        moveStat.isMoving = false;
+        //        //b_answeredCorrectly = false;
+        //    }
+        //}
     }
 
     void UpdateMovement()
@@ -149,23 +152,41 @@ public class PlayerMoveController : MonoBehaviour
         playerCellPos = gameGrid.GetWorldFlToCellPos(playerPos);
 
         Move(dpad.moveDir);
+        RenderAnim();
 
-        if (targetTilePos != Vector2.zero)
+        //if (targetTilePos != Vector2.zero)
+        //{
+        //    if (playerPos != targetTilePos)
+        //    {
+        //        pawn_sprite.transform.position = Vector2.MoveTowards(playerPos, targetTilePos, Time.deltaTime);
+        //    }
+        //    else
+        //    {
+        //        if (!b_reachedTarget)
+        //        {
+        //            gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, gameGrid.GetWorldFlToCellPos(playerPos), originalTile);
+        //            b_shownCrossTiles = false;
+        //            b_reachedTarget = true;
+        //        }
+        //    }
+        //}
+    }
+
+    void RenderAnim()
+    {
+        if (dpad.moveDir == Dpad.MOVE_DIR.LEFT)
         {
-            if (playerPos != targetTilePos)
-            {
-                pawn_sprite.transform.position = Vector2.MoveTowards(playerPos, targetTilePos, Time.deltaTime);
-            }
-            else
-            {
-                if (!b_reachedTarget)
-                {
-                    gameGrid.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, gameGrid.GetWorldFlToCellPos(playerPos), originalTile);
-                    b_shownCrossTiles = false;
-                    b_reachedTarget = true;
-                }
-            }
+            p_animator.transform.localScale = new Vector3(1, 1, 1);
         }
+        else if (dpad.moveDir == Dpad.MOVE_DIR.RIGHT)
+        {
+            p_animator.transform.localScale = new Vector3(-1, 1, 1);
+        }
+        else if (dpad.moveDir == Dpad.MOVE_DIR.DOWN)
+        {
+        }
+
+        p_animator.SetFloat("NormalizeSpd", (int)dpad.moveDir);
     }
 
     void Move(Dpad.MOVE_DIR _moveDir)
@@ -190,9 +211,8 @@ public class PlayerMoveController : MonoBehaviour
         if (_moveDir != Dpad.MOVE_DIR.NONE)
         {
             Vector2 direction = (targetTilePos - playerPos).normalized;
-            float speed = 5f;
 
-            body.MovePosition((Vector2)pawn_sprite.transform.position + direction * speed);
+            body.MovePosition((Vector2)pawn_sprite.transform.position + direction * (moveStat.moveSpeed * Time.deltaTime));
         }
     }
 
