@@ -47,6 +47,7 @@ public class PlayerMoveController : MonoBehaviour
     Vector3Int touchCellPos;
     //Vector3Int selectedCellPos;
     public Vector3Int playerCellPos { get; set; }
+    Vector3Int prevCellPos;
 
     Vector2 playerPos;
     Vector2 targetTilePos;
@@ -103,6 +104,8 @@ public class PlayerMoveController : MonoBehaviour
         e_playstate = PlayState.E_NONCOMBAT;
         isOver = false;
         p_animator = pawn_sprite.transform.GetChild(2).GetChild(0).GetComponent<Animator>();
+        prevCellPos = gameGrid.GetWorldFlToCellPos(pawn_sprite.transform.position);
+        TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
     }
 
     void Update()
@@ -150,6 +153,13 @@ public class PlayerMoveController : MonoBehaviour
     {
         playerPos = pawn_sprite.transform.position;
         playerCellPos = gameGrid.GetWorldFlToCellPos(playerPos);
+        if (prevCellPos != playerCellPos)
+        {
+            TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, null);
+            prevCellPos = playerCellPos;
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos) != TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING))
+                TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+        }
 
         Move(dpad.moveDir);
         RenderAnim();

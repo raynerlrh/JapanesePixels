@@ -2,20 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public struct MovementData
-{
-    public bool reach;
-    public float speed;
-    public MovementData(bool reached = true)
-    {
-        reach = reached;
-        speed = 2f;
-    }
-
-}
+/**
+ * This class contains information to navigate a CPU character's sprite
+ * Extension: Guide can now be given a specific destination to go to
+ **/
 
 public class BomberGuide : MonoBehaviour {
-    TimerRoutine delay; // for testing movement
 
     enum MOVEDIR
     {
@@ -28,55 +20,122 @@ public class BomberGuide : MonoBehaviour {
 
     MOVEDIR direction;
     Vector3Int destination;
-    MovementData movement;
+    public Transform waypoint;
     public bool canProceed;
     public int cellsFree = 3;
     private int originalCellsFree;
+    public bool hasWaypoint = false;
+    List<Vector3Int> waypoints;
+    public int wpIndex; // waypoint index
+    Vector3Int lastValid;
+    public GameObject bomberobj;
+    public TimerRoutine safetyTimer;
 
 	// Use this for initialization
 	void Start () {
         direction = MOVEDIR.E_CENTRE;
         direction = getRandomDir();
-        //prevDir = direction;
-        {
-            delay = gameObject.AddComponent<TimerRoutine>();
-            delay.initTimer(2);
-            delay.executedFunction = moveForward;
-        }
-        movement = new MovementData(true);
         canProceed = false;
         originalCellsFree = cellsFree;
-	}
+        wpIndex = 0;
+        safetyTimer = gameObject.AddComponent<TimerRoutine>();
+        safetyTimer.initTimer(2);
+        safetyTimer.executedFunction = resetWaypoints;
+
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        //if (movement.reach)
+        // if i can move
         if (canProceed)
         {
-            // if sees player
-            //chooseDir();
-            if (!obstacleCheck(direction, 1))
+            // check if the cell in front of me is blocked
+            if (!hasWaypoint)
             {
-                destination = convertDirToVec3();
-                //delay.executeFunction();
-                moveForward();
-                canProceed = false;
-                //movement.reach = false;
-                cellsFree = originalCellsFree;
-            }
-            else
-            {
-                MOVEDIR randDir = getRandomDir();
-                if (!obstacleCheck(randDir, cellsFree)) // if i meet with a wall, i will find a new path with preferably as many cells free as the range u provide
-                //if (recursionCheck(randDir, 3)) // not guaranteed to work yet, recursion is hard
+                if (!obstacleCheck(direction, 1))
                 {
-                    direction = randDir;
+                    destination = convertDirToVec3(); // not blocked, get next cell to go to depending on my direction
+                    moveForward(); // move cell by cell
+                    canProceed = false; // until my sprite catches up to me, dont move
+                    cellsFree = originalCellsFree; // just resetting a variable
                 }
                 else
-                    cellsFree--;
+                {
+                    MOVEDIR randDir = getRandomDir(); // Blocked, get a random direction
+                    if (!obstacleCheck(randDir, cellsFree)) // if i meet with a wall, i will find a new path with preferably as many cells free as the range provided
+                    //if (recursionCheck(randDir, 3)) // not guaranteed to work yet, recursion is hard
+                    {
+                        direction = randDir;
+                    }
+                    else
+                        cellsFree--; // check from max range to 0
+                }
+
+
+            }
+            else if (hasWaypoint) // if i have a destination, pathfind
+            {
+                if (waypoints == null) // pathfind gives waypoint cells to move to
+                {
+                    GetComponent<AStarPath>().init(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(waypoint.position));
+                    waypoints = GetComponent<AStarPath>().runPathFinding();
+                }
+                else // move
+                {
+                    //hasWaypoint = false;
+                    if (wpIndex < waypoints.Count - 1)
+                    {
+                        wpIndex++;
+                        //if (wpIndex == 1)
+                            //lastValid = waypoints[1];
+                        checkWaypointValidity();
+                        //for (int i = 0; i < waypoints.Count; ++i)
+                            //print(waypoints[i] + "co");
+                        moveToWaypoint();
+                        canProceed = false;
+                    }
+                    else
+                    {
+                        if (!safetyTimer.hasRun)
+                            safetyTimer.executeFunction();
+                    }
+                }
+                //move
+                //if (waypoints != null)
+                //{
+                //    wpIndex++;
+                //    checkWaypointValidity();
+                //    for (int i = 0; i < waypoints.Count; ++i)
+                //        print(waypoints[i] + "co");
+                //    moveToWaypoint();
+                //    canProceed = false;
+                //    if (wpIndex >= waypoints.Count - 1)
+                //    {
+                //        waypoints = null;
+                //    }
+
+                //}
+                //else
+                //{
+                //    if (bomberobj.GetComponent<Bomber>().bombRef == null)
+                //    {
+                //        if (!safetyTimer.hasRun)
+                //        {
+                //            safetyTimer.executeFunction();
+                //        }
+                //    }
+                //}
             }
         }
 	}
+
+    public void resetWaypoints()
+    {
+        wpIndex = 0;
+        hasWaypoint = false;
+        waypoints = null;
+        safetyTimer.hasRun = false;
+    }
     
     private int cellsAway(Vector3Int cell1, Vector3Int cell2)
     {
@@ -84,47 +143,10 @@ public class BomberGuide : MonoBehaviour {
         return (int)cellsAway.magnitude;
     }
 
-    private Vector3Int chooseDir(int redo = 1, MOVEDIR lockDir = MOVEDIR.E_CENTRE)
+    private float fCellsAway(Vector3Int cell1, Vector3Int cell2)
     {
-        if (redo == -1)
-        {
-            return destination;
-        }
-
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
-        Vector3Int modified = mycell;
-        Vector3Int targetcell = PlayerMoveController.instance.GetPlayerCellPos; // target can be anyone, not just the player
-        //int locked = (int)lockDir;
-        for (int i = 0; i < 4; i++)
-        {
-            //if (i == locked)
-                //continue;
-            if (i == 0)
-                modified.Set(mycell.x - redo, modified.y, modified.z);
-            if (i == 1)
-                modified.Set(mycell.x + redo, mycell.y, mycell.z);
-            if (i == 2)
-                modified.Set(mycell.x, mycell.y + redo, mycell.z);
-            if (i == 3)
-                modified.Set(mycell.x, mycell.y - redo, mycell.z);
-            if (cellsAway(modified, targetcell) < cellsAway(mycell, targetcell))
-            {
-                if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
-                {
-                    // raycast/collide few blocks ahead to see if there is a wall ahead
-                    //continue;
-                    //if (redo == -1)
-                    //chooseDir(redo + 1); // for recursion
-                    //lockDir = (MOVEDIR)i; // if removed, object skips block
-                    break;
-                }
-                //redo = -1; // for recursion
-                destination = modified;
-                direction = (MOVEDIR)i;
-                break;
-            }
-        }
-        return destination;
+        Vector3Int cellsAway = cell2 - cell1;
+        return cellsAway.magnitude;
     }
 
     private MOVEDIR getRandomDir()
@@ -144,31 +166,60 @@ public class BomberGuide : MonoBehaviour {
     {
         Vector3 newpos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(destination);
         transform.position = newpos;
-        movement.reach = true;
+    }
+
+    private void moveToWaypoint()
+    {
+        Vector3 newpos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(waypoints[wpIndex]);
+        transform.position = newpos;
+    }
+
+    // if waypoint is more than 1 cell away, sound buzzer
+    private bool checkWaypointValidity()
+    {
+        Vector3Int last = waypoints[0];
+        List<Vector3Int> delete = new List<Vector3Int>();
+        for (int i = 0; i < waypoints.Count; ++i)
+        {
+            float dist = fCellsAway(waypoints[i], last);
+            if (i == 9)
+            {
+                //print(waypoints[i]);
+                //print(last);
+            }
+            //print(waypoints[wpIndex]);
+            //print(lastValid);
+            if (dist > 1)
+            {
+                delete.Add(waypoints[i]);
+                // waypoints.RemoveAt(i);
+                //return false;
+            }
+            else
+                last = waypoints[i];
+        }
+        List<int> ilist = new List<int>();
+        for (int j = 0; j < waypoints.Count; ++ j)
+        {
+            for (int c = 0; c < delete.Count; ++c)
+            {
+                if (waypoints[j] == delete[c])
+                    ilist.Add(j);
+            }
+        }
+
+        for (int f = 0; f < ilist.Count; ++f)
+        {
+            waypoints.RemoveAt(ilist[f] - f);
+        }
+        return true;
+
     }
 
     public Vector3Int convertDirToVec3()
     {
         Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         switch (direction)
-        {
-            case MOVEDIR.E_LEFT:
-                return new Vector3Int(mycell.x - 1, mycell.y, mycell.z);
-            case MOVEDIR.E_RIGHT:
-                return new Vector3Int(mycell.x + 1, mycell.y, mycell.z);
-            case MOVEDIR.E_UP:
-                return new Vector3Int(mycell.x, mycell.y + 1, mycell.z);
-            case MOVEDIR.E_DOWN:
-                return new Vector3Int(mycell.x, mycell.y - 1, mycell.z);
-            default:
-                return mycell;
-        }
-    }
-
-    private Vector3Int convertDirToVec3(MOVEDIR desired)
-    {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
-        switch (desired)
         {
             case MOVEDIR.E_LEFT:
                 return new Vector3Int(mycell.x - 1, mycell.y, mycell.z);
@@ -194,7 +245,7 @@ public class BomberGuide : MonoBehaviour {
                 for (int i = 0; i <= range; ++i)
                 {
                     test.Set(mycell.x - i, mycell.y, mycell.z);
-                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test))
+                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, test))
                     {
                         fail = true;
                         break;
@@ -205,7 +256,7 @@ public class BomberGuide : MonoBehaviour {
                 for (int i = 0; i <= range; ++i)
                 {
                     test.Set(mycell.x + i, mycell.y, mycell.z);
-                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test))
+                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, test))
                     {
                         fail = true;
                         break;
@@ -216,7 +267,7 @@ public class BomberGuide : MonoBehaviour {
                 for (int i = 0; i <= range; ++i)
                 {
                     test.Set(mycell.x, mycell.y + i, mycell.z);
-                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test))
+                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, test))
                     {
                         fail = true;
                         break;
@@ -227,7 +278,7 @@ public class BomberGuide : MonoBehaviour {
                 for (int i = 0; i <= range; ++i)
                 {
                     test.Set(mycell.x, mycell.y - i, mycell.z);
-                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test))
+                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, test))
                     {
                         fail = true;
                         break;
@@ -258,6 +309,44 @@ public class BomberGuide : MonoBehaviour {
             if (!obstacleCheck(dir, range))
                 return true;
             return false;
+        }
+    }
+
+    public void findWaypoint(List<Vector3Int> possible, Vector3 bombpos)
+    {
+        if (!hasWaypoint)
+        {
+            List<Vector3Int> pro = null;
+            for (int i = 0; i < possible.Count; ++i)
+            {
+                if (pro == null) // pathfind gives waypoint cells to move to
+                {
+                    GetComponent<AStarPath>().init(possible[i]);
+                    pro = GetComponent<AStarPath>().runPathFinding();
+                    if (pro != null)
+                    {
+                        bool gg = false;
+                        for (int w = 1; w < pro.Count; ++w) // 1 so it doesnt count the player's starting point which is actually the bomb cell
+                        {
+                            Vector3Int bombcell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(bombpos);
+                            if (pro[w].Equals(bombcell))
+                            {
+                                gg = true;
+                                break;
+                                //waypoints = null;
+                            }
+                        }
+                        if (gg)
+                        {
+                            continue;
+                        }
+                        waypoint.position = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(possible[i]);
+                        hasWaypoint = true;
+                        break;
+                    }
+                }
+
+            }
         }
     }
 }

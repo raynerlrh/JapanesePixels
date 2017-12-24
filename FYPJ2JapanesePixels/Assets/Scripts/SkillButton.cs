@@ -7,6 +7,11 @@ public class SkillButton : MonoBehaviour
 {
     PlayerSkill attachedSkill;
 
+    void Start()
+    {
+        AttachSkill(PlayerSkillController.instance.skills[1]);
+    }
+
     public void OnPress()
     {
         if (PlayerSkillController.instance.CanPerformSkill(attachedSkill))

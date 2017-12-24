@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class Flame : ObjectStats {
     TimerRoutine burnout;
@@ -21,6 +22,12 @@ public class Flame : ObjectStats {
                 obj.GetComponent<CharacterStats>().decreaseHealth(damage);
                 DestroySelf();
             }
+        }
+        if (obj.gameObject.layer == 17)
+        {
+            Vector3Int cellpos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+            TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, cellpos, null);
+            DestroySelf();
         }
     }
 }

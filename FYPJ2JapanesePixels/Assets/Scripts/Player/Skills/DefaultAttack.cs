@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DefaultAttack : PlayerSkill {
+public class DefaultAttack : PlayerSkill
+{
 
     public bool b_needsUpdate { get; set; }
     public int numMoves { get; set; }
@@ -13,7 +14,7 @@ public class DefaultAttack : PlayerSkill {
     public DefaultAttack()
     {
         skillName = "Default Attack: Drop bomb";
-        numMoves = 1;
+        numMoves = 0;
         b_needsUpdate = false;
     }
 

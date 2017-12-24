@@ -74,7 +74,9 @@ public class GameModeManager : MonoBehaviour
     public int GetRewards(int act, int previousAction)
     {
         int reward;
-        int n = languageSystem.GetQuestionIndex() + 1;
+        int n = 0;
+        if (languageSystem != null)
+            n = languageSystem.GetQuestionIndex() + 1;
         RLEnvironment env = GetComponent<RLEnvironment>();
         //if (Mathf.Abs(n - act) > Mathf.Abs(n - previousAction))
         //{

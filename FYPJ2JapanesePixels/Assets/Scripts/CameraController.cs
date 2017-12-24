@@ -9,6 +9,7 @@ public struct CamSettings
     {
         E_PCENTERED,
         E_OFFSET,
+        E_WHOLEMAP
     }
     public CamMode mode;
 }
@@ -21,16 +22,18 @@ public class CameraController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         settings.yOffset = Camera.main.orthographicSize;
-        settings.mode = CamSettings.CamMode.E_PCENTERED;
+        settings.mode = CamSettings.CamMode.E_WHOLEMAP;
 	}
 	
 	// Update is called once per frame
 	void Update () {
         if (settings.mode == CamSettings.CamMode.E_OFFSET)
             pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y - settings.yOffset * 0.5f, transform.position.z);
-        else
+        else if(settings.mode == CamSettings.CamMode.E_PCENTERED)
             pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y, transform.position.z);
-        transform.position = pos;
+
+        if (settings.mode != CamSettings.CamMode.E_WHOLEMAP)
+            transform.position = pos;
 	}
 
     public void switchMode(CamSettings.CamMode cameraMode)

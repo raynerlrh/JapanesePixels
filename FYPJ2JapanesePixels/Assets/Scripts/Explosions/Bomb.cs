@@ -42,17 +42,15 @@ public class Bomb : ObjectStats {
             spawnCell.Set(startPos.x + x, startPos.y, startPos.z);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, spawnCell))
             {
-                //Debug.Log(x);
                 break;
             }
-            //if (tileobj.gameObject.layer == 13)
-            //{
-
-            //}
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
             flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
+            // Allow spawning of flame at the destructible block position before stopping all spawns
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
+                break;
         }
 
         for (int x = -1; x >= -effectRange; --x)
@@ -67,6 +65,8 @@ public class Bomb : ObjectStats {
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
             flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
+                break;
         }
 
         for (int y = 0; y <= effectRange; ++y)
@@ -81,6 +81,8 @@ public class Bomb : ObjectStats {
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
             flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
+                break;
         }
 
         for (int y = -1; y >= -effectRange; --y)
@@ -93,6 +95,8 @@ public class Bomb : ObjectStats {
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
             flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
+                break;
         }
     }
 

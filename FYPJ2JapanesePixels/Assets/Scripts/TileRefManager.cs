@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class TileRefManager : MonoBehaviour 
+public class TileRefManager : MonoBehaviour
 {
     public static TileRefManager instance = null;
     public Tile[] tileRefs;
@@ -21,6 +21,7 @@ public class TileRefManager : MonoBehaviour
         TILEMAP_PLAYER,
         TILEMAP_GRIDCELLS,
         TILEMAP_SOLIDWALL,
+        TILEMAP_DESTRUCTIBLE
     }
 
     // Only for most foremost operations
