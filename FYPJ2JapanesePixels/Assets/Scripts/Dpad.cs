@@ -16,11 +16,8 @@ public class Dpad : MonoBehaviour
     public MOVE_DIR moveDir { get; set; }
     private bool pressed;
 
-    PlayerMoveController player;
-
     void Start()
     {
-        player = PlayerMoveController.instance;
         pressed = false;
     }
 

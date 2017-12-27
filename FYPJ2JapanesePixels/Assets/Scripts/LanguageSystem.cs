@@ -53,7 +53,7 @@ public class LanguageSystem : MonoBehaviour
     int newQuestionIndex;
     int theOptionIndex;
 
-    const int preGameTime = 15;
+    const int preGameTime = 1;
     float preGameTimer;
 
     Vector2[] questionPosArr; // prev, curr, next

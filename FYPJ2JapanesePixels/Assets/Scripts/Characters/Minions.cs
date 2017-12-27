@@ -18,8 +18,12 @@ public class Minions : MonoBehaviour
 
     public MinionType m_MinionType;
 
+    PlayerMoveController moveController;
+
 	void Start() 
     {
+        moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+
         isFighting = false;
         character = gameObject.AddComponent<DefaultCharacter>();
         if (m_MinionType == MinionType.E_SKELETON)
@@ -93,7 +97,7 @@ public class Minions : MonoBehaviour
         isFighting = true;
         if (m_MinionType == MinionType.E_FLAMESKULL || m_MinionType == MinionType.E_PROJECTILE)
         {
-            CharacterStats stat = PlayerMoveController.instance.GetPawn.charStat;
+            CharacterStats stat = moveController.GetPawn.charStat;
             stat.decreaseHealth(character.charStat.attackVal);
             Destroy(this.gameObject);
         }
@@ -105,7 +109,7 @@ public class Minions : MonoBehaviour
     {
         if (isFighting && m_MinionType == MinionType.E_SKELETON)
         {
-            PlayerMoveController.instance.decreasehealthbytime(2, character.charStat.attackVal);
+            moveController.decreasehealthbytime(2, character.charStat.attackVal);
         }
     }
 

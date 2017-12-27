@@ -196,7 +196,9 @@ public class Bomber : MonoBehaviour {
     {
         Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3Int modified = mycell;
-        Vector3Int targetcell = PlayerMoveController.instance.GetPlayerCellPos;
+
+        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+        Vector3Int targetcell = moveController.GetPlayerCellPos;
 
         for (int i = 0; i < 4; i++)
         {

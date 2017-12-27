@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 
 public struct MovementStats
 {
@@ -18,9 +19,8 @@ public struct MovementStats
     }
 }
 
-public class PlayerMoveController : MonoBehaviour
+public class PlayerMoveController : NetworkBehaviour
 {
-    public static PlayerMoveController instance = null;
     private DefaultCharacter pawn; // main character, can be an array of pawns for each character
     private GameObject pawn_sprite; // can be an array of sprites for each character
     public DefaultCharacter GetPawn
@@ -33,11 +33,8 @@ public class PlayerMoveController : MonoBehaviour
 
     //public const int MAX_MOVES = 5;
     GameGrid gameGrid;
+    TileRefManager tileRefManager;
 
-    [SerializeField]
-    Sprite availableTileSprite;
-
-    [SerializeField]
     Dpad dpad;
 
     Tile originalTile;
@@ -46,7 +43,13 @@ public class PlayerMoveController : MonoBehaviour
     Vector3Int touchPos;
     Vector3Int touchCellPos;
     //Vector3Int selectedCellPos;
+
+    //[SyncVar]
     public Vector3Int playerCellPos { get; set; }
+
+    [SyncVar]
+    Vector3 test;
+
     Vector3Int prevCellPos;
 
     Vector2 playerPos;
@@ -73,31 +76,36 @@ public class PlayerMoveController : MonoBehaviour
     public PlayState e_playstate;
     public bool isOver;
 
-    // Only for most foremost operations
-    void Awake()
+    // not being called
+    void OnStartLocalPlayer()
     {
-        if (instance == null)
-            instance = this;
-        else if (instance != this)
-            Destroy(gameObject);
+        Debug.Log("Connected to server");
 
-        //DontDestroyOnLoad(gameObject);
+        gameGrid = MyNetwork.instance.localGameGrid;
+        if (gameGrid == null)
+            Debug.Log("NULL");
+    }
+
+    public void SetSinglePlayerMode()
+    {
+        Destroy(GetComponent<SyncTransform>());
     }
 
     void Start()
     {
-        gameGrid = GameModeManager.instance.gameGrid;
-        pawn_sprite = GameObject.Find("PlayerHero");
+        gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
+        tileRefManager = gameGrid.GetComponent<TileRefManager>();
+        dpad = GameObject.Find("Dpad").GetComponent<Dpad>();
+
+        pawn_sprite = this.gameObject;
         pawn = pawn_sprite.AddComponent<DefaultCharacter>();
         pawn.InitChar();
+
         // Set the player at the starting cell
-        Vector2 startingPos = gameGrid.GetCellToWorld(new Vector3Int(-3, 0, 0));
-        //pawn_sprite.transform.position = new Vector3(startingPos.x, startingPos.y, 0);
-        //playerPos = pawn_sprite.transform.position;
+        //Vector2 startingPos = gameGrid.GetCellToWorld(new Vector3Int(-3, 0, 0));
 
         originalTile = new Tile();
-        availableTile = new Tile();
-        availableTile.sprite = availableTileSprite;
+
         moveStat = new MovementStats(5f);
         body = pawn_sprite.GetComponent<Rigidbody2D>();
         body.gravityScale = 0.0f;
@@ -105,11 +113,17 @@ public class PlayerMoveController : MonoBehaviour
         isOver = false;
         p_animator = pawn_sprite.transform.GetChild(2).GetChild(0).GetComponent<Animator>();
         prevCellPos = gameGrid.GetWorldFlToCellPos(pawn_sprite.transform.position);
-        TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+        //tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
     }
 
     void Update()
     {
+        if (MyNetwork.instance.IsOnlineGame())
+        {
+            if (!isLocalPlayer)
+                return;
+        }
+
         if (!pawn_sprite.activeSelf)
             return;
 
@@ -153,12 +167,13 @@ public class PlayerMoveController : MonoBehaviour
     {
         playerPos = pawn_sprite.transform.position;
         playerCellPos = gameGrid.GetWorldFlToCellPos(playerPos);
+
         if (prevCellPos != playerCellPos)
         {
-            TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, null);
+            tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, null);
             prevCellPos = playerCellPos;
-            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos) != TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING))
-                TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+            if (tileRefManager.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos) != tileRefManager.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING))
+                tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos, tileRefManager.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
         }
 
         Move(dpad.moveDir);
@@ -246,6 +261,11 @@ public class PlayerMoveController : MonoBehaviour
 #if UNITY_EDITOR
         Vector3 temp = new Vector3(Input.mousePosition.x, Input.mousePosition.y, pawn_sprite.transform.position.z);
         return Camera.main.ScreenToWorldPoint(temp);
+
+#elif UNITY_STANDALONE_WIN
+        Vector3 temp = new Vector3(Input.mousePosition.x, Input.mousePosition.y, pawn_sprite.transform.position.z);
+        return Camera.main.ScreenToWorldPoint(temp);
+
 #elif UNITY_ANDROID
         if (Input.touchCount > 0)
         {
@@ -255,6 +275,8 @@ public class PlayerMoveController : MonoBehaviour
             }
         }
 #endif
+
+        return Vector3.zero;
     }
 
     public bool hasInteract()
@@ -315,7 +337,11 @@ public class PlayerMoveController : MonoBehaviour
 #if UNITY_EDITOR
         touchPos = new Vector3Int((int)Input.mousePosition.x, (int)Input.mousePosition.y, (int)Input.mousePosition.z);
         b_touchedScreen = Input.GetMouseButtonDown(0);
-        
+
+#elif UNITY_STANDALONE_WIN
+        touchPos = new Vector3Int((int)Input.mousePosition.x, (int)Input.mousePosition.y, (int)Input.mousePosition.z);
+        b_touchedScreen = Input.GetMouseButtonDown(0);
+
 #elif UNITY_ANDROID
         if (Input.touchCount > 0)
         {

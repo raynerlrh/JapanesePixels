@@ -28,6 +28,8 @@ namespace Boss
 
         public BattleState e_battleState;
 
+        PlayerMoveController moveController;
+
         public override void InitChar(float maxhealthval = 100)
         {
             base.InitChar(maxhealthval);
@@ -43,6 +45,8 @@ namespace Boss
             bossCooldown.initTimer(waitTime);
             bossCooldown.executedFunction = unPause;
             e_battleState = BattleState.E_NOTDECIDED;
+
+            moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
         }
 
         public void highlightAttackGrid()
@@ -142,7 +146,7 @@ namespace Boss
         public void moveForward(Vector3Int forwardvec, int lockAxis = 0)
         {
             GameGrid grid = GameModeManager.instance.gameGrid;
-            Vector3Int playercell = PlayerMoveController.instance.GetPlayerCellPos;
+            Vector3Int playercell = moveController.GetPlayerCellPos;
             Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(EnemyMoveController.instance.GetBossObj.transform.position);
             int cellsAway = grid.GetCellsAwaySquared(mycell, playercell);
             if (lockAxis == 0 || lockAxis == 1)
@@ -182,7 +186,7 @@ namespace Boss
 
         public bool detectPlayerApprox(int attkradius = 1)
         {
-            Vector3Int playercell = PlayerMoveController.instance.GetPlayerCellPos;
+            Vector3Int playercell = moveController.GetPlayerCellPos;
             Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(EnemyMoveController.instance.GetBossObj.transform.position);
             Vector3Int cellsAway = playercell - mycell;
             if (cellsAway.magnitude <= attkradius)
@@ -193,7 +197,7 @@ namespace Boss
         public bool detectPlayer(int attkradius = 1)
         {
             Vector3Int[] cells = GameModeManager.instance.gameGrid.GetPerimeter(2);
-            Vector3Int playercell = PlayerMoveController.instance.GetPlayerCellPos;
+            Vector3Int playercell = moveController.GetPlayerCellPos;
             for (int i = 0; i < cells.Length; ++i)
             {
                 if (cells[i].Equals(playercell))
@@ -235,7 +239,7 @@ namespace Boss
             else if (e_battleState == BattleState.E_HEAVYATTACK)
             {
                 Vector3Int pos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(EnemyMoveController.instance.GetBossObj.transform.position);
-                Vector3Int targetCell = PlayerMoveController.instance.GetPlayerCellPos;
+                Vector3Int targetCell = moveController.GetPlayerCellPos;
                 Vector3 target = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(targetCell);
                 if (pos.y == targetCell.y)
                 {

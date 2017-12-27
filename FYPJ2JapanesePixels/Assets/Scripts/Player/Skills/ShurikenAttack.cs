@@ -37,7 +37,9 @@ public class ShurikenAttack : PlayerSkill
 
         b_needsUpdate = true;
 
-        Vector2 playerPos = GameModeManager.instance.gameGrid.GetCellToWorld(PlayerMoveController.instance.GetPlayerCellPos);
+        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+
+        Vector2 playerPos = GameModeManager.instance.gameGrid.GetCellToWorld(moveController.GetPlayerCellPos);
         startingPos = (int)playerPos.x;
         totalAttackDist = startingPos + cellsAffected;
 

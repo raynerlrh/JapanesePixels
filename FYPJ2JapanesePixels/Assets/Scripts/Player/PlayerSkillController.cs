@@ -4,19 +4,15 @@ using UnityEngine;
 
 public class PlayerSkillController : MonoBehaviour 
 {
-    public static PlayerSkillController instance = null;
-
     public PlayerSkill[] skills { get; set; }
+
+    private PlayerMoveController moveController;
 
     void Awake()
     {
-        if (instance == null)
-            instance = this;
-        else if (instance != this)
-            Destroy(gameObject);
+        moveController = GetComponent<PlayerMoveController>();
 
         skills = new PlayerSkill[3];
-
         LoadSkills();
     }
 
@@ -35,16 +31,14 @@ public class PlayerSkillController : MonoBehaviour
         // Check health stuff first
         if (_skill.skillName == "Heal")
         {
-            float playerHealth = PlayerMoveController.instance.GetPawn.charStat.hpSys.health;
-            if (playerHealth == PlayerMoveController.instance.GetPawn.charStat.hpSys.MAX_HEALTH)
+            float playerHealth = moveController.GetPawn.charStat.hpSys.health;
+            if (playerHealth == moveController.GetPawn.charStat.hpSys.MAX_HEALTH)
                 return false;
         }
 
-        PlayerMoveController playerMove = PlayerMoveController.instance;
-
-        if ((playerMove.numAvailableMoves - _skill.numMoves) >= 0)
+        if ((moveController.numAvailableMoves - _skill.numMoves) >= 0)
         {
-            playerMove.numAvailableMoves -= _skill.numMoves;
+            moveController.numAvailableMoves -= _skill.numMoves;
             return true;
         }
 

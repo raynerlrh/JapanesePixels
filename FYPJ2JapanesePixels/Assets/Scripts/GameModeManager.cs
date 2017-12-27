@@ -86,7 +86,7 @@ public class GameModeManager : MonoBehaviour
         {
             reward = 1;
             //languageSystem.RefreshQuestion(); // removed for now
-            EnemyMoveController.instance.currentBoss.doAttack();
+            //EnemyMoveController.instance.currentBoss.doAttack(); // removed for now
             //Debug.Log("Guessed correctly 1");
             //env.resetagent();
         }
@@ -102,7 +102,7 @@ public class GameModeManager : MonoBehaviour
             else
                 env.brainMemory.storeAnswer(act);
 
-            EnemyMoveController.instance.currentBoss.doAttack();
+            //EnemyMoveController.instance.currentBoss.doAttack(); // removed for now
             //env.resetagent();
         }
         else if ((act > previousAction) && (n > act))

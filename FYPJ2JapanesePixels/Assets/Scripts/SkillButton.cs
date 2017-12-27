@@ -7,14 +7,29 @@ public class SkillButton : MonoBehaviour
 {
     PlayerSkill attachedSkill;
 
+    bool b_setLocalPlayer;
+
     void Start()
     {
-        AttachSkill(PlayerSkillController.instance.skills[1]);
+        if (MyNetwork.instance.IsOnlineGame())
+            return;
+
+        SetUp();
+    }
+
+    void SetUp()
+    {
+        PlayerSkillController skillController = MyNetwork.instance.localPlayer.GetComponent<PlayerSkillController>();
+
+        AttachSkill(skillController.skills[1]);
+        b_setLocalPlayer = true;
     }
 
     public void OnPress()
     {
-        if (PlayerSkillController.instance.CanPerformSkill(attachedSkill))
+        PlayerSkillController skillController = MyNetwork.instance.localPlayer.GetComponent<PlayerSkillController>();
+
+        if (skillController.CanPerformSkill(attachedSkill))
         {
             attachedSkill.ExecuteSkill();
         }
@@ -27,6 +42,14 @@ public class SkillButton : MonoBehaviour
 
     void Update()
     {
+        if (!b_setLocalPlayer)
+        {
+            if (!MyNetwork.instance.b_foundLocalPlayer)
+                return;
+
+            SetUp();
+        }
+
         if (attachedSkill.b_needsUpdate)
             attachedSkill.Update();
     }

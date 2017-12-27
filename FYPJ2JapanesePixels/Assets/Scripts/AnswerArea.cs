@@ -11,14 +11,16 @@ public class AnswerArea : MonoBehaviour
             if (col.gameObject.GetComponent<LanguageButton>().b_answer)
             {
                 GameModeManager.instance.languageSystem.RefreshQuestion(true);
-
                 GameModeManager.instance.SendMessage("ReceivePlayerChoice", false);
-                PlayerMoveController.instance.b_answeredCorrectly = true;
-                PlayerMoveController.instance.numAvailableMoves++;
+
+                PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+
+                moveController.b_answeredCorrectly = true;
+                moveController.numAvailableMoves++;
 
                 // Turn on player movement grid
                 //TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(true);
-                PlayerMoveController.instance.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
+                moveController.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
 
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(1, 1);
