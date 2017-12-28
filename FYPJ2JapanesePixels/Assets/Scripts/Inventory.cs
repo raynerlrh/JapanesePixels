@@ -2,37 +2,36 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public struct OnHand
 {
-    public GameObject equippedWeapon;
-}
-
-public struct InventoryStruct
-{
+    // bomb type can be placed here
+    public GameObject weapon;
     public int size;
-    public InventoryStruct(int setSize = 1)
-    {
-        size = setSize;
-    }
 }
 
 public class Inventory : MonoBehaviour {
     public GameObject[] items;
-    public InventoryStruct details;
     public int edit_size = 1;
+    [SerializeField]
     private OnHand equipped;
-    public GameObject getEquipment
+    public int OnHandAmount
     {
-        get { return equipped.equippedWeapon; }
+        get { return equipped.size; }
+        set { equipped.size = value; }
+    }
+    public GameObject OnHandItem
+    {
+        get { return equipped.weapon; }
+        set { equipped.weapon = value; }
     }
 
-	// Use this for initialization
-	void Start () {
-        details = new InventoryStruct(edit_size);
-        items = new GameObject[details.size];
+    // Use this for initialization
+    void Start () {
+        items = new GameObject[equipped.size];
         refreshInventory();
-        equipped.equippedWeapon = equipItem(0);
         GetComponent<CharacterStats>().updateAttkStat();
+        equipped.size = 0;
 	}
 	
 	// Update is called once per frame

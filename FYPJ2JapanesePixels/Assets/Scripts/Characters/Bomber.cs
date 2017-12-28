@@ -182,14 +182,7 @@ public class Bomber : MonoBehaviour {
     {
         Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(mycell); //guide.GetComponent<BomberGuide>().convertDirToVec3()
-        bombRef = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.parent.localRotation);
-        //bool passThrough = false;
-        //if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, playerPos))
-        //{
-        //    playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
-        //    passThrough = true;
-        //}
-        //if (passThrough)
+        bombRef = GameObject.Instantiate(transform.parent.GetChild(2).GetComponent<Inventory>().OnHandItem, spawnPos, transform.parent.localRotation);
         bombRef.GetComponent<Bomb>().effectRange = bombRange;
         bombRef.GetComponent<Collider2D>().isTrigger = true;
         bombRef.SetActive(true);
@@ -225,7 +218,9 @@ public class Bomber : MonoBehaviour {
     {
         Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3Int modified = mycell;
-        Vector3Int targetcell = PlayerMoveController.instance.GetPlayerCellPos;
+
+        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+        Vector3Int targetcell = moveController.GetPlayerCellPos;
 
         for (int i = 0; i < 4; i++)
         {

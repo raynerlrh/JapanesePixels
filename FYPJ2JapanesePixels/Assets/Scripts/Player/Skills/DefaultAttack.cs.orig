@@ -21,27 +21,32 @@ public class DefaultAttack : PlayerSkill
 
     public void ExecuteSkill()
     {
+<<<<<<< HEAD
+        Transform playerTrans = PlayerMoveController.instance.GetPawn.gameObject.transform;
+=======
         PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
-        if (moveController.GetInventory.OnHandAmount <= 0)
-            return;
+
         damage = moveController.GetPawn.GetComponent<CharacterStats>().attackVal;
         Transform playerTrans = moveController.GetPawn.gameObject.transform;
+>>>>>>> 8fb7c412051dcfb5efe5e1eaf7552c8601016725
         Vector3Int playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
         if (bombRef != null)
             if (GameModeManager.instance.gameGrid.GetWorldFlToCellPos(bombRef.transform.position) == playerPos)
                 return;
-
+        damage = PlayerMoveController.instance.GetPawn.GetComponent<CharacterStats>().attackVal;
         bool passThrough = true;
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(playerPos);
 
-        GameObject bomb = GameObject.Instantiate(moveController.GetInventory.OnHandItem, spawnPos, playerTrans.rotation);
-        if (moveController.GetInventory.OnHandAmount > 0)
-            moveController.GetInventory.OnHandAmount--;
+        GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, playerTrans.rotation);
+
         if (passThrough)
             bomb.GetComponent<Collider2D>().isTrigger = true;
 
         bomb.SetActive(true);
-bombRef = bomb;
+<<<<<<< HEAD
+        bombRef = bomb;
+=======
+
         if (MyNetwork.instance.IsOnlineGame())
         {
             //bomb.AddComponent<SyncTransform>();
@@ -54,6 +59,7 @@ bombRef = bomb;
 
             GameObject.Find("ItemSpawner").GetComponent<ItemSpawner>().CmdSpawnObject(bomb);
         }
+>>>>>>> 8fb7c412051dcfb5efe5e1eaf7552c8601016725
     }
 
     //[Command]

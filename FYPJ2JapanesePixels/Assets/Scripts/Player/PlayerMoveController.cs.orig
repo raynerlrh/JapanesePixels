@@ -30,8 +30,7 @@ public class PlayerMoveController : NetworkBehaviour
             return pawn;
         }
     }
-    private Inventory inventory;
-    public Inventory GetInventory{     get {    return inventory;    }    }
+
     //public const int MAX_MOVES = 5;
     GameGrid gameGrid;
     TileRefManager tileRefManager;
@@ -94,11 +93,16 @@ public class PlayerMoveController : NetworkBehaviour
 
     void Start()
     {
+<<<<<<< HEAD
+        gameGrid = GameModeManager.instance.gameGrid;
+        pawn_sprite = GameObject.Find("PlayerBomber");
+=======
         gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
         tileRefManager = gameGrid.GetComponent<TileRefManager>();
         dpad = GameObject.Find("Dpad").GetComponent<Dpad>();
 
         pawn_sprite = this.gameObject;
+>>>>>>> 8fb7c412051dcfb5efe5e1eaf7552c8601016725
         pawn = pawn_sprite.AddComponent<DefaultCharacter>();
         pawn.InitChar();
 
@@ -114,7 +118,6 @@ public class PlayerMoveController : NetworkBehaviour
         isOver = false;
         p_animator = pawn_sprite.transform.GetChild(1).GetChild(0).GetComponent<Animator>();
         prevCellPos = gameGrid.GetWorldFlToCellPos(pawn_sprite.transform.position);
-        inventory = GetComponent<Inventory>();
         //tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
     }
 

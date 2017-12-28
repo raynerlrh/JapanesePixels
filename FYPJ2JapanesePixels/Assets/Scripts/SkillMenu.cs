@@ -8,19 +8,42 @@ public class SkillMenu : MonoBehaviour
     public Transform skillButtons;
     public Text availableMovesText;
 
+    PlayerMoveController moveController;
+
+    bool b_setLocalPlayer;
+
     void Start()
     {
-        PlayerSkillController playerSkills = PlayerSkillController.instance;
+        if (MyNetwork.instance.IsOnlineGame())
+            return;
+
+        SetUp();
+    }
+
+    void SetUp()
+    {
+        PlayerSkillController skillController = MyNetwork.instance.localPlayer.GetComponent<PlayerSkillController>();
+        moveController = skillController.GetComponent<PlayerMoveController>();
 
         // Set skills 
         for (int i = 0; i < skillButtons.childCount; i++)
         {
-            skillButtons.GetChild(i).GetComponent<SkillButton>().AttachSkill(playerSkills.skills[i]);
+            skillButtons.GetChild(i).GetComponent<SkillButton>().AttachSkill(skillController.skills[i]);
         }
+
+        b_setLocalPlayer = true;
     }
 
     void Update()
     {
-        availableMovesText.text = PlayerMoveController.instance.numAvailableMoves.ToString();
+        if (!b_setLocalPlayer)
+        {
+            if (!MyNetwork.instance.b_foundLocalPlayer)
+                return;
+
+            SetUp();
+        }
+
+        availableMovesText.text = moveController.numAvailableMoves.ToString();
     }
 }

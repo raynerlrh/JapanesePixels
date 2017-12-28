@@ -14,7 +14,8 @@ public struct CamSettings
     public CamMode mode;
 }
 
-public class CameraController : MonoBehaviour {
+public class CameraController : MonoBehaviour 
+{
     public GameObject zoomTarget;
     private CamSettings settings;
     Vector3 pos;
@@ -26,7 +27,10 @@ public class CameraController : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update () 
+    {
+        zoomTarget = MyNetwork.instance.localPlayer;
+
         if (settings.mode == CamSettings.CamMode.E_OFFSET)
             pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y - settings.yOffset * 0.5f, transform.position.z);
         else if(settings.mode == CamSettings.CamMode.E_PCENTERED)

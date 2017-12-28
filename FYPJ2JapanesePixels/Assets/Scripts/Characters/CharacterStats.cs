@@ -113,8 +113,8 @@ public class CharacterStats : MonoBehaviour {
         Inventory ivt = GetComponent<Inventory>();
         if (ivt)
         {
-            if (ivt.getEquipment)
-                attackVal += ivt.getEquipment.GetComponent<ObjectStats>().damage;
+            //if (ivt.getEquipment)
+              //  attackVal += ivt.getEquipment.GetComponent<ObjectStats>().damage;
         }
     }
 }

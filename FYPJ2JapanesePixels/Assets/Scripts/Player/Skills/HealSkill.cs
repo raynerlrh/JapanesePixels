@@ -19,8 +19,8 @@ public class HealSkill : PlayerSkill
     public void ExecuteSkill()
     {
         //Debug.Log("Executed Skill: " + skillName);
-
-        PlayerMoveController.instance.GetPawn.charStat.increaseHealth(20);
+        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+        moveController.GetPawn.charStat.increaseHealth(20);
     }
 
     public void Update()

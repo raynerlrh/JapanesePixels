@@ -68,7 +68,7 @@ public class TileRefManager : MonoBehaviour
 
     public Tilemap GetTilemap(TILEMAP_TYPE type)
     {
-        return GameModeManager.instance.gameGrid.transform.GetChild((int)type).GetComponent<Tilemap>();
+        return transform.GetChild((int)type).GetComponent<Tilemap>();
     }
 
     public Tile GetTileAtCellPos(TILEMAP_TYPE tileMapType, Vector3Int cellPos)

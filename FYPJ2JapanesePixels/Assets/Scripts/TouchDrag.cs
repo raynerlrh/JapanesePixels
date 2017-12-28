@@ -48,6 +48,15 @@ public class TouchDrag : MonoBehaviour
         else
             Release();
 
+#elif UNITY_STANDALONE_WIN
+        if (Input.GetMouseButton(0))
+        {
+            if (collider == Physics2D.OverlapPoint(Input.mousePosition))
+                b_isDragged = true;
+        }
+        else
+            Release();
+
 #elif UNITY_ANDROID
         if (Input.touchCount > 0)
         {
@@ -62,13 +71,17 @@ public class TouchDrag : MonoBehaviour
             Drag();
     }
 
+    Vector3 pos;
+    Vector3 touchPos;
+
     // Make buttons move to cursor/finger position
     void Drag()
     {
-        Vector3 pos;
-        Vector3 touchPos;
+        
 
 #if UNITY_EDITOR
+        touchPos = Input.mousePosition;
+#elif UNITY_STANDALONE_WIN
         touchPos = Input.mousePosition;
 #elif UNITY_ANDROID
         touchPos = Input.GetTouch(0).position;

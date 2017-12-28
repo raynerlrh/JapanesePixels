@@ -10,9 +10,10 @@ public class TextGenerator : MonoBehaviour {
     private Canvas canvas3d;
     public int m_TimeToDestroy = 1;
     private TimerRoutine timer;
-	// Use this for initialization
-	void Awake () {
-        canvas2d = GameObject.FindGameObjectWithTag("2DCanvas").GetComponent<Canvas>();
+
+	void Awake () 
+    {
+        //canvas2d = GameObject.FindGameObjectWithTag("2DCanvas").GetComponent<Canvas>();
         canvas3d = GameObject.FindGameObjectWithTag("3DCanvas").GetComponent<Canvas>();
         destroyRefs = new List<GameObject>(size);
         timer = gameObject.AddComponent<TimerRoutine>();

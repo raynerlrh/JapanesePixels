@@ -46,7 +46,7 @@ public class Bomb : ObjectStats {
                 break;
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
-            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
+            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.localRotation);
             flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
             // Allow spawning of flame at the destructible block position before stopping all spawns
@@ -63,7 +63,7 @@ public class Bomb : ObjectStats {
                 break;
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
-            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
+            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.localRotation);
             flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
@@ -79,7 +79,7 @@ public class Bomb : ObjectStats {
                 break;
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
-            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
+            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.localRotation);
             flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
@@ -93,7 +93,7 @@ public class Bomb : ObjectStats {
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, spawnCell))
                 break;
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
-            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[3], spawnPos, transform.localRotation);
+            GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.localRotation);
             flame.GetComponent<ObjectStats>().damage = damage;
             flame.SetActive(true);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))

@@ -15,7 +15,7 @@ public class QuizAnim : MonoBehaviour
 
     float endTimer = 0;
 
-    void Awake()
+    void Start()
     {
         originalPos = transform.localPosition;
 
@@ -34,6 +34,8 @@ public class QuizAnim : MonoBehaviour
         {
             // Show rewards...
             // To do later
+            PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+            moveController.GetInventory.OnHandAmount = moveController.numAvailableMoves;
 
             endTimer += Time.deltaTime;
 
