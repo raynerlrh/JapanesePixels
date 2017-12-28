@@ -87,7 +87,7 @@ public class PlayerMoveController : MonoBehaviour
     void Start()
     {
         gameGrid = GameModeManager.instance.gameGrid;
-        pawn_sprite = GameObject.Find("PlayerHero");
+        pawn_sprite = GameObject.Find("PlayerBomber");
         pawn = pawn_sprite.AddComponent<DefaultCharacter>();
         pawn.InitChar();
         // Set the player at the starting cell
@@ -103,7 +103,7 @@ public class PlayerMoveController : MonoBehaviour
         body.gravityScale = 0.0f;
         e_playstate = PlayState.E_NONCOMBAT;
         isOver = false;
-        p_animator = pawn_sprite.transform.GetChild(2).GetChild(0).GetComponent<Animator>();
+        p_animator = pawn_sprite.transform.GetChild(1).GetChild(0).GetComponent<Animator>();
         prevCellPos = gameGrid.GetWorldFlToCellPos(pawn_sprite.transform.position);
         TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
     }
@@ -191,9 +191,6 @@ public class PlayerMoveController : MonoBehaviour
         else if (dpad.moveDir == Dpad.MOVE_DIR.RIGHT)
         {
             p_animator.transform.localScale = new Vector3(-1, 1, 1);
-        }
-        else if (dpad.moveDir == Dpad.MOVE_DIR.DOWN)
-        {
         }
 
         p_animator.SetFloat("NormalizeSpd", (int)dpad.moveDir);

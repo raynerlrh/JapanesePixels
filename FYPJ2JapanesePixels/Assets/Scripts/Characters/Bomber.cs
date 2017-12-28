@@ -33,29 +33,39 @@ public class Bomber : MonoBehaviour {
     }
     BomberState e_state;
     public GameObject bombRef;
+    Vector3Int myCellPos;
+    Vector3Int prevCellPos;
 
-	// Use this for initialization
-	void Start () {
+    Rigidbody2D physBody;
+    int priorityRange;
+    Animator anim;
+
+    // Use this for initialization
+    void Start () {
         canDrop = true;
         movement = new MovementData(2);
         {
             delay = gameObject.AddComponent<TimerRoutine>();
-            delay.initTimer(5);
+            delay.initTimer(6f);
             delay.executedFunction = resetBomb;
         }
         bombRange = 2;
         sightRange = bombRange * 2;
         BoxCollider2D col = gameObject.AddComponent<BoxCollider2D>();
-        col.size = new Vector2(0.3f * sightRange, 0.3f);
+        col.size = new Vector2(0.8f * sightRange, 0.8f);
         col.isTrigger = true;
         col = gameObject.AddComponent<BoxCollider2D>();
-        col.size = new Vector2(0.3f, 0.3f * sightRange);
+        col.size = new Vector2(0.8f, 0.8f * sightRange);
         col.isTrigger = true;
         dmgBody = transform.parent.GetChild(2).gameObject;
         dmgBody.GetComponent<DefaultCharacter>().InitChar();
         e_state = BomberState.E_PATROL;
         bombRef = null;
-	}
+        prevCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        physBody = transform.parent.GetComponent<Rigidbody2D>();
+        priorityRange = 0;
+        anim = transform.parent.GetChild(3).GetChild(0).GetComponent<Animator>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -65,30 +75,42 @@ public class Bomber : MonoBehaviour {
         if (dist > speed)
         {
             Vector2 direction = (guide.transform.position - transform.parent.position).normalized;
-            transform.parent.GetComponent<Rigidbody2D>().MovePosition((Vector2)transform.parent.position + direction * speed);
+            physBody.MovePosition((Vector2)transform.parent.position + direction * speed);
         }
         else
+        {
             guide.GetComponent<BomberGuide>().canProceed = true; // tell guide that i reached
+        }
 
         if (dmgBody.GetComponent<DefaultCharacter>().checkIfDead()) // no more health, destroy myself
         {
             Destroy(transform.parent.gameObject);
         }
 
-        //if (guide.GetComponent<BomberGuide>().hasWaypoint && bombRef == null)
-        //{
-        //    guide.GetComponent<BomberGuide>().hasWaypoint = false;
-        //    guide.GetComponent<BomberGuide>().wpIndex = 0;
-        //}
+        myCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        if (myCellPos != prevCellPos)
+        {
+            TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, null);
+            prevCellPos = myCellPos;
+            TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, myCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+        }
+        animate();
+        //switch ()
 
+        //if (direction == Dpad.MOVE_DIR.LEFT)
+        //{
+        //    p_animator.transform.localScale = new Vector3(1, 1, 1);
+        //}
+        //else if (dpad.moveDir == Dpad.MOVE_DIR.RIGHT)
+        //{
+        //    p_animator.transform.localScale = new Vector3(-1, 1, 1);
+        //}
     }
 
     void OnTriggerStay2D(Collider2D obj)
     {
         // if its not me
-        if (!obj.gameObject.Equals(transform.parent.gameObject) && e_state != BomberState.E_AVOID)
-        {
-            /*if (obj.gameObject.layer == 14)
+                    /*if (obj.gameObject.layer == 14)
             {
                 // get player cell pos
                 Vector3Int otherBomber = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(obj.transform.position);
@@ -107,6 +129,8 @@ public class Bomber : MonoBehaviour {
                     //guide.GetComponent<BomberGuide>().setDirection(findNextDirection(otherBomber)); // chase a player or destructable
                 }
             }*/
+        if (!obj.gameObject.Equals(transform.parent.gameObject) && !obj.gameObject.Equals(transform.parent.GetChild(2).gameObject))
+        {
             if (obj.gameObject.layer == 14 || obj.gameObject.layer == 17) // is this a object i care about
             {
                 if (canDrop) // if i can drop a bomb right now
@@ -123,20 +147,25 @@ public class Bomber : MonoBehaviour {
                     }
                 }
             }
+            // the following block should not be called if it is the bomber's own bomb
+            if (obj.gameObject.layer == 10 && !obj.gameObject.Equals(bombRef) && obj.gameObject.CompareTag("Interactable")) // is this a solidobject? Ignore my own bomb and do not detect flames which are also solidobjs
+            {
+                if (bombRef == null)
+                    priorityRange = 0;
+                int bombRange = obj.gameObject.GetComponent<Bomb>().effectRange;
+
+                //if (bombRange > priorityRange)
+                {
+                    bombRef = obj.gameObject;
+                    priorityRange = bombRange;
+                    List<Vector3Int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(obj.transform.position), obj.gameObject.GetComponent<Bomb>().effectRange);
+                    BomberGuide scrpt = guide.GetComponent<BomberGuide>();
+                    scrpt.resetWaypoints();
+                    scrpt.findWaypoint(cells, transform.parent.position);
+                }
+            }
         }
         //avoidBomb(obj);
-    }
-
-    private void OnTriggerEnter2D(Collider2D col)
-    {
-        // the following block should not be called if it is the bomber's own bomb
-        if (col.gameObject.layer == 10 && !col.gameObject.Equals(bombRef) && col.gameObject.tag == "Interactable") // is this a solidobject? Ignore my own bomb and do not detect flames which are also solidobjs
-        {
-            List<Vector3Int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(col.transform.position), col.gameObject.GetComponent<Bomb>().effectRange);
-            BomberGuide scrpt = guide.GetComponent<BomberGuide>();
-            scrpt.resetWaypoints();
-            scrpt.findWaypoint(cells, transform.parent.position);
-        }
     }
 
     //void OnCollisionStay2D(Collision2D obj)
@@ -285,21 +314,21 @@ public class Bomber : MonoBehaviour {
             modified.Set(mycell.x + x, mycell.y, mycell.z);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified))
             {
-                return true;
+                    return true;
             }
             else if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
             {
                 break;
             }
             //else
-              //  TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+                //TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS, modified, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
         }
         for (int x = -1; x >= -range; --x)
         {
             modified.Set(mycell.x + x, mycell.y, mycell.z);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified))
             {
-                return true;
+                    return true;
             }
             else if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
             {
@@ -311,7 +340,7 @@ public class Bomber : MonoBehaviour {
             modified.Set(mycell.x, mycell.y + y, mycell.z);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified))
             {
-                return true;
+                    return true;
             }
             else if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
             {
@@ -323,7 +352,7 @@ public class Bomber : MonoBehaviour {
             modified.Set(mycell.x, mycell.y + y, mycell.z);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified))
             {
-                return true;
+                    return true;
             }
             else if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
             {
@@ -333,40 +362,18 @@ public class Bomber : MonoBehaviour {
         return false;
     }
 
-    void avoidBomb(Collider2D obj)
-    {
-        if (obj.gameObject.layer == 10 && obj.gameObject.CompareTag("Interactable"))
-        {
-            e_state = BomberState.E_AVOID;
-            bombRef = obj.gameObject;
-            Vector3Int bombcell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(obj.transform.position);
-            switch (findNextDirection(bombcell))
-            {
-                case 0:
-                    guide.GetComponent<BomberGuide>().setDirection(1);
-                    break;
-                case 1:
-                    guide.GetComponent<BomberGuide>().setDirection(0);
-                    break;
-                case 2:
-                    guide.GetComponent<BomberGuide>().setDirection(3);
-                    break;
-                case 3:
-                    guide.GetComponent<BomberGuide>().setDirection(2);
-                    break;
-            }
-        }
-    }
-
     public List<Vector3Int> findHidingPlace(Vector3Int bombcell, int range)
     {
         Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3Int modified = mycell;
         List<Vector3Int> danger = GetCrossCells(range, bombcell);
         List<Vector3Int> safe = new List<Vector3Int>();
-        for (int x = -sightRange; x <= sightRange; ++x)
+        int hiderange = sightRange;
+        if (range > sightRange)
+            hiderange = range;
+        for (int x = -hiderange; x <= hiderange; ++x)
         {
-            for (int y = -sightRange; y <= sightRange; ++y)
+            for (int y = -hiderange; y <= hiderange; ++y)
             {
                 modified.Set(mycell.x + x, mycell.y + y, mycell.z);
                 if (danger.Contains(modified))
@@ -375,7 +382,7 @@ public class Bomber : MonoBehaviour {
                     continue;
                 //if (modified.x == mycell.x || modified.y == mycell.y)
                     //continue;
-                if (cellsAway(mycell, modified) <= bombRange)
+                if (cellsAway(mycell, modified) <= sightRange)
                 {
                     safe.Add(modified);
                 }
@@ -398,5 +405,21 @@ public class Bomber : MonoBehaviour {
             vectors.Add(modified);
         }
         return vectors;
+    }
+
+    private void animate()
+    {
+        int dir = guide.GetComponent<BomberGuide>().getDirection();
+        //print(dir);
+        switch((BomberGuide.MOVEDIR)dir)
+        {
+            case BomberGuide.MOVEDIR.E_LEFT:
+                anim.transform.localScale = new Vector3(1, 1, 1);
+                break;
+            case BomberGuide.MOVEDIR.E_RIGHT:
+                anim.transform.localScale = new Vector3(-1, 1, 1);
+                break;
+        }
+        anim.SetFloat("NormalizeSpd", dir);
     }
 }

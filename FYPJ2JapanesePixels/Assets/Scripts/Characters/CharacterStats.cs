@@ -96,7 +96,7 @@ public class CharacterStats : MonoBehaviour {
         hpSys.health += upvalue;
         if (hpSys.health > hpSys.MAX_HEALTH)
             hpSys.health = hpSys.MAX_HEALTH;
-        GetComponent<TextGenerator>().GenerateText(upvalue.ToString(), true, transform.position, 5, 1, true, Color.green);
+        GetComponent<TextGenerator>().GenerateText(upvalue.ToString(), true, transform.position, 1, true, Color.green);
     }
 
     public void updateDefStat()

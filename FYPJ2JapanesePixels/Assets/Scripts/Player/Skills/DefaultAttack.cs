@@ -10,6 +10,7 @@ public class DefaultAttack : PlayerSkill
     public int cellsAffected { get; set; }
     public float damage { get; set; }
     public string skillName { get; set; }
+    private GameObject bombRef;
 
     public DefaultAttack()
     {
@@ -20,15 +21,19 @@ public class DefaultAttack : PlayerSkill
 
     public void ExecuteSkill()
     {
-        damage = PlayerMoveController.instance.GetPawn.GetComponent<CharacterStats>().attackVal;
         Transform playerTrans = PlayerMoveController.instance.GetPawn.gameObject.transform;
         Vector3Int playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
+        if (bombRef != null)
+            if (GameModeManager.instance.gameGrid.GetWorldFlToCellPos(bombRef.transform.position) == playerPos)
+                return;
+        damage = PlayerMoveController.instance.GetPawn.GetComponent<CharacterStats>().attackVal;
         bool passThrough = true;
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(playerPos);
         GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, playerTrans.rotation);
         if (passThrough)
             bomb.GetComponent<Collider2D>().isTrigger = true;
         bomb.SetActive(true);
+        bombRef = bomb;
     }
 
     public void Update()

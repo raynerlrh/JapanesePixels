@@ -17,6 +17,7 @@ public class Bomb : ObjectStats {
         hasExploded = false;
         effectPos = new Vector3Int[effectRange * 4 + 1];
         startPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+        hasMoved = false;
 	}
 	
 	// Update is called once per frame
@@ -30,8 +31,8 @@ public class Bomb : ObjectStats {
 
     void Explode()
     {
-        Destroy(this.gameObject);
         spawnFlames();
+        Destroy(this.gameObject);
     }
 
     void spawnFlames()
@@ -102,10 +103,10 @@ public class Bomb : ObjectStats {
 
     void OnTriggerEnter2D(Collider2D obj)
     {
-        if  ((obj.gameObject.layer == 14 || obj.gameObject.layer == 15) && hasMoved )
+        if  (obj.gameObject.layer == 14 && hasMoved )
             GetComponent<Collider2D>().isTrigger = false;
-        else
-            hasMoved = false;
+        //else
+          //  hasMoved = false;
     }
 
     void OnTriggerExit2D(Collider2D obj)
