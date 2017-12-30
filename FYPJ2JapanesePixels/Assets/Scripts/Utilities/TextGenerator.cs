@@ -26,7 +26,7 @@ public class TextGenerator : MonoBehaviour {
 		animate();
 	}
 
-    public void GenerateText(string printTxt, bool is3d, Vector3 spawnPos, int scale =  5, float yOffset = 1, bool isDestroy = true, Color? col = null)
+    public void GenerateText(string printTxt, bool is3d, Vector3 spawnPos, float yOffset = 1, bool isDestroy = true, Color? col = null)
     {
         Vector3 pos = new Vector3(spawnPos.x, spawnPos.y + yOffset, spawnPos.z);
 
@@ -40,7 +40,7 @@ public class TextGenerator : MonoBehaviour {
             txt.text = printTxt;
             //txt.fontStyle = FontStyle.Bold;
             //txt.alignment = TextAnchor.MiddleLeft;
-            txt.fontSize = scale * 10;
+            txt.fontSize = size;
             txt.gameObject.SetActive(true);
             //txt.horizontalOverflow = HorizontalWrapMode.Overflow;
             //txt.verticalOverflow = VerticalWrapMode.Overflow;

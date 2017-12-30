@@ -34,6 +34,8 @@ public class QuizAnim : MonoBehaviour
         {
             // Show rewards...
             // To do later
+            PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+            moveController.GetInventory.OnHandAmount = moveController.numAvailableMoves;
 
             endTimer += Time.deltaTime;
 

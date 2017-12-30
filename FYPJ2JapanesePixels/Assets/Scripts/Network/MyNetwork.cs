@@ -58,6 +58,9 @@ public class MyNetwork : MonoBehaviour
         }
     }
 
+    // Other players are always -1, only local player is 0
+    // This function does not work
+    // Don't think any scripts require the host anyway
     void FindHost(GameObject[] _players)
     {
         for (int i = 0; i < _players.Length; i++)
@@ -93,6 +96,7 @@ public class MyNetwork : MonoBehaviour
                     _player.GetComponent<PlayerMoveController>().b_isHost = true;
 
                 localPlayer = _player.gameObject;
+                localPlayer.GetComponent<PlayerMoveController>().GetPawn.InitChar();
 
                 localGameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
                 b_foundLocalPlayer = true;

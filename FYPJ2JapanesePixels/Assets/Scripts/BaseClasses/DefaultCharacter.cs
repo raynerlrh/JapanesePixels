@@ -19,7 +19,13 @@ public class DefaultCharacter : MonoBehaviour
     public virtual void InitChar(float maxhealthval = 100)
     {
         e_charState = CharacterState.E_ALIVE;
-        charStat = GetComponent<CharacterStats>();
+        if (CompareTag("Player"))
+        {
+            PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+            charStat = moveController.GetPawn.GetComponent<CharacterStats>();
+        }
+        else
+            charStat = GetComponent<CharacterStats>();
         charStat.setHealth(maxhealthval);
     }
 

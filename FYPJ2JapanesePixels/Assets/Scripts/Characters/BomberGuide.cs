@@ -9,7 +9,7 @@ using UnityEngine;
 
 public class BomberGuide : MonoBehaviour {
 
-    enum MOVEDIR
+    public enum MOVEDIR
     {
         E_LEFT = 0,
         E_RIGHT,
@@ -20,7 +20,7 @@ public class BomberGuide : MonoBehaviour {
 
     MOVEDIR direction;
     Vector3Int destination;
-    public Transform waypoint;
+    private Vector3 waypoint;
     public bool canProceed;
     public int cellsFree = 3;
     private int originalCellsFree;
@@ -33,13 +33,12 @@ public class BomberGuide : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        direction = MOVEDIR.E_CENTRE;
         direction = getRandomDir();
         canProceed = false;
         originalCellsFree = cellsFree;
         wpIndex = 0;
         safetyTimer = gameObject.AddComponent<TimerRoutine>();
-        safetyTimer.initTimer(2);
+        safetyTimer.initTimer(3);
         safetyTimer.executedFunction = resetWaypoints;
 
     }
@@ -52,6 +51,9 @@ public class BomberGuide : MonoBehaviour {
             // check if the cell in front of me is blocked
             if (!hasWaypoint)
             {
+                if (direction == MOVEDIR.E_CENTRE)
+                    direction = getRandomDir();
+
                 if (!obstacleCheck(direction, 1))
                 {
                     destination = convertDirToVec3(); // not blocked, get next cell to go to depending on my direction
@@ -77,8 +79,9 @@ public class BomberGuide : MonoBehaviour {
             {
                 if (waypoints == null) // pathfind gives waypoint cells to move to
                 {
-                    GetComponent<AStarPath>().init(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(waypoint.position));
+                    GetComponent<AStarPath>().init(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(waypoint));
                     waypoints = GetComponent<AStarPath>().runPathFinding();
+                    checkWaypointValidity();
                 }
                 else // move
                 {
@@ -87,10 +90,11 @@ public class BomberGuide : MonoBehaviour {
                     {
                         wpIndex++;
                         //if (wpIndex == 1)
-                            //lastValid = waypoints[1];
+                        //lastValid = waypoints[1];
                         checkWaypointValidity();
                         //for (int i = 0; i < waypoints.Count; ++i)
-                            //print(waypoints[i] + "co");
+                        //print(waypoints[i] + "co");
+                        direction = convertVec3ToDir(bomberobj.transform.position, waypoints[wpIndex]);
                         moveToWaypoint();
                         canProceed = false;
                     }
@@ -98,6 +102,7 @@ public class BomberGuide : MonoBehaviour {
                     {
                         if (!safetyTimer.hasRun)
                             safetyTimer.executeFunction();
+                        direction = MOVEDIR.E_CENTRE;
                     }
                 }
                 //move
@@ -127,7 +132,7 @@ public class BomberGuide : MonoBehaviour {
                 //}
             }
         }
-	}
+    }
 
     public void resetWaypoints()
     {
@@ -182,11 +187,6 @@ public class BomberGuide : MonoBehaviour {
         for (int i = 0; i < waypoints.Count; ++i)
         {
             float dist = fCellsAway(waypoints[i], last);
-            if (i == 9)
-            {
-                //print(waypoints[i]);
-                //print(last);
-            }
             //print(waypoints[wpIndex]);
             //print(lastValid);
             if (dist > 1)
@@ -232,6 +232,27 @@ public class BomberGuide : MonoBehaviour {
             default:
                 return mycell;
         }
+    }
+
+    public MOVEDIR convertVec3ToDir(Vector3 startpos, Vector3Int des)
+    {
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(startpos);
+        Vector3Int diff = des - mycell;
+        if (diff.x == 0)
+        {
+            if (des.y > mycell.y)
+                return MOVEDIR.E_UP;
+            else
+                return MOVEDIR.E_DOWN;
+        }
+        else if (diff.y == 0)
+        {
+            if (des.x > mycell.x)
+                return MOVEDIR.E_RIGHT;
+            else
+                return MOVEDIR.E_LEFT;
+        }
+        return MOVEDIR.E_CENTRE;
     }
 
     private bool obstacleCheck(MOVEDIR dir, int range)
@@ -340,7 +361,7 @@ public class BomberGuide : MonoBehaviour {
                         {
                             continue;
                         }
-                        waypoint.position = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(possible[i]);
+                        waypoint = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(possible[i]);
                         hasWaypoint = true;
                         break;
                     }

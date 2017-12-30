@@ -37,9 +37,4 @@ public class ItemSpawner : NetworkBehaviour
             NetworkServer.Spawn(item);
         }
     }
-
-    public void SpawnGrid(GameObject _gameObject)
-    {
-        NetworkServer.Spawn(_gameObject);
-    }
 }

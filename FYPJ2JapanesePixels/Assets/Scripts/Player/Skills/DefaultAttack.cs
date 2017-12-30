@@ -11,6 +11,8 @@ public class DefaultAttack : PlayerSkill
     public float damage { get; set; }
     public string skillName { get; set; }
 
+    private Vector3 prevBombPos = Vector3.zero;
+
     public DefaultAttack()
     {
         skillName = "Default Attack: Drop bomb";
@@ -25,19 +27,21 @@ public class DefaultAttack : PlayerSkill
         damage = moveController.GetPawn.GetComponent<CharacterStats>().attackVal;
         Transform playerTrans = moveController.GetPawn.gameObject.transform;
         Vector3Int playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
+
+        if (prevBombPos != Vector3.zero)
+        {
+            if (GameModeManager.instance.gameGrid.GetWorldFlToCellPos(prevBombPos) == playerPos)
+                return;
+        }
+        
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(playerPos);
 
-        //GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, playerTrans.rotation);
-
-        //bool passThrough = true;
-        //if (passThrough)
-            //bomb.GetComponent<Collider2D>().isTrigger = true;
+        if (moveController.GetInventory.OnHandAmount > 0)
+            moveController.GetInventory.OnHandAmount--;
 
         if (MyNetwork.instance.IsOnlineGame())
         {
-            //bomb.AddComponent<SyncTransform>();
-            //bomb.GetComponent<SyncTransform>().b_isEnemy = true;
-
+            prevBombPos = spawnPos;
             SpawnBomb("Prefabs/Bomb", spawnPos, playerTrans.rotation);
         }
     }
