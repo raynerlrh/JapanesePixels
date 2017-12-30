@@ -38,8 +38,7 @@ public class ItemSpawner : NetworkBehaviour
         }
     }
 
-    [Command]
-    public void CmdSpawnObject(GameObject _gameObject)
+    public void SpawnGrid(GameObject _gameObject)
     {
         NetworkServer.Spawn(_gameObject);
     }

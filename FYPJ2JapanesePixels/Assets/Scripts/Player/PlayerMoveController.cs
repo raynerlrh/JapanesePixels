@@ -21,6 +21,8 @@ public struct MovementStats
 
 public class PlayerMoveController : NetworkBehaviour
 {
+    public bool b_isHost { get; set; }
+
     private DefaultCharacter pawn; // main character, can be an array of pawns for each character
     private GameObject pawn_sprite; // can be an array of sprites for each character
     public DefaultCharacter GetPawn
@@ -122,6 +124,11 @@ public class PlayerMoveController : NetworkBehaviour
         {
             if (!isLocalPlayer)
                 return;
+
+            if (isServer)
+            {
+                Debug.Log(" I AM SERVER");
+            }
         }
 
         if (!pawn_sprite.activeSelf)
@@ -466,5 +473,18 @@ public class PlayerMoveController : NetworkBehaviour
         {
             return gameGrid.GetWorldFlToCellPos(playerPos);
         }
+    }
+
+    [Command]
+    public void CmdSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    {
+        RpcSpawn(_prefabsPath, _pos, _rot);
+    }
+
+    [ClientRpc]
+    public void RpcSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    {
+        GameObject _bomb = Resources.Load(_prefabsPath) as GameObject;
+        GameObject _gameObject = GameObject.Instantiate(_bomb, _pos, _rot);
     }
 }

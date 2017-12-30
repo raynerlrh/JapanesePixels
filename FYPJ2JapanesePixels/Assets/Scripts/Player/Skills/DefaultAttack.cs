@@ -25,35 +25,32 @@ public class DefaultAttack : PlayerSkill
         damage = moveController.GetPawn.GetComponent<CharacterStats>().attackVal;
         Transform playerTrans = moveController.GetPawn.gameObject.transform;
         Vector3Int playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
-        bool passThrough = true;
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(playerPos);
 
-        GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, playerTrans.rotation);
+        //GameObject bomb = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, playerTrans.rotation);
 
-        if (passThrough)
-            bomb.GetComponent<Collider2D>().isTrigger = true;
-
-        bomb.SetActive(true);
+        //bool passThrough = true;
+        //if (passThrough)
+            //bomb.GetComponent<Collider2D>().isTrigger = true;
 
         if (MyNetwork.instance.IsOnlineGame())
         {
             //bomb.AddComponent<SyncTransform>();
             //bomb.GetComponent<SyncTransform>().b_isEnemy = true;
 
-            //Debug.Log("DEFAULT");
-
-            //CmdSpawnBomb(bomb);
-            //MyNetwork.instance.CmdSpawnObject(bomb);
-
-            GameObject.Find("ItemSpawner").GetComponent<ItemSpawner>().CmdSpawnObject(bomb);
+            SpawnBomb("Prefabs/Bomb", spawnPos, playerTrans.rotation);
         }
     }
 
-    //[Command]
-    //void CmdSpawnBomb(GameObject _gameObject)
-    //{
-    //    NetworkServer.Spawn(_gameObject);
-    //}
+    void SpawnBomb(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    {
+        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+
+        if (moveController.isServer)
+            moveController.RpcSpawn(_prefabsPath, _pos, _rot);
+        else
+            moveController.CmdSpawn(_prefabsPath, _pos, _rot);
+    }
 
     public void Update()
     {
