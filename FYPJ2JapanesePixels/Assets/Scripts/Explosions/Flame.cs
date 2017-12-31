@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Flame : ObjectStats {
+public class Flame : ObjectStats 
+{
     TimerRoutine burnout;
+
 	// Use this for initialization
 	void Start () {
         burnout = gameObject.AddComponent<TimerRoutine>();
@@ -31,13 +33,30 @@ public class Flame : ObjectStats {
             val = -2f;
             if (val > 5f && val < 15f)
             {
-                GameModeManager.instance.itemSpawner.SpawnItem(transform.position, false, -5f); // give player a laughable chance to get a reward
+                SpawnItem(transform.position, false, -5f); // give player a laughable chance to get a reward
             }
             else if (val > -5f && val < 5f)
-                GameModeManager.instance.itemSpawner.SpawnItem(transform.position, true, -1f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_EXPLOSION);
+                SpawnItem(transform.position, true, -1f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_EXPLOSION);
             else if (val > -15f && val < -5f)
-                GameModeManager.instance.itemSpawner.SpawnItem(transform.position, true, -4f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_HEALTH);
+                SpawnItem(transform.position, true, -4f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_HEALTH);
             DestroySelf();
         }
+    }
+
+    void SpawnItem(Vector3 pos, bool chance = false, float chancenum = 2f, Item.ITEM_TYPE itype = Item.ITEM_TYPE.QUESTION, Item.EFFECT_TYPE etype = Item.EFFECT_TYPE.E_EXPLOSION)
+    {
+        if (chance)
+        {
+            float val = Random.Range(-5f, 5f);
+            if (val > chancenum)
+                return;
+        }
+
+        GameObject itemPrefab = Resources.Load("Prefabs/Item") as GameObject;
+        GameObject obj = (GameObject)Instantiate(itemPrefab, pos, Quaternion.identity);
+
+        Item i = obj.GetComponent<Item>();
+        i.itemType = itype;
+        i.effectType = etype;
     }
 }

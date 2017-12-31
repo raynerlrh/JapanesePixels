@@ -729,6 +729,7 @@ MonoBehaviour:
   HitMultiplier: 1
   attackVal: 0
   defVal: 0
+  hpBar: {fileID: 0}
 --- !u!114 &114052468491536946
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1076,6 +1077,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae01457dfa5f66546b45f5680e2db461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  b_isEnemy: 0
 --- !u!114 &114868161258598810
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1109,16 +1111,19 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1276795478393080}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80614c5984121dc41a90ecdf2a1fe6a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  items: []
+  items:
+  - {fileID: 0}
   edit_size: 5
   equipped:
     weapon: {fileID: 0}
     size: 0
+    range: 0
+  pendingReward: 0
 --- !u!212 &212141774310260324
 SpriteRenderer:
   m_ObjectHideFlags: 1

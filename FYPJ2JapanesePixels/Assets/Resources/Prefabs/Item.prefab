@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 114668848985427466}
   - component: {fileID: 61720273925693498}
   m_Layer: 10
-  m_Name: QuestionItem
+  m_Name: Item
   m_TagString: InventoryItem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

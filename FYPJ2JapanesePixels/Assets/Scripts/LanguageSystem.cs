@@ -69,7 +69,7 @@ public class LanguageSystem : MonoBehaviour
     {
         preGameTimer = preGameTime + 1;
         b_changedQuestionGroup = true;
-        GetComponent<QuizAnim>().enabled = false;
+        GetComponent<QuizAnim>().Init();
         questionIndexList = new List<int>();
         questionPosArr = new Vector2[questionText.childCount];
 

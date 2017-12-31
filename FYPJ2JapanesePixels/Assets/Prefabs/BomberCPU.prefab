@@ -342,8 +342,10 @@ GameObject:
   - component: {fileID: 114694734376800582}
   - component: {fileID: 114516583497493586}
   - component: {fileID: 114868924507468040}
+  - component: {fileID: 114404652459755796}
+  - component: {fileID: 114302975818423268}
   m_Layer: 14
-  m_Name: BomberCPU 1
+  m_Name: BomberCPU
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -993,6 +995,18 @@ MonoBehaviour:
       m_Calls: []
     m_TypeName: UnityEngine.UI.Slider+SliderEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
+--- !u!114 &114302975818423268
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1602661936825762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae01457dfa5f66546b45f5680e2db461, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  b_isEnemy: 1
 --- !u!114 &114305293642077618
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1041,6 +1055,38 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   e_charState: 0
   charStat: {fileID: 0}
+--- !u!114 &114404652459755796
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1602661936825762}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 372142912, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SceneId:
+    m_Value: 0
+  m_AssetId:
+    i0: 20
+    i1: 190
+    i2: 81
+    i3: 182
+    i4: 41
+    i5: 21
+    i6: 98
+    i7: 52
+    i8: 123
+    i9: 101
+    i10: 66
+    i11: 196
+    i12: 192
+    i13: 40
+    i14: 135
+    i15: 233
+  m_ServerOnly: 0
+  m_LocalPlayerAuthority: 0
 --- !u!114 &114440528185978252
 MonoBehaviour:
   m_ObjectHideFlags: 1

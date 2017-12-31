@@ -16,7 +16,7 @@ public class QuizAnim : MonoBehaviour
     float endTimer = 0;
     public RLEnvironment[] CPUList;
 
-    void Awake()
+    public void Init()
     {
         originalPos = transform.localPosition;
 
@@ -27,6 +27,8 @@ public class QuizAnim : MonoBehaviour
             b_showing = true;
             topBackground.SetActive(true);
         }
+
+        this.enabled = false;
     }
     
     void Update()
@@ -76,6 +78,7 @@ public class QuizAnim : MonoBehaviour
                 GetComponent<LanguageSystem>().enabled = true;
                 topBackground.SetActive(false);
                 gameObject.SetActive(false);
+
                 // reset the number of moves
                 PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
                 if (moveController.GetInventory.pendingReward)
