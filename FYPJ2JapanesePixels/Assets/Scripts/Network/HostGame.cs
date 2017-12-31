@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 
 public class HostGame : MonoBehaviour 
@@ -7,6 +8,9 @@ public class HostGame : MonoBehaviour
     private uint roomSize = 4;
 
     private string roomName;
+
+    [SerializeField]
+    Text createRoomErrorText;
 
     private NetworkManager networkManager;
 
@@ -34,7 +38,9 @@ public class HostGame : MonoBehaviour
             networkManager.matchMaker.CreateMatch(roomName, roomSize, true, "", "", "", 0, 0, networkManager.OnMatchCreate);
         }
         else
-            Debug.Log("Error creating room");
+        {
+            createRoomErrorText.text = "Room name cannot be empty";
+        }
     }
 
     void OnLevelWasLoaded(int level)

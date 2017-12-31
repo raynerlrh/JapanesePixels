@@ -53,6 +53,7 @@ public class JoinGame : MonoBehaviour
         {
             GameObject roomListItemGO = Instantiate(roomListItemPrefab);
             roomListItemGO.transform.SetParent(roomListParent);
+            roomListItemGO.transform.localScale = new Vector3(1, 1, 1);
 
             RoomListItem roomListItem = roomListItemGO.GetComponent<RoomListItem>();
 
@@ -82,6 +83,8 @@ public class JoinGame : MonoBehaviour
 
     public void JoinRoom(MatchInfoSnapshot _match)
     {
+        PlayerPrefs.SetInt("Connection_Status", 1);
+
         networkManager.matchMaker.JoinMatch(_match.networkId, "", "", "", 0, 0, networkManager.OnMatchJoined);
         ClearRoomList();
         status.text = "Joining...";

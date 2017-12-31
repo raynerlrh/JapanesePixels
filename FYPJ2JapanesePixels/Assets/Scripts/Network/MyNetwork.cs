@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Networking.Match;
 
 public class MyNetwork : MonoBehaviour 
 {
@@ -21,6 +22,41 @@ public class MyNetwork : MonoBehaviour
     }
 
     public GAME_TYPE gameType { get; set; }
+
+    void OnApplicationQuit()
+    {
+        NetworkManager networkManager = NetworkManager.singleton;
+
+        MatchInfo matchInfo = networkManager.matchInfo;
+
+        if (matchInfo == null)
+            return;
+
+        networkManager.matchMaker.DropConnection(matchInfo.networkId, matchInfo.nodeId, 0, networkManager.OnDropConnection);
+        networkManager.StopHost();
+
+        PlayerPrefs.SetInt("Connection_Status", 1);
+
+        Debug.Log("Application ending after " + Time.time + " seconds");
+    }
+
+    void OnPlayerDisconnected(NetworkPlayer player)
+    {
+        Debug.Log("Clean up after player " + player);
+        Network.RemoveRPCs(player);
+        Network.DestroyPlayerObjects(player);
+    }
+
+    void OnDisconnectedFromServer(NetworkDisconnection info)
+    {
+        if (Network.isServer)
+            Debug.Log("Local server connection disconnected");
+        else
+            if (info == NetworkDisconnection.LostConnection)
+                Debug.Log("Lost connection to the server");
+            else
+                Debug.Log("Successfully diconnected from the server");
+    }
 
     void Awake()
     {
