@@ -23,7 +23,8 @@ public class DefaultAttack : PlayerSkill
     public void ExecuteSkill()
     {
         PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
-
+        if (moveController.GetInventory.OnHandAmount <= 0)
+            return;
         damage = moveController.GetPawn.GetComponent<CharacterStats>().attackVal;
         Transform playerTrans = moveController.GetPawn.gameObject.transform;
         Vector3Int playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
@@ -55,10 +56,13 @@ public class DefaultAttack : PlayerSkill
     {
         PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
 
+        GameObject spawned = null;
         if (moveController.isServer)
             moveController.RpcSpawn(_prefabsPath, _pos, _rot);
         else
             moveController.CmdSpawn(_prefabsPath, _pos, _rot);
+        if (spawned)
+            spawned.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
     }
 
     public void Update()

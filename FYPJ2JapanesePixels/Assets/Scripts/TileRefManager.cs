@@ -12,6 +12,8 @@ public class TileRefManager : MonoBehaviour
     {
         TILE_GRASS,
         TILE_WARNING,
+        TILE_WALL,
+        TILE_DEBUG
     }
 
     public enum TILEMAP_TYPE

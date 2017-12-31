@@ -27,6 +27,16 @@ public class Flame : ObjectStats {
         {
             Vector3Int cellpos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
             TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, cellpos, null);
+            float val = Random.Range(-15f, 15f);
+            val = -2f;
+            if (val > 5f && val < 15f)
+            {
+                GameModeManager.instance.itemSpawner.SpawnItem(transform.position, false, -5f); // give player a laughable chance to get a reward
+            }
+            else if (val > -5f && val < 5f)
+                GameModeManager.instance.itemSpawner.SpawnItem(transform.position, true, -1f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_EXPLOSION);
+            else if (val > -15f && val < -5f)
+                GameModeManager.instance.itemSpawner.SpawnItem(transform.position, true, -4f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_HEALTH);
             DestroySelf();
         }
     }

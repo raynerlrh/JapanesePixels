@@ -1028,6 +1028,7 @@ MonoBehaviour:
   HitMultiplier: 1
   attackVal: 0
   defVal: 0
+  hpBar: {fileID: 0}
 --- !u!114 &114952315145812204
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1043,7 +1044,9 @@ MonoBehaviour:
   edit_size: 5
   equipped:
     weapon: {fileID: 1487954695940548, guid: 4e7b085b2873fef4990541a46f2ff5e7, type: 2}
-    size: 0
+    size: 100
+    range: 0
+  pendingReward: 0
 --- !u!114 &114957353166919126
 MonoBehaviour:
   m_ObjectHideFlags: 1

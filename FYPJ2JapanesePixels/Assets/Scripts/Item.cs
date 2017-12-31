@@ -11,7 +11,15 @@ public class Item : NetworkBehaviour
         QUESTION,
     }
 
-    public ITEM_TYPE itemType;
+    public enum EFFECT_TYPE
+    {
+        E_HEALTH,
+        E_EXPLOSION,
+        E_SPEEDINCREASE
+    }
+
+    public ITEM_TYPE itemType = ITEM_TYPE.SKILL;
+    public EFFECT_TYPE effectType = EFFECT_TYPE.E_EXPLOSION;
 
     Vector3Int itemCellPos;
     NetworkIdentity player;
@@ -19,8 +27,6 @@ public class Item : NetworkBehaviour
     void Start()
     {
         GameGrid gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
-
-
         itemCellPos = gameGrid.GetWorldFlToCellPos(transform.localPosition);
     }
 
@@ -37,10 +43,17 @@ public class Item : NetworkBehaviour
 
     void OnTriggerEnter2D(Collider2D col)
     {
-        if (col.tag == "Player")
+        if (col.tag == "Player" && itemType == ITEM_TYPE.QUESTION)
         {
             player = col.GetComponent<NetworkIdentity>();
             UseItem();
+            col.GetComponent<Inventory>().pendingReward = true;
+        }
+        else if(col.tag == "Player")
+            UseItem();
+        else if (col.gameObject.layer == 14)
+        {
+            UseItemCPU(col.gameObject);
         }
     }
 
@@ -49,8 +62,18 @@ public class Item : NetworkBehaviour
         switch (itemType)
         {
             case ITEM_TYPE.SKILL:
+                switch (effectType)
+                {
+                    case EFFECT_TYPE.E_EXPLOSION:
+                        Inventory inv = MyNetwork.instance.localPlayer.GetComponent<Inventory>();
+                        inv.OnHandRange++;
+                        break;
+                    case EFFECT_TYPE.E_HEALTH:
+                        CharacterStats stats = MyNetwork.instance.localPlayer.GetComponent<CharacterStats>();
+                        stats.increaseHealth(stats.hpSys.MAX_HEALTH);
+                        break;
+                }
                 // give a randomized skill? or already randomized at the start and just give a skill
-
                 break;
             case ITEM_TYPE.QUESTION:
                 // enables quiz menu
@@ -58,6 +81,27 @@ public class Item : NetworkBehaviour
                 break;
         }
 
+        // Remove item
+        GameObject.Destroy(gameObject);
+    }
+
+    void UseItemCPU(GameObject go)
+    {
+        switch (itemType)
+        {
+            case ITEM_TYPE.SKILL:
+                switch (effectType)
+                {
+                    case EFFECT_TYPE.E_EXPLOSION:
+                        go.GetComponent<Inventory>().OnHandRange++;
+                        break;
+                    case EFFECT_TYPE.E_HEALTH:
+                        go.GetComponent<CharacterStats>().increaseHealth(go.GetComponent<CharacterStats>().hpSys.MAX_HEALTH);
+                        break;
+                }
+                // give a randomized skill? or already randomized at the start and just give a skill
+                break;
+        }
         // Remove item
         GameObject.Destroy(gameObject);
     }

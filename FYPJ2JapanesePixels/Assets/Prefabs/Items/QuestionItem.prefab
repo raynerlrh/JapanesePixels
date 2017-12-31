@@ -23,9 +23,9 @@ GameObject:
   - component: {fileID: 114448934725470516}
   - component: {fileID: 114668848985427466}
   - component: {fileID: 61720273925693498}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: QuestionItem
-  m_TagString: Untagged
+  m_TagString: InventoryItem
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -80,6 +80,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemType: 1
+  effectType: 1
 --- !u!114 &114668848985427466
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -145,7 +146,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1896150105
   m_SortingLayer: 2
-  m_SortingOrder: 0
+  m_SortingOrder: 101
   m_Sprite: {fileID: 21300000, guid: 0a1179683dded4244b110cf989a275b7, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0

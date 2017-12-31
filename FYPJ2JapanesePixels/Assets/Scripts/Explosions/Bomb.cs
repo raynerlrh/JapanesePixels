@@ -16,7 +16,6 @@ public class Bomb : ObjectStats {
         explode_time.executedFunction = Explode;
         hasExploded = false;
         effectPos = new Vector3Int[effectRange * 4 + 1];
-        startPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         hasMoved = false;
 	}
 	
@@ -27,7 +26,8 @@ public class Bomb : ObjectStats {
             explode_time.executeFunction();
             hasExploded = true;
         }
-	}
+        startPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+    }
 
     void Explode()
     {

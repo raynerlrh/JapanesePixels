@@ -53,7 +53,7 @@ public class LanguageSystem : MonoBehaviour
     int newQuestionIndex;
     int theOptionIndex;
 
-    const int preGameTime = 1;
+    public int preGameTime = 1;
     float preGameTimer;
 
     Vector2[] questionPosArr; // prev, curr, next
@@ -183,7 +183,7 @@ public class LanguageSystem : MonoBehaviour
 
     QuestionData GetActiveQuestion(int offset = 0)
     {
-        return _quiz.languageData.questions[activeQuestionGroupIndex].questionData[questionIndexList[activeQuestionIndex + offset]];
+            return _quiz.languageData.questions[activeQuestionGroupIndex].questionData[questionIndexList[activeQuestionIndex + offset]];
     }
 
     public int GetQuestionIndex()
@@ -199,7 +199,20 @@ public class LanguageSystem : MonoBehaviour
         return questionText.transform.GetChild(index).GetComponent<Text>();
     }
 
-    void SetQuestion()
+    public int GetRandomIndex(ref int index)
+    {
+        if (questionIndexList.Count > 0)
+        {
+            if (index < questionIndexList.Count)
+                return questionIndexList[index];
+            index = questionIndexList.Count;
+            return questionIndexList[questionIndexList.Count - 1];
+        }
+        else
+            return questionIndexList.Count;
+    }
+
+    public void SetQuestion()
     {
         Vector2 targetPos;
 
@@ -224,6 +237,24 @@ public class LanguageSystem : MonoBehaviour
             GetQuestionText(2).text = System.Convert.ToString(GetActiveQuestion(1).symbol);
         else
             GetQuestionText(2).text = "";
+
+        if (GetQuestionText(3))
+            GetQuestionText(3).text = System.Convert.ToString(GetActiveQuestion(0).symbol);
+        //GetQuestionText(4).text = System.Convert.ToString(GetActiveQuestion(0).symbol);
+        //GetQuestionText(5).text = System.Convert.ToString(GetActiveQuestion(0).symbol);
+    }
+
+    public void SetQuestionText(int txtIndex, int playerIndex)
+    {
+        //GetQuestionText(3).text = System.Convert.ToString(GetActiveQuestion(0).symbol);
+        ////if (txtIndex >= _quiz.languageData.questions[activeQuestionGroupIndex].questionData.Length)
+        ////  txtIndex = _quiz.languageData.questions[activeQuestionGroupIndex].questionData.Length - 1;
+        //if (_quiz != null && _quiz.languageData != null && _quiz.languageData.questions.Length > 0)
+        //{
+        //    QuestionData question = _quiz.languageData.questions[activeQuestionGroupIndex].questionData[questionIndexList[txtIndex]];
+        //    if (question != null)
+        //        GetQuestionText(playerIndex).text = System.Convert.ToString(question.symbol);
+        //}
     }
 
     void DisplayQuiz()

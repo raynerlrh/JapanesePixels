@@ -42,4 +42,26 @@ public class ItemSpawner : NetworkBehaviour
         GameObject enemy = (GameObject)Instantiate(enemyPrefab, new Vector3(-2.44f, 3.51f, 0f), Quaternion.identity);
         NetworkServer.Spawn(enemy);
     }
+
+    [Command]
+    public void CmdSpawnObject(GameObject _gameObject)
+    {
+        NetworkServer.Spawn(_gameObject);
+    }
+
+    public void SpawnItem(Vector3 pos, bool chance = false, float chancenum = 2f, Item.ITEM_TYPE itype = Item.ITEM_TYPE.QUESTION, Item.EFFECT_TYPE etype = Item.EFFECT_TYPE.E_EXPLOSION)
+    {
+        if (chance)
+        {
+            float val = Random.Range(-5f, 5f);
+            if (val > chancenum)
+                return;
+        }
+
+        GameObject obj = (GameObject)Instantiate(itemPrefab, pos, Quaternion.identity);
+        Item i = obj.GetComponent<Item>();
+        i.itemType = itype;
+        i.effectType = etype;
+        //NetworkServer.Spawn(item);
+    }
 }
