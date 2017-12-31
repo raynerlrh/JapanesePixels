@@ -9,7 +9,7 @@ public class SyncTransform : NetworkBehaviour
     [SyncVar]
     Quaternion realRotation;
 
-    public bool b_isEnemy { get; set; }
+    public bool b_isEnemy;// { get; set; }
     private float updateInterval;
 
     void Update()

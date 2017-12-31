@@ -180,6 +180,7 @@ public class Bomber : MonoBehaviour {
 
     private void dropBomb()
     {
+        return;
         Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(mycell); //guide.GetComponent<BomberGuide>().convertDirToVec3()
         bombRef = GameObject.Instantiate(transform.parent.GetChild(2).GetComponent<Inventory>().OnHandItem, spawnPos, transform.parent.localRotation);
@@ -213,6 +214,7 @@ public class Bomber : MonoBehaviour {
         return false;
     }
 
+    // not in use
     // closest cell to the player is not a wall
     public Vector3Int findPlayerDir()
     {

@@ -44,6 +44,11 @@ public class DefaultAttack : PlayerSkill
             prevBombPos = spawnPos;
             SpawnBomb("Prefabs/Bomb", spawnPos, playerTrans.rotation);
         }
+        else
+        {
+            GameObject _bomb = Resources.Load("Prefabs/Bomb") as GameObject;
+            GameObject.Instantiate(_bomb, spawnPos, playerTrans.rotation);
+        }
     }
 
     void SpawnBomb(string _prefabsPath, Vector3 _pos, Quaternion _rot)
