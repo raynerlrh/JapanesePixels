@@ -19,6 +19,18 @@ TagManager:
   - UI
   - 
   - 
+<<<<<<< HEAD
+  - enemy
+  - threeDUI
+  - solidObject
+  - ignoredByAll
+  - tilemap
+  - wall
+  - player
+  - computer
+  - computerTrigger
+  - destructible
+=======
   - Enemy
   - 3DUI
   - SolidObject
@@ -29,6 +41,7 @@ TagManager:
   - Computer
   - ComputerTrigger
   - Destructible
+>>>>>>> 7fa4b1b5693ab5555cc61deaa49beb8b85ae95eb
   - 
   - 
   - 

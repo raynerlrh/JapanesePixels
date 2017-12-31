@@ -10,7 +10,8 @@ public class DefaultAttack : PlayerSkill
     public int cellsAffected { get; set; }
     public float damage { get; set; }
     public string skillName { get; set; }
-    private GameObject bombRef;
+
+    private Vector3 prevBombPos = Vector3.zero;
 
     public DefaultAttack()
     {
@@ -27,42 +28,37 @@ public class DefaultAttack : PlayerSkill
         damage = moveController.GetPawn.GetComponent<CharacterStats>().attackVal;
         Transform playerTrans = moveController.GetPawn.gameObject.transform;
         Vector3Int playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
-        if (bombRef != null)
-            if (GameModeManager.instance.gameGrid.GetWorldFlToCellPos(bombRef.transform.position) == playerPos)
-                return;
 
-        bool passThrough = true;
+        if (prevBombPos != Vector3.zero)
+        {
+            if (GameModeManager.instance.gameGrid.GetWorldFlToCellPos(prevBombPos) == playerPos)
+                return;
+        }
+        
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(playerPos);
 
-        GameObject bomb = GameObject.Instantiate(moveController.GetInventory.OnHandItem, spawnPos, playerTrans.rotation);
         if (moveController.GetInventory.OnHandAmount > 0)
             moveController.GetInventory.OnHandAmount--;
-        if (passThrough)
-            bomb.GetComponent<Collider2D>().isTrigger = true;
 
-        bomb.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
-
-        bomb.SetActive(true);
-        bombRef = bomb;
         if (MyNetwork.instance.IsOnlineGame())
         {
-            //bomb.AddComponent<SyncTransform>();
-            //bomb.GetComponent<SyncTransform>().b_isEnemy = true;
-
-            //Debug.Log("DEFAULT");
-
-            //CmdSpawnBomb(bomb);
-            //MyNetwork.instance.CmdSpawnObject(bomb);
-
-            GameObject.Find("ItemSpawner").GetComponent<ItemSpawner>().CmdSpawnObject(bomb);
+            prevBombPos = spawnPos;
+            SpawnBomb("Prefabs/Bomb", spawnPos, playerTrans.rotation);
         }
     }
 
-    //[Command]
-    //void CmdSpawnBomb(GameObject _gameObject)
-    //{
-    //    NetworkServer.Spawn(_gameObject);
-    //}
+    void SpawnBomb(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    {
+        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+
+        GameObject spawned = null;
+        if (moveController.isServer)
+            moveController.RpcSpawn(_prefabsPath, _pos, _rot);
+        else
+            moveController.CmdSpawn(_prefabsPath, _pos, _rot);
+        if (spawned)
+            spawned.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
+    }
 
     public void Update()
     {

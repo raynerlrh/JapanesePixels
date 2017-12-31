@@ -16,7 +16,7 @@ public class QuizAnim : MonoBehaviour
     float endTimer = 0;
     public RLEnvironment[] CPUList;
 
-    void Start()
+    void Awake()
     {
         originalPos = transform.localPosition;
 
@@ -36,14 +36,14 @@ public class QuizAnim : MonoBehaviour
 
             endTimer += Time.deltaTime;
 
-            if (endTimer < 2f)
+            if (endTimer < 2f) // 2f
             {
                 timeLeftText.text = "Time's Up!";
                 rewardsText.text = "";
             }
-            else if (endTimer > 1f && endTimer < 5f)
+            else if (endTimer > 1f && endTimer < 3f) // 5f
                 timeLeftText.text = "Rewards: ";
-            else if (endTimer > 5f)
+            else if (endTimer > 2f) // 5f
                 b_showRewards = false;
         }
         else

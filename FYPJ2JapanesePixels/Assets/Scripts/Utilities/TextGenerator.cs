@@ -11,7 +11,7 @@ public class TextGenerator : MonoBehaviour {
     public int m_TimeToDestroy = 1;
     private TimerRoutine timer;
 
-	void Awake () 
+	void Start () // was awake
     {
         //canvas2d = GameObject.FindGameObjectWithTag("2DCanvas").GetComponent<Canvas>();
         canvas3d = GameObject.FindGameObjectWithTag("3DCanvas").GetComponent<Canvas>();

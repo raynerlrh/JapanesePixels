@@ -36,6 +36,9 @@ public class PlayerSkillController : MonoBehaviour
                 return false;
         }
 
+        if (moveController.GetInventory.OnHandAmount <= 0)
+            return false;
+
         if ((moveController.numAvailableMoves - _skill.numMoves) >= 0)
         {
             moveController.numAvailableMoves -= _skill.numMoves;

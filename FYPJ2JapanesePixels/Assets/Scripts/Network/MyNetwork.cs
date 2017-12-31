@@ -7,6 +7,7 @@ public class MyNetwork : MonoBehaviour
 {
     public static MyNetwork instance = null;
 
+    public GameObject gameHost { get; set; }
     public GameObject localPlayer { get; set; }
     public GameGrid localGameGrid { get; set; }
 
@@ -29,10 +30,11 @@ public class MyNetwork : MonoBehaviour
             Destroy(gameObject);
 
         // here temporarily cos lazy change scene
-        PlayerPrefs.SetString("Game_Mode", "Single_Player");
+        PlayerPrefs.SetString("Game_Mode", "Online_Versus");
 
         if (PlayerPrefs.GetString("Game_Mode") == "Single_Player")
         {
+            //b_foundLocalPlayer = true;
             gameType = GAME_TYPE.SINGLE_PLAYER;
         }
         else if (PlayerPrefs.GetString("Game_Mode") == "Online_Versus")
@@ -53,8 +55,22 @@ public class MyNetwork : MonoBehaviour
             localPlayer.GetComponent<PlayerMoveController>().SetSinglePlayerMode();
             Destroy(GetComponent<NetworkManagerHUD>());
             Destroy(GetComponent<NetworkManager>());
+        }
+    }
 
-            gameType = GAME_TYPE.SINGLE_PLAYER;
+    // Other players are always -1, only local player is 0
+    // This function does not work
+    // Don't think any scripts require the host anyway
+    void FindHost(GameObject[] _players)
+    {
+        for (int i = 0; i < _players.Length; i++)
+        {
+            if (_players[i].GetComponent<NetworkIdentity>().playerControllerId == -1)
+            {
+                gameHost = _players[i];
+                Debug.Log("FOUND HOST");
+                return;
+            }
         }
     }
 
@@ -62,17 +78,26 @@ public class MyNetwork : MonoBehaviour
     {
         if (gameType == GAME_TYPE.SINGLE_PLAYER)
             return;
-
+       
         if (b_foundLocalPlayer)
             return;
 
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
 
+        FindHost(players);
+
         for (int i = 0; i < players.Length; i++)
         {
-            if (players[i].GetComponent<NetworkIdentity>().isLocalPlayer)
+            NetworkIdentity _player = players[i].GetComponent<NetworkIdentity>();
+
+            if (_player.isLocalPlayer)
             {
-                localPlayer = players[i];
+                if (_player.isServer)
+                    _player.GetComponent<PlayerMoveController>().b_isHost = true;
+
+                localPlayer = _player.gameObject;
+                localPlayer.GetComponent<PlayerMoveController>().GetPawn.InitChar();
+
                 localGameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
                 b_foundLocalPlayer = true;
                 return;

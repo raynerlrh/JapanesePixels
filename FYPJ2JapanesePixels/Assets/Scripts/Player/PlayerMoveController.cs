@@ -21,6 +21,8 @@ public struct MovementStats
 
 public class PlayerMoveController : NetworkBehaviour
 {
+    public bool b_isHost { get; set; }
+
     private DefaultCharacter pawn; // main character, can be an array of pawns for each character
     private GameObject pawn_sprite; // can be an array of sprites for each character
     public DefaultCharacter GetPawn
@@ -37,6 +39,9 @@ public class PlayerMoveController : NetworkBehaviour
     TileRefManager tileRefManager;
 
     Dpad dpad;
+
+    [SyncVar]
+    Dpad.MOVE_DIR dpad_moveDir;
 
     Tile originalTile;
     Tile availableTile;
@@ -100,7 +105,7 @@ public class PlayerMoveController : NetworkBehaviour
 
         pawn_sprite = this.gameObject;
         pawn = pawn_sprite.AddComponent<DefaultCharacter>();
-        pawn.InitChar();
+        //pawn.InitChar();
 
         // Set the player at the starting cell
         //Vector2 startingPos = gameGrid.GetCellToWorld(new Vector3Int(-3, 0, 0));
@@ -116,6 +121,22 @@ public class PlayerMoveController : NetworkBehaviour
         prevCellPos = gameGrid.GetWorldFlToCellPos(pawn_sprite.transform.position);
         inventory = GetComponent<Inventory>();
         //tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+    }
+
+    void SyncSpriteAnimations()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i].GetComponent<NetworkIdentity>().isLocalPlayer)
+                continue;
+
+            Animator _animator = players[i].transform.GetChild(1).GetChild(0).GetComponent<Animator>();
+            Dpad.MOVE_DIR _dir = players[i].GetComponent<PlayerMoveController>().dpad_moveDir;
+
+            players[i].GetComponent<PlayerMoveController>().RenderOtherPlayersAnim(_animator, _dir);
+        }
     }
 
     void Update()
@@ -139,6 +160,12 @@ public class PlayerMoveController : NetworkBehaviour
             //if (b_answeredCorrectly)
                 // UpdateInput();
 
+            //if (isServer)
+                //RpcSyncSA();
+            //else
+                //CmdSyncSA();
+
+            SyncSpriteAnimations();
             UpdateMovement();
         }
         //else
@@ -149,6 +176,12 @@ public class PlayerMoveController : NetworkBehaviour
         //        moveStat.isMoving = true;
         //    }
         //}
+    }
+
+    [Command]
+    void CmdUpdateMoveDir(Dpad.MOVE_DIR _dir)
+    {
+        dpad_moveDir = _dir;
     }
 
     void FixedUpdate()
@@ -178,6 +211,11 @@ public class PlayerMoveController : NetworkBehaviour
                 tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos, tileRefManager.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
         }
 
+        if (!isServer)
+            CmdUpdateMoveDir(dpad.moveDir);
+        else
+            dpad_moveDir = dpad.moveDir;
+
         Move(dpad.moveDir);
         RenderAnim();
 
@@ -197,6 +235,20 @@ public class PlayerMoveController : NetworkBehaviour
         //        }
         //    }
         //}
+    }
+
+    void RenderOtherPlayersAnim(Animator _animator, Dpad.MOVE_DIR _dir)
+    {
+        if (_dir == Dpad.MOVE_DIR.LEFT)
+        {
+            _animator.transform.localScale = new Vector3(1, 1, 1);
+        }
+        else if (_dir == Dpad.MOVE_DIR.RIGHT)
+        {
+            _animator.transform.localScale = new Vector3(-1, 1, 1);
+        }
+
+        _animator.SetFloat("NormalizeSpd", (int)_dir);
     }
 
     void RenderAnim()
@@ -465,5 +517,18 @@ public class PlayerMoveController : NetworkBehaviour
         {
             return gameGrid.GetWorldFlToCellPos(playerPos);
         }
+    }
+
+    [Command]
+    public void CmdSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    {
+        RpcSpawn(_prefabsPath, _pos, _rot);
+    }
+
+    [ClientRpc]
+    public void RpcSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    {
+        GameObject _bomb = Resources.Load(_prefabsPath) as GameObject;
+        GameObject _gameObject = GameObject.Instantiate(_bomb, _pos, _rot);
     }
 }
