@@ -17,20 +17,13 @@ public class CharacterStats : MonoBehaviour {
     public float attackVal;
     public float defVal;
 
-    private GameObject hpBar;
+    public GameObject hpBar;
     private GameObject defBar;
     public UIProp hpProp;
     public UIProp defProp; 
+
 	// Use this for initialization
 	void Start () {
-        if (transform.childCount > 0 && transform.GetChild(0).gameObject.layer == 9)
-        {
-            hpBar = GameObject.Instantiate(transform.GetChild(0).GetChild(0), transform.GetChild(0), false).gameObject;
-            hpBar.SetActive(true);
-            defBar = GameObject.Instantiate(transform.GetChild(0).GetChild(1), transform.GetChild(0), false).gameObject;
-            defBar.SetActive(true);
-        }
-        updateAttkStat();
 	}
 	
 	// Update is called once per frame
@@ -61,7 +54,21 @@ public class CharacterStats : MonoBehaviour {
         updateDefStat();
 
         if (hpBar != null)
+        {
             hpProp.t_progbarwidth = hpBar.transform.GetComponent<RectTransform>().sizeDelta.x / hpSys.MAX_HEALTH;
+        }
+        else
+        {
+            if (transform.childCount > 0 && transform.GetChild(0).gameObject.layer == 9)
+            {
+                hpBar = GameObject.Instantiate(transform.GetChild(0).GetChild(0), transform.GetChild(0), false).gameObject;
+                hpBar.SetActive(true);
+                defBar = GameObject.Instantiate(transform.GetChild(0).GetChild(1), transform.GetChild(0), false).gameObject;
+                defBar.SetActive(true);
+            }
+            updateAttkStat();
+            setHealth();
+        }
     }
 
     public void decreaseHealth(float dmg_value)

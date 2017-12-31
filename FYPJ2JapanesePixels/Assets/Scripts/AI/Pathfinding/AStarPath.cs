@@ -124,7 +124,7 @@ public class AStarPath : MonoBehaviour {
 
     public void init(Vector3Int endcell)
     {
-        startnode = new PNode(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position), true);
+        startnode = new PNode(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(GetComponent<BomberGuide>().bomberobj.transform.position), true);
         endnode = new PNode(endcell, true);
         taken_list = null;
         end = false;

@@ -23,13 +23,18 @@ public class RLEnvironment : MonoBehaviour {
     AgentBrain agent;
     public Agent.AgentMemory brainMemory;
     public Coroutine mainRoutine;
+    public int orderIndex;
+    public int playerIndex = 3;
+    public Inventory inventory;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         envVars.prevAction = -1;
         envVars.trialsTrained = 0;
-        envVars.pauseAction = true;
-	}
+        envVars.pauseAction = false;
+        orderIndex = 0;
+        //BeginLearning();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -50,7 +55,7 @@ public class RLEnvironment : MonoBehaviour {
         bool optimistic = true;
         agent = new AgentBrain(envVars.num_things, optimistic);
         //ReadString(ref agent.value_table);
-        brainMemory = new Agent.AgentMemory(5);
+        brainMemory = new Agent.AgentMemory(2);
         mainRoutine = StartCoroutine(Act());
     }
 
@@ -66,8 +71,8 @@ public class RLEnvironment : MonoBehaviour {
             int action = agent.PickAction();
             if (envVars.prevAction == -1)
                 envVars.prevAction = action;
-            //char chosen = action; // 
-            float reward = GameModeManager.instance.GetRewards(action, envVars.prevAction);
+            //char chosen = action;
+            float reward = GetRewards(action, envVars.prevAction);
             envVars.prevAction = action;
             envVars.total_correct += reward;
             agent.UpdatePolicy(action, reward);
@@ -78,6 +83,82 @@ public class RLEnvironment : MonoBehaviour {
     {
         bool optimistic = true;
         agent.ResetAgent(envVars.num_things, optimistic);
+    }
+
+    /// <summary>
+    /// Reward ai's action if it is correct
+    /// </summary>
+    /// <param name="act">The action that AI made</param>
+    /// <param return="reward">Reward ranges from (-1, 1)</param>
+    public int GetRewards(int act, int previousAction)
+    {
+        int reward;
+        int n = 0;
+        if (GameModeManager.instance.languageSystem != null)
+            n = GameModeManager.instance.languageSystem.GetRandomIndex(ref orderIndex);
+        if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.IN_GAME)
+        {
+            envVars.pauseAction = true;
+            inventory.OnHandAmount = orderIndex;
+        }
+        //if (Mathf.Abs(n - act) > Mathf.Abs(n - previousAction))
+        //{
+        //    act = previousAction;
+        //}
+        if (brainMemory.getLastAnswer() == n || brainMemory.doesBrainContain(n))
+        {
+            reward = 1;
+            //languageSystem.RefreshQuestion(); // removed for now
+            //EnemyMoveController.instance.currentBoss.doAttack(); // removed for now
+            //Debug.Log("Guessed correctly 1");
+            //env.resetagent();
+            ++orderIndex;
+            GameModeManager.instance.languageSystem.SetQuestionText(orderIndex, playerIndex);
+        }
+        else if (n == act)
+        {
+            reward = 1;
+            //languageSystem.RefreshQuestion(); // removed for now
+            if (brainMemory.GetSize == brainMemory.newMaxMemory)
+            {
+                brainMemory.forgetAnswer();
+                brainMemory.storeAnswer(act);
+            }
+            else
+                brainMemory.storeAnswer(act);
+
+            ++orderIndex;
+            //EnemyMoveController.instance.currentBoss.doAttack(); // removed for now
+            //env.resetagent();
+            GameModeManager.instance.languageSystem.SetQuestionText(orderIndex, playerIndex);
+        }
+        /*else if ((act > previousAction) && (n > act)) // reward for taking a step in the right direction
+        {
+            reward = 1;
+            //Debug.Log("+1 confidence");
+            ++orderIndex;
+        }
+        else if ((act < previousAction) && (n < act))
+        {
+            reward = 1;
+            //Debug.Log("+1 confidence");
+            ++orderIndex;
+        }*/
+        else
+        {
+            reward = -1;
+            envVars.trialsTrained++;
+            //Debug.Log(act);
+        }
+        //t_rewards.text = "Total rewards: " + rl_environment.totalRewards.ToString();
+        int g = n - act;
+        if (g < 0)
+            g = -g;
+        //if (t_progbar)
+          //  t_progbar.sizeDelta = new Vector2(160 - aiprogress.t_progbarwidth * g, t_progbar.sizeDelta.y);
+        StartCoroutine(GetComponent<RLEnvironment>().Act());
+        //StartCoroutine(delaylearning());
+        return reward;
     }
 
     /*

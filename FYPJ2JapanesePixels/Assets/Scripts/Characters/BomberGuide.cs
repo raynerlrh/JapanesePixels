@@ -20,6 +20,7 @@ public class BomberGuide : MonoBehaviour {
 
     MOVEDIR direction;
     Vector3Int destination;
+    public Vector3 bomberdes;
     private Vector3 waypoint;
     public bool canProceed;
     public int cellsFree = 3;
@@ -34,13 +35,13 @@ public class BomberGuide : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         direction = getRandomDir();
-        canProceed = false;
+        canProceed = true;
         originalCellsFree = cellsFree;
         wpIndex = 0;
         safetyTimer = gameObject.AddComponent<TimerRoutine>();
         safetyTimer.initTimer(3);
         safetyTimer.executedFunction = resetWaypoints;
-
+        bomberobj = transform.GetChild(1).gameObject;
     }
 	
 	// Update is called once per frame
@@ -81,7 +82,7 @@ public class BomberGuide : MonoBehaviour {
                 {
                     GetComponent<AStarPath>().init(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(waypoint));
                     waypoints = GetComponent<AStarPath>().runPathFinding();
-                    checkWaypointValidity();
+                    waypoints = checkWaypointValidity(waypoints);
                 }
                 else // move
                 {
@@ -91,7 +92,7 @@ public class BomberGuide : MonoBehaviour {
                         wpIndex++;
                         //if (wpIndex == 1)
                         //lastValid = waypoints[1];
-                        checkWaypointValidity();
+                        checkWaypointValidity(waypoints);
                         //for (int i = 0; i < waypoints.Count; ++i)
                         //print(waypoints[i] + "co");
                         direction = convertVec3ToDir(bomberobj.transform.position, waypoints[wpIndex]);
@@ -170,49 +171,49 @@ public class BomberGuide : MonoBehaviour {
     private void moveForward()
     {
         Vector3 newpos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(destination);
-        transform.position = newpos;
+        bomberdes = newpos;
     }
 
     private void moveToWaypoint()
     {
         Vector3 newpos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(waypoints[wpIndex]);
-        transform.position = newpos;
+        bomberdes = newpos;
     }
 
     // if waypoint is more than 1 cell away, sound buzzer
-    private bool checkWaypointValidity()
+    private List<Vector3Int> checkWaypointValidity(List<Vector3Int> list)
     {
-        Vector3Int last = waypoints[0];
+        Vector3Int last = list[0];
         List<Vector3Int> delete = new List<Vector3Int>();
-        for (int i = 0; i < waypoints.Count; ++i)
+        for (int i = 0; i < list.Count; ++i)
         {
-            float dist = fCellsAway(waypoints[i], last);
+            float dist = fCellsAway(list[i], last);
             //print(waypoints[wpIndex]);
             //print(lastValid);
             if (dist > 1)
             {
-                delete.Add(waypoints[i]);
+                delete.Add(list[i]);
                 // waypoints.RemoveAt(i);
                 //return false;
             }
             else
-                last = waypoints[i];
+                last = list[i];
         }
         List<int> ilist = new List<int>();
-        for (int j = 0; j < waypoints.Count; ++ j)
+        for (int j = 0; j < list.Count; ++ j)
         {
             for (int c = 0; c < delete.Count; ++c)
             {
-                if (waypoints[j] == delete[c])
+                if (list[j] == delete[c])
                     ilist.Add(j);
             }
         }
 
         for (int f = 0; f < ilist.Count; ++f)
         {
-            waypoints.RemoveAt(ilist[f] - f);
+            list.RemoveAt(ilist[f] - f);
         }
-        return true;
+        return list;
 
     }
 
@@ -340,33 +341,34 @@ public class BomberGuide : MonoBehaviour {
             List<Vector3Int> pro = null;
             for (int i = 0; i < possible.Count; ++i)
             {
-                if (pro == null) // pathfind gives waypoint cells to move to
+                // pathfind gives waypoint cells to move to
+                GetComponent<AStarPath>().init(possible[i]);
+                pro = GetComponent<AStarPath>().runPathFinding();
+                if (pro != null)
                 {
-                    GetComponent<AStarPath>().init(possible[i]);
-                    pro = GetComponent<AStarPath>().runPathFinding();
-                    if (pro != null)
+                    bool gg = false;
+                    pro = checkWaypointValidity(pro);
+                    for (int w = 1; w < pro.Count; ++w) // 1 so it doesnt count the player's starting point which is actually the bomb cell
                     {
-                        bool gg = false;
-                        for (int w = 1; w < pro.Count; ++w) // 1 so it doesnt count the player's starting point which is actually the bomb cell
+                        //TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_ENEMY, pro[w], TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_DEBUG));
+                        Vector3Int bombcell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(bombpos);
+                        if (pro[w] == bombcell)
                         {
-                            Vector3Int bombcell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(bombpos);
-                            if (pro[w].Equals(bombcell))
-                            {
-                                gg = true;
-                                break;
-                                //waypoints = null;
-                            }
+                            gg = true;
+                            break;
+                            //waypoints = null;
                         }
-                        if (gg)
-                        {
-                            continue;
-                        }
-                        waypoint = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(possible[i]);
-                        hasWaypoint = true;
-                        break;
                     }
+                    //TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_ENEMY, possible[i], TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+                    if (gg)
+                    {
+                        continue;
+                    }
+                    print("gg2");
+                    waypoint = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(possible[i]);
+                    hasWaypoint = true;
+                    break;
                 }
-
             }
         }
     }

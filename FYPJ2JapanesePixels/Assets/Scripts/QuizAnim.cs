@@ -14,6 +14,7 @@ public class QuizAnim : MonoBehaviour
     public Text rewardsText;
 
     float endTimer = 0;
+    public RLEnvironment[] CPUList;
 
     void Start()
     {
@@ -32,10 +33,6 @@ public class QuizAnim : MonoBehaviour
     {
         if (b_showRewards)
         {
-            // Show rewards...
-            // To do later
-            PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
-            moveController.GetInventory.OnHandAmount = moveController.numAvailableMoves;
 
             endTimer += Time.deltaTime;
 
@@ -79,6 +76,15 @@ public class QuizAnim : MonoBehaviour
                 GetComponent<LanguageSystem>().enabled = true;
                 topBackground.SetActive(false);
                 gameObject.SetActive(false);
+                // reset the number of moves
+                PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+                if (moveController.GetInventory.pendingReward)
+                {
+                    moveController.GetInventory.OnHandAmount += moveController.numAvailableMoves;
+                    moveController.GetInventory.pendingReward = false;
+                    moveController.numAvailableMoves = 0;
+                }
+
             }
         }
     }

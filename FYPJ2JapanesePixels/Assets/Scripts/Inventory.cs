@@ -8,6 +8,7 @@ public struct OnHand
     // bomb type can be placed here
     public GameObject weapon;
     public int size;
+    public int range;
 }
 
 public class Inventory : MonoBehaviour {
@@ -25,13 +26,21 @@ public class Inventory : MonoBehaviour {
         get { return equipped.weapon; }
         set { equipped.weapon = value; }
     }
+    public int OnHandRange
+    {
+        get { return equipped.range; }
+        set { equipped.range = value; }
+    }
+    public bool pendingReward;
 
     // Use this for initialization
     void Start () {
         items = new GameObject[equipped.size];
         refreshInventory();
         GetComponent<CharacterStats>().updateAttkStat();
-        equipped.size = 0;
+        equipped.size = 100;
+        equipped.range = 1;
+        pendingReward = true;
 	}
 	
 	// Update is called once per frame

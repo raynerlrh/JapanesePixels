@@ -23,6 +23,7 @@ public class GameModeManager : MonoBehaviour
     public GameObject DeathscreenUI;
     [SerializeField]
     public GameObject WinscreenUI;
+    public ItemSpawner itemSpawner;
 
     public enum GAME_STATE
     {
@@ -51,7 +52,6 @@ public class GameModeManager : MonoBehaviour
 
     void Start()
     {
-        GetComponent<RLEnvironment>().BeginLearning();
         GameObject progressBar = GameObject.Find("AIProgressBar");
         if (progressBar)
         {
@@ -64,72 +64,6 @@ public class GameModeManager : MonoBehaviour
     void Update()
     {
 
-    }
-
-    /// <summary>
-    /// Reward ai's action if it is correct
-    /// </summary>
-    /// <param name="act">The action that AI made</param>
-    /// <param return="reward">Reward ranges from (-1, 1)</param>
-    public int GetRewards(int act, int previousAction)
-    {
-        int reward;
-        int n = 0;
-        if (languageSystem != null)
-            n = languageSystem.GetQuestionIndex() + 1;
-        RLEnvironment env = GetComponent<RLEnvironment>();
-        //if (Mathf.Abs(n - act) > Mathf.Abs(n - previousAction))
-        //{
-        //    act = previousAction;
-        //}
-        if (env.brainMemory.getLastAnswer() == n || env.brainMemory.doesBrainContain(n))
-        {
-            reward = 1;
-            //languageSystem.RefreshQuestion(); // removed for now
-            //EnemyMoveController.instance.currentBoss.doAttack(); // removed for now
-            //Debug.Log("Guessed correctly 1");
-            //env.resetagent();
-        }
-        else if (n == act)
-        {
-            reward = 1;
-            //languageSystem.RefreshQuestion(); // removed for now
-            if (env.brainMemory.GetSize == env.brainMemory.newMaxMemory)
-            {
-                env.brainMemory.forgetAnswer();
-                env.brainMemory.storeAnswer(act);
-            }
-            else
-                env.brainMemory.storeAnswer(act);
-
-            //EnemyMoveController.instance.currentBoss.doAttack(); // removed for now
-            //env.resetagent();
-        }
-        else if ((act > previousAction) && (n > act))
-        {
-            reward = 1;
-            //Debug.Log("+1 confidence");
-        }
-        else if ((act < previousAction) && (n < act))
-        {
-            reward = 1;
-            //Debug.Log("+1 confidence");
-        }
-        else
-        {
-            reward = -1;
-            env.envVars.trialsTrained++;
-            //Debug.Log(act);
-        }
-        //t_rewards.text = "Total rewards: " + rl_environment.totalRewards.ToString();
-        int g = n - act;
-        if (g < 0)
-            g = -g;
-        if (t_progbar)
-            t_progbar.sizeDelta = new Vector2(160 - aiprogress.t_progbarwidth * g, t_progbar.sizeDelta.y);
-        StartCoroutine(GetComponent<RLEnvironment>().Act());
-        //StartCoroutine(delaylearning());
-        return reward;
     }
 
     void ReceivePlayerChoice(bool wrong)

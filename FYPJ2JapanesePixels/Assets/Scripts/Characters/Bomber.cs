@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /**
@@ -18,7 +17,7 @@ public struct MovementData
 
 public class Bomber : MonoBehaviour {
     private bool canDrop;
-    public GameObject guide;
+    public BomberGuide guide;
     MovementData movement;
     TimerRoutine delay;
     public Vector3Int dropSpot;
@@ -49,37 +48,38 @@ public class Bomber : MonoBehaviour {
             delay.initTimer(6f);
             delay.executedFunction = resetBomb;
         }
-        bombRange = 2;
-        sightRange = bombRange * 2;
+        bombRange = 1;
+        sightRange = bombRange + 4;
         BoxCollider2D col = gameObject.AddComponent<BoxCollider2D>();
-        col.size = new Vector2(0.8f * sightRange, 0.8f);
+        col.size = new Vector2(1f * sightRange, 1f);
         col.isTrigger = true;
         col = gameObject.AddComponent<BoxCollider2D>();
-        col.size = new Vector2(0.8f, 0.8f * sightRange);
+        col.size = new Vector2(1f, 1f * sightRange);
         col.isTrigger = true;
         dmgBody = transform.parent.GetChild(2).gameObject;
         dmgBody.GetComponent<DefaultCharacter>().InitChar();
         e_state = BomberState.E_PATROL;
         bombRef = null;
-        prevCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        prevCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         physBody = transform.parent.GetComponent<Rigidbody2D>();
         priorityRange = 0;
         anim = transform.parent.GetChild(3).GetChild(0).GetComponent<Animator>();
+        guide = transform.parent.GetComponent<BomberGuide>();
     }
 	
 	// Update is called once per frame
 	void Update () {
         // Moving towards guide
-        float dist = Vector2.Distance(transform.parent.position, guide.transform.position);
+        float dist = Vector2.Distance(transform.position, guide.bomberdes);
         float speed = (movement.speed * Time.deltaTime);
         if (dist > speed)
         {
-            Vector2 direction = (guide.transform.position - transform.parent.position).normalized;
-            physBody.MovePosition((Vector2)transform.parent.position + direction * speed);
+            Vector2 direction = (guide.bomberdes - transform.position).normalized;
+            physBody.MovePosition((Vector2)transform.position + direction * speed);
         }
         else
         {
-            guide.GetComponent<BomberGuide>().canProceed = true; // tell guide that i reached
+            guide.canProceed = true; // tell guide that i reached
         }
 
         if (dmgBody.GetComponent<DefaultCharacter>().checkIfDead()) // no more health, destroy myself
@@ -87,7 +87,7 @@ public class Bomber : MonoBehaviour {
             Destroy(transform.parent.gameObject);
         }
 
-        myCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        myCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         if (myCellPos != prevCellPos)
         {
             TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, null);
@@ -129,21 +129,22 @@ public class Bomber : MonoBehaviour {
                     //guide.GetComponent<BomberGuide>().setDirection(findNextDirection(otherBomber)); // chase a player or destructable
                 }
             }*/
-        if (!obj.gameObject.Equals(transform.parent.gameObject) && !obj.gameObject.Equals(transform.parent.GetChild(2).gameObject))
+        if (!obj.gameObject.Equals(transform.parent.gameObject) && !obj.gameObject.Equals(dmgBody))
         {
             if (obj.gameObject.layer == 14 || obj.gameObject.layer == 17) // is this a object i care about
             {
-                if (canDrop) // if i can drop a bomb right now
+                if (canDrop && dmgBody.GetComponent<Inventory>().OnHandAmount > 0) // if i can drop a bomb right now
                 {
                     // Before i drop, i should do some thinking first, is there a cell i can hide? should i drop it in a deliberate place?
                     if (XYValidDrop(bombRange))
                     {
-                        List<Vector3Int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position), bombRange);
-                        guide.GetComponent<BomberGuide>().findWaypoint(cells, transform.parent.position);
-                        if (guide.GetComponent<BomberGuide>().hasWaypoint)
+                        List<Vector3Int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position), bombRange);
+                        guide.findWaypoint(cells, transform.position);
+                        if (guide.hasWaypoint)
                             dropBomb(); // drop bomb
                         delay.executeFunction(); // cool down for bomb drop
                         canDrop = false;
+                        dmgBody.GetComponent<Inventory>().OnHandAmount--;
                     }
                 }
             }
@@ -159,11 +160,14 @@ public class Bomber : MonoBehaviour {
                     bombRef = obj.gameObject;
                     priorityRange = bombRange;
                     List<Vector3Int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(obj.transform.position), obj.gameObject.GetComponent<Bomb>().effectRange);
-                    BomberGuide scrpt = guide.GetComponent<BomberGuide>();
-                    scrpt.resetWaypoints();
-                    scrpt.findWaypoint(cells, transform.parent.position);
+                    guide.resetWaypoints();
+                    guide.findWaypoint(cells, obj.transform.position);
                 }
             }
+            //else if (obj.gameObject.layer == 10 && obj.gameObject.CompareTag("InventoryItem"))
+            //{
+
+            //}
         }
         //avoidBomb(obj);
     }
@@ -180,10 +184,11 @@ public class Bomber : MonoBehaviour {
 
     private void dropBomb()
     {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(mycell); //guide.GetComponent<BomberGuide>().convertDirToVec3()
-        bombRef = GameObject.Instantiate(transform.parent.GetChild(2).GetComponent<Inventory>().OnHandItem, spawnPos, transform.parent.localRotation);
-        bombRef.GetComponent<Bomb>().effectRange = bombRange;
+        bombRef = GameObject.Instantiate(dmgBody.GetComponent<Inventory>().OnHandItem, spawnPos, transform.parent.localRotation);
+        bombRef.GetComponent<Bomb>().effectRange = dmgBody.GetComponent<Inventory>().OnHandRange;
+        setRange(dmgBody.GetComponent<Inventory>().OnHandRange);
         bombRef.GetComponent<Collider2D>().isTrigger = true;
         bombRef.SetActive(true);
     }
@@ -193,121 +198,21 @@ public class Bomber : MonoBehaviour {
         canDrop = true;
     }
 
-    // Approximately detect if player is in bomb range
-    private bool detectPlayerApprox(Vector3Int targetcell, int range = 1)
-    {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
-        Vector3Int cellsAway = targetcell - mycell;
-        if (cellsAway.magnitude <= range)
-            return true;
-        return false;
-    }
-
-    private bool xyAxisCheck(Vector3Int targetcell)
-    {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
-        if (targetcell.x == mycell.x || targetcell.y == mycell.y)
-        {
-            return true;
-        }
-        return false;
-    }
-
-    // closest cell to the player is not a wall
-    public Vector3Int findPlayerDir()
-    {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
-        Vector3Int modified = mycell;
-
-        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
-        Vector3Int targetcell = moveController.GetPlayerCellPos;
-
-        for (int i = 0; i < 4; i++)
-        {
-            if (i == 0)
-                modified.Set(mycell.x - 1, modified.y, modified.z);
-            if (i == 1)
-                modified.Set(mycell.x + 1, mycell.y, mycell.z);
-            if (i == 2)
-                modified.Set(mycell.x, mycell.y + 1, mycell.z);
-            if (i == 3)
-                modified.Set(mycell.x, mycell.y - 1, mycell.z);
-            if (cellsAway(modified, targetcell) < cellsAway(mycell, targetcell))
-            {
-                break;
-            }
-        }
-
-        return modified;
-    }
-
-    public int findNextDirection(Vector3Int targetcell)
-    {
-
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
-        Vector3Int modified = mycell;
-        for (int i = 0; i < 4; i++)
-        {
-            if (i == 0)
-                modified.Set(mycell.x - 1, mycell.y, mycell.z);
-            if (i == 1)
-                modified.Set(mycell.x + 1, mycell.y, mycell.z);
-            if (i == 2)
-                modified.Set(mycell.x, mycell.y + 1, mycell.z);
-            if (i == 3)
-                modified.Set(mycell.x, mycell.y - 1, mycell.z);
-            if (cellsAway(modified, targetcell) < cellsAway(mycell, targetcell))
-            {
-                return i;
-            }
-        }
-        return guide.GetComponent<BomberGuide>().getDirection();
-    }
-
     private int cellsAway(Vector3Int cell1, Vector3Int cell2)
     {
         Vector3Int cellsAway = cell2 - cell1;
         return (int)cellsAway.magnitude;
     }
 
-    private bool XYObstacleCheck(Vector3Int targetcell, int range)
-    {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
-        Vector3Int modified;
-        Vector3Int des = targetcell - mycell;
-        bool block = false;
-
-        for (int i = 0; i <= range; ++i)
-        {
-            modified = mycell;
-            if (des.x < 0)
-                modified.Set(mycell.x - i, mycell.y, mycell.z);
-            else if (des.x > 0)
-                modified.Set(mycell.x + i, mycell.y, mycell.z);
-            else if (des.y < 0)
-                modified.Set(mycell.x, mycell.y - i, mycell.z);
-            else if (des.y > 0)
-                modified.Set(mycell.x, mycell.y + i, mycell.z);
-            if (targetcell == modified)
-                break;
-            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
-            {
-                block = true;
-                break;
-            }
-        }
-        return block;
-    }
-
     private bool XYValidDrop(int range)
     {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         Vector3Int modified = mycell;
 
         for (int x = 1; x <= range; ++x)
         {
             modified.Set(mycell.x + x, mycell.y, mycell.z);
-            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified))
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) )
             {
                     return true;
             }
@@ -321,7 +226,7 @@ public class Bomber : MonoBehaviour {
         for (int x = -1; x >= -range; --x)
         {
             modified.Set(mycell.x + x, mycell.y, mycell.z);
-            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified))
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified))
             {
                     return true;
             }
@@ -333,9 +238,9 @@ public class Bomber : MonoBehaviour {
         for (int y = 1; y <= range; ++y)
         {
             modified.Set(mycell.x, mycell.y + y, mycell.z);
-            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified))
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified))
             {
-                    return true;
+                return true;
             }
             else if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
             {
@@ -345,9 +250,9 @@ public class Bomber : MonoBehaviour {
         for (int y = -1; y >= -range; --y)
         {
             modified.Set(mycell.x, mycell.y + y, mycell.z);
-            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified))
+            if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified) /*|| TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, modified)*/)
             {
-                    return true;
+                return true;
             }
             else if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified))
             {
@@ -359,7 +264,7 @@ public class Bomber : MonoBehaviour {
 
     public List<Vector3Int> findHidingPlace(Vector3Int bombcell, int range)
     {
-        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.parent.position);
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         Vector3Int modified = mycell;
         List<Vector3Int> danger = GetCrossCells(range, bombcell);
         List<Vector3Int> safe = new List<Vector3Int>();
@@ -383,8 +288,8 @@ public class Bomber : MonoBehaviour {
                 }
             }
         }
-        ////for (int i = 0; i < safe.Count; ++i)
-        //    TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, safe[i], TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+        //for (int i = 0; i < safe.Count; ++i)
+        //    TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_ENEMY, safe[i], TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_DEBUG));
         return safe;
     }
 
@@ -404,7 +309,7 @@ public class Bomber : MonoBehaviour {
 
     private void animate()
     {
-        int dir = guide.GetComponent<BomberGuide>().getDirection();
+        int dir = guide.getDirection();
         //print(dir);
         switch((BomberGuide.MOVEDIR)dir)
         {
@@ -416,5 +321,21 @@ public class Bomber : MonoBehaviour {
                 break;
         }
         anim.SetFloat("NormalizeSpd", dir);
+    }
+
+    public void setRange(int range)
+    {
+        bombRange = range;
+        sightRange = bombRange + 4;
+        BoxCollider2D col = GetComponent<BoxCollider2D>();
+        col.size = new Vector2(1f * sightRange, 1f);
+        BoxCollider2D[] boxColliders = GetComponents<BoxCollider2D>();
+        for (int i = 0; i < boxColliders.Length; ++i)
+            if (!boxColliders[i].Equals(col))
+            {
+                col = boxColliders[i];
+                break;
+            }
+        col.size = new Vector2(1f, 1f * sightRange);
     }
 }

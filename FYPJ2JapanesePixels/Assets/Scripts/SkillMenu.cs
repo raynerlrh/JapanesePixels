@@ -36,6 +36,7 @@ public class SkillMenu : MonoBehaviour
 
     void Update()
     {
+ 
         if (!b_setLocalPlayer)
         {
             if (!MyNetwork.instance.b_foundLocalPlayer)

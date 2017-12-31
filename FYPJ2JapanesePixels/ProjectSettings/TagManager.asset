@@ -19,16 +19,16 @@ TagManager:
   - UI
   - 
   - 
-  - Enemy
-  - 3DUI
-  - SolidObject
-  - IgnoredByAll
-  - Tilemap
-  - Wall
-  - Player
-  - Computer
-  - ComputerTrigger
-  - 
+  - enemy
+  - threeDUI
+  - solidObject
+  - ignoredByAll
+  - tilemap
+  - wall
+  - player
+  - computer
+  - computerTrigger
+  - destructible
   - 
   - 
   - 

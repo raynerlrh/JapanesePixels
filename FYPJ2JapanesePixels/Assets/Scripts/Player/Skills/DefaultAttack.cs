@@ -40,8 +40,10 @@ public class DefaultAttack : PlayerSkill
         if (passThrough)
             bomb.GetComponent<Collider2D>().isTrigger = true;
 
+        bomb.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
+
         bomb.SetActive(true);
-bombRef = bomb;
+        bombRef = bomb;
         if (MyNetwork.instance.IsOnlineGame())
         {
             //bomb.AddComponent<SyncTransform>();

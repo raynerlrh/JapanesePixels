@@ -20,7 +20,7 @@ public class AnswerArea : MonoBehaviour
 
                 // Turn on player movement grid
                 //TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(true);
-                moveController.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
+                //moveController.e_playstate = PlayerMoveController.PlayState.E_COMBAT;
 
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(1, 1);
