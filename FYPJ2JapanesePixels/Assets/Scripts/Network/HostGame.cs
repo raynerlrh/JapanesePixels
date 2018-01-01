@@ -43,9 +43,9 @@ public class HostGame : MonoBehaviour
         }
     }
 
-    void OnLevelWasLoaded(int level)
-    {
-        if (level == 1) // may need to be changed, depends on build settings
-            GetComponent<MyNetwork>().enabled = true;
-    }
+    //void OnLevelWasLoaded(int level)
+    //{
+    //    if (level == 1) // may need to be changed, depends on build settings
+    //        GetComponent<MyNetwork>().enabled = true;
+    //}
 }

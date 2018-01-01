@@ -25,6 +25,9 @@ public class MyNetwork : MonoBehaviour
 
     void OnApplicationQuit()
     {
+        if (!IsOnlineGame())
+            return;
+
         NetworkManager networkManager = NetworkManager.singleton;
 
         MatchInfo matchInfo = networkManager.matchInfo;
@@ -87,10 +90,15 @@ public class MyNetwork : MonoBehaviour
     {
         if (PlayerPrefs.GetString("Game_Mode") == "Single_Player")
         {
-            localPlayer = GameObject.Instantiate(GetComponent<NetworkManager>().playerPrefab);
+            GameObject playerPrefab = Resources.Load("Prefabs/PlayerHero") as GameObject;
+            localPlayer = GameObject.Instantiate(playerPrefab);
+
+            localPlayer.GetComponent<PlayerMoveController>().GetPawn.InitChar();
             localPlayer.GetComponent<PlayerMoveController>().SetSinglePlayerMode();
-            Destroy(GetComponent<NetworkManagerHUD>());
-            Destroy(GetComponent<NetworkManager>());
+
+            // Don't need to destroy because NetworkManager is brought over from lobby, single player does not activate from lobby
+            //Destroy(GetComponent<NetworkManagerHUD>());
+            //Destroy(GetComponent<MyNetworkManager>());
         }
     }
 

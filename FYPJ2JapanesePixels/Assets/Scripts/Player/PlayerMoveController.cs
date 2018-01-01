@@ -95,9 +95,10 @@ public class PlayerMoveController : NetworkBehaviour
     public void SetSinglePlayerMode()
     {
         Destroy(GetComponent<SyncTransform>());
+        //Destroy(GetComponent<NetworkIdentity>());
     }
 
-    void Start()
+    void Awake()
     {
         gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
         tileRefManager = gameGrid.GetComponent<TileRefManager>();
@@ -105,7 +106,6 @@ public class PlayerMoveController : NetworkBehaviour
 
         pawn_sprite = this.gameObject;
         pawn = pawn_sprite.AddComponent<DefaultCharacter>();
-        //pawn.InitChar();
 
         // Set the player at the starting cell
         //Vector2 startingPos = gameGrid.GetCellToWorld(new Vector3Int(-3, 0, 0));
@@ -165,7 +165,9 @@ public class PlayerMoveController : NetworkBehaviour
             //else
                 //CmdSyncSA();
 
-            SyncSpriteAnimations();
+            if (MyNetwork.instance.IsOnlineGame())
+                SyncSpriteAnimations();
+
             UpdateMovement();
         }
         //else
@@ -211,10 +213,13 @@ public class PlayerMoveController : NetworkBehaviour
                 tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos, tileRefManager.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
         }
 
-        if (!isServer)
-            CmdUpdateMoveDir(dpad.moveDir);
-        else
-            dpad_moveDir = dpad.moveDir;
+        if (MyNetwork.instance.IsOnlineGame())
+        {
+            if (!isServer)
+                CmdUpdateMoveDir(dpad.moveDir);
+            else
+                dpad_moveDir = dpad.moveDir;
+        }
 
         Move(dpad.moveDir);
         RenderAnim();

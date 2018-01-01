@@ -158,8 +158,11 @@ public class LanguageSystem : MonoBehaviour
 
     void Update()
     {
-        if (!MyNetwork.instance.b_foundLocalPlayer)
-            return;
+        if (MyNetwork.instance.IsOnlineGame())
+        {
+            if (!MyNetwork.instance.b_foundLocalPlayer)
+                return;
+        }
 
         if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.PRE_GAME)
         {
