@@ -16,8 +16,8 @@ public class SkillMenu : MonoBehaviour
     {
         if (MyNetwork.instance.IsOnlineGame())
             return;
-
-        SetUp();
+        if (MyNetwork.instance.localPlayer)
+            SetUp();
     }
 
     void SetUp()
@@ -41,8 +41,8 @@ public class SkillMenu : MonoBehaviour
         {
             if (!MyNetwork.instance.b_foundLocalPlayer)
                 return;
-
-            SetUp();
+            if (MyNetwork.instance.localPlayer)
+                SetUp();
         }
 
         availableMovesText.text = moveController.numAvailableMoves.ToString();

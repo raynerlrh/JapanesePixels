@@ -81,6 +81,8 @@ public class PlayerMoveController : NetworkBehaviour
 
     public PlayState e_playstate;
     public bool isOver;
+    public GameObject bombText2d;
+    public GameObject rangeText2d;
 
     // not being called
     void OnStartLocalPlayer()
@@ -98,7 +100,7 @@ public class PlayerMoveController : NetworkBehaviour
         //Destroy(GetComponent<NetworkIdentity>());
     }
 
-    void Awake()
+    void Start()
     {
         gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
         tileRefManager = gameGrid.GetComponent<TileRefManager>();
@@ -120,7 +122,12 @@ public class PlayerMoveController : NetworkBehaviour
         p_animator = pawn_sprite.transform.GetChild(1).GetChild(0).GetComponent<Animator>();
         prevCellPos = gameGrid.GetWorldFlToCellPos(pawn_sprite.transform.position);
         inventory = GetComponent<Inventory>();
+        bombText2d = GameObject.FindGameObjectWithTag("2DCanvas").transform.GetChild(4).GetChild(0).GetChild(0).gameObject;
+        rangeText2d = GameObject.FindGameObjectWithTag("2DCanvas").transform.GetChild(5).GetChild(0).GetChild(0).gameObject;
         //tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+        MyNetwork.instance.b_foundLocalPlayer = false;
+        MyNetwork.instance.localPlayer = null;
+
     }
 
     void SyncSpriteAnimations()
@@ -209,9 +216,9 @@ public class PlayerMoveController : NetworkBehaviour
         {
             tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, null);
             prevCellPos = playerCellPos;
-            if (tileRefManager.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos) != tileRefManager.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING))
-                tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos, tileRefManager.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
         }
+        if (tileRefManager.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos) != tileRefManager.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING))
+            tileRefManager.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, playerCellPos, tileRefManager.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
 
         if (MyNetwork.instance.IsOnlineGame())
         {
@@ -535,5 +542,6 @@ public class PlayerMoveController : NetworkBehaviour
     {
         GameObject _bomb = Resources.Load(_prefabsPath) as GameObject;
         GameObject _gameObject = GameObject.Instantiate(_bomb, _pos, _rot);
+        _gameObject.GetComponent<Bomb>().effectRange = GetInventory.OnHandRange;
     }
 }

@@ -67,6 +67,7 @@ public class Item : NetworkBehaviour
                     case EFFECT_TYPE.E_EXPLOSION:
                         Inventory inv = MyNetwork.instance.localPlayer.GetComponent<Inventory>();
                         inv.OnHandRange++;
+                        inv.UpdateUI();
                         break;
                     case EFFECT_TYPE.E_HEALTH:
                         CharacterStats stats = MyNetwork.instance.localPlayer.GetComponent<CharacterStats>();

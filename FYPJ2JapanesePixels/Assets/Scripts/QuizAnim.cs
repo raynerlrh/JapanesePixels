@@ -85,6 +85,7 @@ public class QuizAnim : MonoBehaviour
                 {
                     moveController.GetInventory.OnHandAmount += moveController.numAvailableMoves;
                     moveController.GetInventory.pendingReward = false;
+                    moveController.GetInventory.UpdateUI();
                     moveController.numAvailableMoves = 0;
                 }
 

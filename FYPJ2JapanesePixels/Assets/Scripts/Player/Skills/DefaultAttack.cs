@@ -39,6 +39,7 @@ public class DefaultAttack : PlayerSkill
 
         if (moveController.GetInventory.OnHandAmount > 0)
             moveController.GetInventory.OnHandAmount--;
+        moveController.GetInventory.UpdateUI();
 
         if (MyNetwork.instance.IsOnlineGame())
         {
@@ -47,7 +48,9 @@ public class DefaultAttack : PlayerSkill
         }
         else
         {
+            
             GameObject _bomb = Resources.Load("Prefabs/Bomb") as GameObject;
+            _bomb.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
             GameObject.Instantiate(_bomb, spawnPos, playerTrans.rotation);
         }
     }
@@ -56,13 +59,14 @@ public class DefaultAttack : PlayerSkill
     {
         PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
 
-        GameObject spawned = null;
+        GameObject spawn = null;
         if (moveController.isServer)
             moveController.RpcSpawn(_prefabsPath, _pos, _rot);
         else
             moveController.CmdSpawn(_prefabsPath, _pos, _rot);
-        if (spawned)
-            spawned.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
+
+        if (spawn)
+            spawn.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
     }
 
     public void Update()

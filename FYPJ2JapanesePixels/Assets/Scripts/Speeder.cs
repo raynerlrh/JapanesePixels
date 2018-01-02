@@ -7,7 +7,7 @@ public class Speeder : StateMachineBehaviour {
 	 // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        if (MyNetwork.instance.b_foundLocalPlayer)
+        if (MyNetwork.instance.b_foundLocalPlayer && MyNetwork.instance.localPlayer)
         {
             PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
             animator.speed = moveController.moveStat.moveSpeed * 0.5f;

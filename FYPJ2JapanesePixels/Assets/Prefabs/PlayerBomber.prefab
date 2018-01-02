@@ -821,6 +821,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae01457dfa5f66546b45f5680e2db461, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  b_isEnemy: 0
 --- !u!114 &114342631092422594
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1044,7 +1045,7 @@ MonoBehaviour:
   edit_size: 5
   equipped:
     weapon: {fileID: 1487954695940548, guid: 4e7b085b2873fef4990541a46f2ff5e7, type: 2}
-    size: 100
+    size: 0
     range: 0
   pendingReward: 0
 --- !u!114 &114957353166919126

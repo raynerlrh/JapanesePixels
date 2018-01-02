@@ -31,9 +31,10 @@ public class BomberGuide : MonoBehaviour {
     Vector3Int lastValid;
     public GameObject bomberobj;
     public TimerRoutine safetyTimer;
+    public bool reachedHiding;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         direction = getRandomDir();
         canProceed = true;
         originalCellsFree = cellsFree;
@@ -42,6 +43,7 @@ public class BomberGuide : MonoBehaviour {
         safetyTimer.initTimer(3);
         safetyTimer.executedFunction = resetWaypoints;
         bomberobj = transform.GetChild(1).gameObject;
+        reachedHiding = true;
     }
 	
 	// Update is called once per frame
@@ -87,12 +89,13 @@ public class BomberGuide : MonoBehaviour {
                 else // move
                 {
                     //hasWaypoint = false;
+
                     if (wpIndex < waypoints.Count - 1)
                     {
                         wpIndex++;
                         //if (wpIndex == 1)
                         //lastValid = waypoints[1];
-                        checkWaypointValidity(waypoints);
+                        //checkWaypointValidity(waypoints);
                         //for (int i = 0; i < waypoints.Count; ++i)
                         //print(waypoints[i] + "co");
                         direction = convertVec3ToDir(bomberobj.transform.position, waypoints[wpIndex]);
@@ -104,6 +107,7 @@ public class BomberGuide : MonoBehaviour {
                         if (!safetyTimer.hasRun)
                             safetyTimer.executeFunction();
                         direction = MOVEDIR.E_CENTRE;
+                        reachedHiding = false;
                     }
                 }
                 //move
@@ -141,6 +145,7 @@ public class BomberGuide : MonoBehaviour {
         hasWaypoint = false;
         waypoints = null;
         safetyTimer.hasRun = false;
+        reachedHiding = true;
     }
     
     private int cellsAway(Vector3Int cell1, Vector3Int cell2)
@@ -149,7 +154,7 @@ public class BomberGuide : MonoBehaviour {
         return (int)cellsAway.magnitude;
     }
 
-    private float fCellsAway(Vector3Int cell1, Vector3Int cell2)
+    public float fCellsAway(Vector3Int cell1, Vector3Int cell2)
     {
         Vector3Int cellsAway = cell2 - cell1;
         return cellsAway.magnitude;
@@ -364,7 +369,6 @@ public class BomberGuide : MonoBehaviour {
                     {
                         continue;
                     }
-                    print("gg2");
                     waypoint = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(possible[i]);
                     hasWaypoint = true;
                     break;

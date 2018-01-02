@@ -14,7 +14,10 @@ public class SkillButton : MonoBehaviour
         if (MyNetwork.instance.IsOnlineGame())
             return;
 
-        SetUp();
+        if (MyNetwork.instance.localPlayer)
+        {
+            SetUp();
+        }
     }
 
     void SetUp()
@@ -46,11 +49,11 @@ public class SkillButton : MonoBehaviour
         {
             if (!MyNetwork.instance.b_foundLocalPlayer)
                 return;
-
-            SetUp();
+            if (MyNetwork.instance.localPlayer)
+                SetUp();
         }
 
-        if (attachedSkill.b_needsUpdate)
+        if (attachedSkill != null && attachedSkill.b_needsUpdate)
             attachedSkill.Update();
     }
 

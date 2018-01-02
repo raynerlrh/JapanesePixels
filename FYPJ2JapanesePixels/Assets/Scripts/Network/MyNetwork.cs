@@ -84,6 +84,7 @@ public class MyNetwork : MonoBehaviour
         {
             gameType = GAME_TYPE.ONINE_COOP;
         }
+
     }
 
     void Start()
@@ -120,6 +121,7 @@ public class MyNetwork : MonoBehaviour
 
     void Update()
     {
+        //print(b_foundLocalPlayer);
         if (gameType == GAME_TYPE.SINGLE_PLAYER)
             return;
        
@@ -138,10 +140,9 @@ public class MyNetwork : MonoBehaviour
             {
                 if (_player.isServer)
                     _player.GetComponent<PlayerMoveController>().b_isHost = true;
-
                 localPlayer = _player.gameObject;
                 localPlayer.GetComponent<PlayerMoveController>().GetPawn.InitChar();
-
+                
                 localGameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
                 b_foundLocalPlayer = true;
                 return;

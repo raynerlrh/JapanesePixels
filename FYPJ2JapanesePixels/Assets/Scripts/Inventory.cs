@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [System.Serializable]
 public struct OnHand
@@ -16,6 +17,7 @@ public class Inventory : MonoBehaviour {
     public int edit_size = 1;
     [SerializeField]
     private OnHand equipped;
+
     public int OnHandAmount
     {
         get { return equipped.size; }
@@ -65,5 +67,12 @@ public class Inventory : MonoBehaviour {
         //ObjectStats stat = emptyhand.AddComponent<ObjectStats>();
         //stat.damage = 0;
         return null;
+    }
+
+    public void UpdateUI()
+    {
+        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+        moveController.bombText2d.GetComponent<Text>().text = moveController.GetInventory.OnHandAmount.ToString();
+        moveController.rangeText2d.GetComponent<Text>().text = moveController.GetInventory.OnHandRange.ToString();
     }
 }
