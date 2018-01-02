@@ -9,6 +9,9 @@ public class ItemSpawner : NetworkBehaviour
     public GameObject itemPrefab;
     public int numberOfItems;
 
+    [SerializeField]
+    Transform gameCharacters;
+
     public GameObject enemyPrefab;
 
     // This will be the start function since without the NetworkManager in single player mode, this game object will be set to inactive
@@ -40,6 +43,7 @@ public class ItemSpawner : NetworkBehaviour
         }
 
         GameObject enemy = (GameObject)Instantiate(enemyPrefab, new Vector3(-2.44f, 3.51f, 0f), Quaternion.identity);
+        enemy.transform.SetParent(gameCharacters);
         NetworkServer.Spawn(enemy);
     }
 

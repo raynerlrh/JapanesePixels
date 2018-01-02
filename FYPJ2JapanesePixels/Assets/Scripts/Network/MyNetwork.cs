@@ -69,12 +69,17 @@ public class MyNetwork : MonoBehaviour
             Destroy(gameObject);
 
         // here temporarily cos lazy change scene
-        PlayerPrefs.SetString("Game_Mode", "Online_Versus");
+        // proper place should be when player selects single player or multiplayer
+        PlayerPrefs.SetString("Game_Mode", "Single_Player");
 
         if (PlayerPrefs.GetString("Game_Mode") == "Single_Player")
         {
-            //b_foundLocalPlayer = true;
+            b_foundLocalPlayer = true;
             gameType = GAME_TYPE.SINGLE_PLAYER;
+
+            GameObject playerPrefab = Resources.Load("Prefabs/PlayerHero") as GameObject;
+            localPlayer = GameObject.Instantiate(playerPrefab);
+            Debug.Log("DDD");
         }
         else if (PlayerPrefs.GetString("Game_Mode") == "Online_Versus")
         {
@@ -90,8 +95,10 @@ public class MyNetwork : MonoBehaviour
     {
         if (PlayerPrefs.GetString("Game_Mode") == "Single_Player")
         {
-            GameObject playerPrefab = Resources.Load("Prefabs/PlayerHero") as GameObject;
-            localPlayer = GameObject.Instantiate(playerPrefab);
+            localPlayer.GetComponent<PlayerMoveController>().Start();
+
+            if (localPlayer.GetComponent<PlayerMoveController>().GetPawn == null)
+                Debug.Log("NULL");
 
             localPlayer.GetComponent<PlayerMoveController>().GetPawn.InitChar();
             localPlayer.GetComponent<PlayerMoveController>().SetSinglePlayerMode();

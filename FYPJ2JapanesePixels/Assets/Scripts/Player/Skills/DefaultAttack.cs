@@ -13,6 +13,8 @@ public class DefaultAttack : PlayerSkill
 
     private Vector3 prevBombPos = Vector3.zero;
 
+    float timeTillReset;
+
     public DefaultAttack()
     {
         skillName = "Default Attack: Drop bomb";
@@ -23,8 +25,7 @@ public class DefaultAttack : PlayerSkill
     public void ExecuteSkill()
     {
         PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
-        if (moveController.GetInventory.OnHandAmount <= 0)
-            return;
+
         damage = moveController.GetPawn.GetComponent<CharacterStats>().attackVal;
         Transform playerTrans = moveController.GetPawn.gameObject.transform;
         Vector3Int playerPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(playerTrans.position);
@@ -50,6 +51,8 @@ public class DefaultAttack : PlayerSkill
             GameObject _bomb = Resources.Load("Prefabs/Bomb") as GameObject;
             GameObject.Instantiate(_bomb, spawnPos, playerTrans.rotation);
         }
+
+        b_needsUpdate = true;
     }
 
     void SpawnBomb(string _prefabsPath, Vector3 _pos, Quaternion _rot)
@@ -69,5 +72,14 @@ public class DefaultAttack : PlayerSkill
     {
         if (!b_needsUpdate)
             return;
+
+        timeTillReset += Time.deltaTime;
+
+        if (timeTillReset > 3f)
+        {
+            prevBombPos = Vector3.zero;
+            timeTillReset = 0f;
+            b_needsUpdate = false;
+        }
     }
 }
