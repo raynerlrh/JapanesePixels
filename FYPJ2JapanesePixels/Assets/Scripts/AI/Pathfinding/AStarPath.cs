@@ -23,10 +23,10 @@ public class AStarPath : MonoBehaviour {
         //start.gCost = 0;
         //start.hCost = GetDistHeuristic(start, goal);
         open_list.Add(start);
-        //int temp = 0; // temp is for debugging if this algo crashes becus of the While
+        int temp = 0; // temp is for debugging if this algo crashes becus of the While
         while (open_list.Count > 0)
         {
-            //temp++;
+            temp++;
             PNode curr = open_list[0];
             for (int i = 1; i < open_list.Count; ++i)// 1 because doesnt count start node
             {
@@ -43,12 +43,12 @@ public class AStarPath : MonoBehaviour {
                 return want_list;
                 //return RetracePath(start, goal, want_list); ; // mission accomplished
             }
-            //else if (temp > 200)
-            //{
-            //    print("break");
-            //    end = true;
-            //    return null;
-            //}
+            else if (temp > 200)
+            {
+                //print("break");
+                end = true;
+                return null;
+            }
 
             open_list.Remove(curr);
             close_list.Add(curr.pos);

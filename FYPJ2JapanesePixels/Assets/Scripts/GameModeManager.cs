@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
 public struct UIProp
 {
@@ -78,7 +79,15 @@ public class GameModeManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        if (MyNetwork.instance.IsOnlineGame())
+            NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
+        else
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public string getSceneName()
+    {
+        return SceneManager.GetActiveScene().name;
     }
 
     public void showDeathScreen()

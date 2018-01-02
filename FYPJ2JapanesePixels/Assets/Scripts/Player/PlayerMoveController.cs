@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -39,9 +41,14 @@ public class PlayerMoveController : NetworkBehaviour
     TileRefManager tileRefManager;
 
     Dpad dpad;
+    GameObject exitRequirements;
+    GameObject levelCleared;
 
     [SyncVar]
     Dpad.MOVE_DIR dpad_moveDir;
+
+    [SyncVar(hook = "OnReqChanged")]
+    int level_numKeysRequired;
 
     Tile originalTile;
     Tile availableTile;
@@ -52,9 +59,6 @@ public class PlayerMoveController : NetworkBehaviour
 
     //[SyncVar]
     public Vector3Int playerCellPos { get; set; }
-
-    [SyncVar]
-    Vector3 test;
 
     Vector3Int prevCellPos;
 
@@ -69,6 +73,11 @@ public class PlayerMoveController : NetworkBehaviour
     bool b_reachedTarget;
     bool b_touchedScreen;
 
+    int numKeys;
+
+    bool b_usedKey;
+    bool b_levelCleared;
+
     public MovementStats moveStat;
     private Rigidbody2D body;
 
@@ -81,6 +90,8 @@ public class PlayerMoveController : NetworkBehaviour
 
     public PlayState e_playstate;
     public bool isOver;
+    float levelClearedTimer;
+    float checkLevelClearTimer;
     public GameObject bombText2d;
     public GameObject rangeText2d;
 
@@ -94,17 +105,109 @@ public class PlayerMoveController : NetworkBehaviour
             Debug.Log("NULL");
     }
 
+    bool IsLocalPlayer()
+    {
+        if (MyNetwork.instance.IsOnlineGame())
+        {
+            return isLocalPlayer;
+        }
+
+        return true;
+    }
+
     public void SetSinglePlayerMode()
     {
         Destroy(GetComponent<SyncTransform>());
-        //Destroy(GetComponent<NetworkIdentity>());
     }
 
-    void Start()
+    public void ReceiveKey()
     {
+        numKeys++;
+    }
+
+    void OnReqChanged(int _newNumKeysRequired)
+    {
+        this.level_numKeysRequired = _newNumKeysRequired;
+        //level_numKeysRequired--;
+        //Debug.Log("USED KEY " + level_numKeysRequired);
+    }
+
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (!IsLocalPlayer())
+            return;
+
+        if (col.gameObject.layer == 18)
+        {
+            // Display exit requirements
+            Text requirementsText = exitRequirements.transform.GetChild(1).GetComponent<Text>();
+
+            //int keysRemaining = level_numKeysRequired - numKeys;
+
+            int enemiesRemaining = GameObject.FindGameObjectsWithTag("Enemy").Length;
+
+            if (enemiesRemaining > 0)
+            {
+                //requirementsText.text = "Find keys to exit!    Keys remaining:  " + keysRemaining;
+                requirementsText.text = "Kill remaining enemies to exit!";
+            }
+            else
+            {
+                requirementsText.text = "Level Cleared!";
+                b_levelCleared = true;
+                levelCleared.SetActive(true);
+            }
+
+            // Use up key
+            if (numKeys > 0)
+            {
+                //numKeys--;
+                //level_numKeysRequired--;
+                //b_usedKey = true;
+
+                //if (MyNetwork.instance.IsOnlineGame())
+                //{
+                //    if (isServer)
+                //        RpcUpdateKeysRequired(level_numKeysRequired);
+                //    else
+                //        CmdUpdateKeysRequired(level_numKeysRequired);
+                //}
+            }
+
+            exitRequirements.SetActive(true);
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D col)
+    {
+        if (!IsLocalPlayer())
+            return;
+
+        if (col.gameObject.layer == 18)
+        {
+            exitRequirements.SetActive(false);
+        }
+    }
+
+    public void Start()
+    {
+        if (!IsLocalPlayer())
+            return;
+
+        level_numKeysRequired = 2;
+
+        Transform gameCharacters = GameObject.Find("GameCharacters").transform;
+        transform.SetParent(gameCharacters);
+
         gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
         tileRefManager = gameGrid.GetComponent<TileRefManager>();
         dpad = GameObject.Find("Dpad").GetComponent<Dpad>();
+        if (exitRequirements == null)
+            exitRequirements = GameObject.Find("LevelExitRequirements");
+        exitRequirements.SetActive(false);
+        if (levelCleared == null)
+            levelCleared = GameObject.Find("LevelCleared");
+        levelCleared.SetActive(false);
 
         pawn_sprite = this.gameObject;
         pawn = pawn_sprite.AddComponent<DefaultCharacter>();
@@ -146,16 +249,96 @@ public class PlayerMoveController : NetworkBehaviour
         }
     }
 
+    void SyncNumKeysRequired()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        for (int i = 0; i < players.Length; i++)
+        {
+            if (players[i].GetComponent<NetworkIdentity>().isLocalPlayer)
+                continue;
+
+            int _numKeysReq = players[i].GetComponent<PlayerMoveController>().level_numKeysRequired;
+
+            players[i].GetComponent<PlayerMoveController>().SetOtherPlayersNumKeysReq(_numKeysReq);
+        }
+    }
+
+    bool NoEnemiesRemaining()
+    {
+        int enemiesRemaining = GameObject.FindGameObjectsWithTag("Enemy").Length;
+
+        return enemiesRemaining == 0;
+    }
+
+    bool CheckIfLevelCleared()
+    {
+        checkLevelClearTimer += Time.deltaTime;
+
+        float checkAfterNumSec = 1f;
+
+        if (checkLevelClearTimer > checkAfterNumSec)
+        {
+            // perform check after time has passed
+            if (NoEnemiesRemaining())
+                return true;
+
+            // reset timer
+            checkLevelClearTimer = 0f;
+        }
+
+        return false;
+    }
+
     void Update()
     {
-        if (MyNetwork.instance.IsOnlineGame())
-        {
-            if (!isLocalPlayer)
-                return;
-        }
+        if (!IsLocalPlayer())
+            return;
 
         if (!pawn_sprite.activeSelf)
             return;
+
+        if (!b_levelCleared)
+        {
+            if (CheckIfLevelCleared())
+            {
+                b_levelCleared = true;
+                levelCleared.SetActive(true);
+            }
+        }
+        else
+        {
+            levelClearedTimer += Time.deltaTime;
+
+            if (levelClearedTimer < 1f)
+                return;
+
+            Destroy(this.gameObject);
+
+            if (MyNetwork.instance.IsOnlineGame())
+                NetworkManager.singleton.ServerChangeScene("Level2Rayner_Multiplayer");
+            else
+                SceneManager.LoadScene("Level2Rayner_Multiplayer");
+        }
+
+        //if (isServer)
+        //{
+        //    b_usedKey = true;
+        //    if (b_usedKey)
+        //    {
+        //        level_numKeysRequired--;
+
+        //        if (MyNetwork.instance.IsOnlineGame())
+        //        {
+        //            level_numKeysRequired = 3;
+        //            RpcUpdateKeysRequired(level_numKeysRequired);
+        //        }
+
+        //        b_usedKey = false;
+        //    }
+        //}
+
+        //Debug.Log(level_numKeysRequired);
 
         if (pawn.checkIfDead())
         {
@@ -173,7 +356,10 @@ public class PlayerMoveController : NetworkBehaviour
                 //CmdSyncSA();
 
             if (MyNetwork.instance.IsOnlineGame())
+            {
+                //SyncNumKeysRequired();
                 SyncSpriteAnimations();
+            }
 
             UpdateMovement();
         }
@@ -193,18 +379,26 @@ public class PlayerMoveController : NetworkBehaviour
         dpad_moveDir = _dir;
     }
 
-    void FixedUpdate()
+    [Command]
+    void CmdUpdateKeysRequired(int newReq)
     {
-        //return;
-        //if (moveStat.isMoving)
-        //{
-        //    bool reached = UpdateFreeMovement(moveStat.destinatePos);
-        //    if (reached)
-        //    {
-        //        moveStat.isMoving = false;
-        //        //b_answeredCorrectly = false;
-        //    }
-        //}
+        RpcUpdateKeysRequired(newReq);
+    }
+
+    [ClientRpc]
+    void RpcUpdateKeysRequired(int newReq)
+    {
+        //level_numKeysRequired--;
+        this.level_numKeysRequired = newReq;
+    }
+
+    void OnDestroy()
+    {
+        if (exitRequirements && levelCleared)
+        {
+            exitRequirements.SetActive(true);
+            levelCleared.SetActive(true);
+        }
     }
 
     void UpdateMovement()
@@ -247,6 +441,12 @@ public class PlayerMoveController : NetworkBehaviour
         //        }
         //    }
         //}
+    }
+
+    void SetOtherPlayersNumKeysReq(int _numKeysRequired)
+    {
+        //if (_numKeysRequired > level_numKeysRequired)
+            _numKeysRequired = level_numKeysRequired;
     }
 
     void RenderOtherPlayersAnim(Animator _animator, Dpad.MOVE_DIR _dir)

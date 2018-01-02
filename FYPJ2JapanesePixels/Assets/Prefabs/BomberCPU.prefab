@@ -347,7 +347,7 @@ GameObject:
   - component: {fileID: 212871996942066118}
   m_Layer: 14
   m_Name: BomberCPU
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

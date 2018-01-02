@@ -42,10 +42,4 @@ public class HostGame : MonoBehaviour
             createRoomErrorText.text = "Room name cannot be empty";
         }
     }
-
-    //void OnLevelWasLoaded(int level)
-    //{
-    //    if (level == 1) // may need to be changed, depends on build settings
-    //        GetComponent<MyNetwork>().enabled = true;
-    //}
 }

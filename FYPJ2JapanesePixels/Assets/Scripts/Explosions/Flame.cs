@@ -38,6 +38,10 @@ public class Flame : ObjectStats
                 SpawnItem(transform.position, true, -1f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_EXPLOSION);
             else if (val > -15f && val < -5f)
                 SpawnItem(transform.position, true, -4f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_HEALTH);
+
+            // testing, need to set val condition later
+            //SpawnItem(transform.position, false, 0f, Item.ITEM_TYPE.KEY);
+
             DestroySelf();
         }
     }
@@ -54,8 +58,29 @@ public class Flame : ObjectStats
         GameObject itemPrefab = Resources.Load("Prefabs/Item") as GameObject;
         GameObject obj = (GameObject)Instantiate(itemPrefab, pos, Quaternion.identity);
 
-        Item i = obj.GetComponent<Item>();
-        i.itemType = itype;
-        i.effectType = etype;
+        Item item = obj.GetComponent<Item>();
+        item.itemType = itype;
+        item.effectType = etype;
+
+        Sprite _sprite;
+        switch (item.itemType)
+        {
+            case Item.ITEM_TYPE.SKILL:
+                //{
+                //    if (item.effectType == Item.EFFECT_TYPE.E_EXPLOSION)
+                //        item.GetComponent<SpriteRenderer>().sprite = TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_PICKUP1).sprite;
+                //    else
+                //        item.GetComponent<SpriteRenderer>().sprite = TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_PICKUP2).sprite;
+                //    Vector3 sizing = item.transform.localScale;
+                //    item.transform.localScale = new Vector3(sizing.x * 10, sizing.y * 10, sizing.z * 10);
+                //}
+                break;
+            case Item.ITEM_TYPE.QUESTION:
+                break;
+            case Item.ITEM_TYPE.KEY:
+                _sprite = Resources.Load<Sprite>("Sprites/Key");
+                item.GetComponent<SpriteRenderer>().sprite = _sprite;
+                break;
+        }
     }
 }

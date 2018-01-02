@@ -9,6 +9,7 @@ public class Item : NetworkBehaviour
     {
         SKILL,
         QUESTION,
+        KEY,
     }
 
     public enum EFFECT_TYPE
@@ -22,7 +23,7 @@ public class Item : NetworkBehaviour
     public EFFECT_TYPE effectType = EFFECT_TYPE.E_EXPLOSION;
 
     Vector3Int itemCellPos;
-    NetworkIdentity player;
+    PlayerMoveController player;
 
     void Start()
     {
@@ -30,27 +31,19 @@ public class Item : NetworkBehaviour
         itemCellPos = gameGrid.GetWorldFlToCellPos(transform.localPosition);
     }
 
-    void Update()
-    {
-        //if (!MyNetwork.instance.b_foundLocalPlayer)
-        //    return;
-
-        //if (MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>().playerCellPos == itemCellPos)
-        //{
-        //    UseItem();
-        //}
-    }
-
     void OnTriggerEnter2D(Collider2D col)
     {
         if (col.tag == "Player" && itemType == ITEM_TYPE.QUESTION)
         {
-            player = col.GetComponent<NetworkIdentity>();
+            player = col.GetComponent<PlayerMoveController>();
             UseItem();
             col.GetComponent<Inventory>().pendingReward = true;
         }
-        else if(col.tag == "Player")
+        else if (col.tag == "Player")
+        {
+            player = col.GetComponent<PlayerMoveController>();
             UseItem();
+        }
         else if (col.gameObject.layer == 14)
         {
             UseItemCPU(col.gameObject);
@@ -79,6 +72,10 @@ public class Item : NetworkBehaviour
             case ITEM_TYPE.QUESTION:
                 // enables quiz menu
                 EnableQuiz();
+                break;
+
+            case ITEM_TYPE.KEY:
+                player.ReceiveKey();
                 break;
         }
 
