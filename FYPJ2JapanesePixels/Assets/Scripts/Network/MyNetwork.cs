@@ -70,7 +70,7 @@ public class MyNetwork : MonoBehaviour
 
         // here temporarily cos lazy change scene
         // proper place should be when player selects single player or multiplayer
-        PlayerPrefs.SetString("Game_Mode", "Online_Coop");
+        //PlayerPrefs.SetString("Game_Mode", "Online_Coop");
 
         if (PlayerPrefs.GetString("Game_Mode") == "Single_Player")
         {
