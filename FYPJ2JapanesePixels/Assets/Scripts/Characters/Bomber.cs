@@ -184,7 +184,6 @@ public class Bomber : MonoBehaviour {
             }
 
             // the following block should not be called if it is the bomber's own bomb
-            print(colcount);
             if (obj.gameObject.layer == 10 && !obj.gameObject.Equals(bombRef) && obj.gameObject.CompareTag("Interactable") && colcount < 2) // is this a solidobject? Ignore my own bomb and do not detect flames which are also solidobjs
             {
                 int bombRange = obj.gameObject.GetComponent<Bomb>().effectRange;

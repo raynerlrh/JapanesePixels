@@ -85,6 +85,14 @@ public class GameModeManager : MonoBehaviour
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
+    public void ReturnLobby()
+    {
+        Destroy(MyNetwork.instance.localPlayer);
+        Destroy(NetworkManager.singleton.gameObject);
+        SceneManager.LoadScene("Lobby");
+
+    }
+
     public string getSceneName()
     {
         return SceneManager.GetActiveScene().name;
@@ -106,4 +114,5 @@ public class GameModeManager : MonoBehaviour
         //Time.timeScale = 0.25f;
         //Time.fixedDeltaTime = Time.timeScale * 0.02f;
     }
+
 }
