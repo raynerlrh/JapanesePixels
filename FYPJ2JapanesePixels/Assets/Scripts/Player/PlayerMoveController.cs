@@ -316,9 +316,9 @@ public class PlayerMoveController : NetworkBehaviour
             Destroy(this.gameObject);
 
             if (MyNetwork.instance.IsOnlineGame())
-                NetworkManager.singleton.ServerChangeScene("Level2Rayner_Multiplayer");
+                NetworkManager.singleton.ServerChangeScene("Level2");
             else
-                SceneManager.LoadScene("Level2Rayner_Multiplayer");
+                SceneManager.LoadScene("Level2");
         }
 
         //if (isServer)
@@ -732,16 +732,16 @@ public class PlayerMoveController : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    public void CmdSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range)
     {
-        RpcSpawn(_prefabsPath, _pos, _rot);
+        RpcSpawn(_prefabsPath, _pos, _rot, _range);
     }
 
     [ClientRpc]
-    public void RpcSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    public void RpcSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range)
     {
         GameObject _bomb = Resources.Load(_prefabsPath) as GameObject;
         GameObject _gameObject = GameObject.Instantiate(_bomb, _pos, _rot);
-        _gameObject.GetComponent<Bomb>().effectRange = GetInventory.OnHandRange;
+        _gameObject.GetComponent<Bomb>().effectRange = _range;
     }
 }

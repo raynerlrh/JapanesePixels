@@ -147,12 +147,12 @@ public class LanguageSystem : MonoBehaviour
             if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.PRE_GAME)
                 Enable();
 
-            Debug.Log("WWW OK!");
+            //Debug.Log("WWW OK!");
             //gameObject.SetActive(false);
         }
         else
         {
-            Debug.Log("WWW Error: " + www.error);
+            //Debug.Log("WWW Error: " + www.error);
         }
     }
 

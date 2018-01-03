@@ -50,9 +50,9 @@ public class DefaultAttack : PlayerSkill
         else
         {
             
-            GameObject _bomb = Resources.Load("Prefabs/Bomb") as GameObject;
+            GameObject bombPrefab = Resources.Load("Prefabs/Bomb") as GameObject;
+            GameObject _bomb = GameObject.Instantiate(bombPrefab, spawnPos, playerTrans.rotation);
             _bomb.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
-            GameObject.Instantiate(_bomb, spawnPos, playerTrans.rotation);
         }
 
         b_needsUpdate = true;
@@ -63,10 +63,13 @@ public class DefaultAttack : PlayerSkill
         PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
 
         GameObject spawn = null;
+
+        int bombRange = moveController.GetInventory.OnHandRange;
+
         if (moveController.isServer)
-            moveController.RpcSpawn(_prefabsPath, _pos, _rot);
+            moveController.RpcSpawn(_prefabsPath, _pos, _rot, bombRange);
         else
-            moveController.CmdSpawn(_prefabsPath, _pos, _rot);
+            moveController.CmdSpawn(_prefabsPath, _pos, _rot, bombRange);
 
         if (spawn)
             spawn.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;

@@ -83,12 +83,6 @@ public class ItemSpawner : NetworkBehaviour
         }
     }
 
-    [Command]
-    public void CmdSpawnObject(GameObject _gameObject)
-    {
-        NetworkServer.Spawn(_gameObject);
-    }
-
     public void spawnAnotherEnemy()
     {
         int r = Random.Range(0, t_spawnArr.Length - 1);

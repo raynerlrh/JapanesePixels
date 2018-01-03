@@ -69,7 +69,7 @@ public class Bomber : MonoBehaviour {
     }
 	
 	// Update is called once per frame
-	void Update () {
+	void FixedUpdate () {
         // Moving towards guide
         float dist = Vector2.Distance(transform.position, guide.bomberdes);
         float speed = (movement.speed * Time.deltaTime);

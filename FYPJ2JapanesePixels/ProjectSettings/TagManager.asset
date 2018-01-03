@@ -10,6 +10,7 @@ TagManager:
   - 2DCanvas
   - InventoryItem
   - Interactable
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -29,7 +30,7 @@ TagManager:
   - Computer
   - ComputerTrigger
   - Destructible
-  - 
+  - LevelExit
   - 
   - 
   - 
