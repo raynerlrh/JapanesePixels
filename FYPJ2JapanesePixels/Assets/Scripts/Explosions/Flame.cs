@@ -27,7 +27,6 @@ public class Flame : ObjectStats
         }
         if (obj.gameObject.layer == 17)
         {
-            print("ff");
             Vector3Int cellpos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
             TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, cellpos, null);
             float val = Random.Range(-15f, 15f);

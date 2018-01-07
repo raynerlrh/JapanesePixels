@@ -31,16 +31,16 @@ public class CameraController : MonoBehaviour
     {
         zoomTarget = MyNetwork.instance.localPlayer;
 
-        if (zoomTarget != null)
-        {
-            if (settings.mode == CamSettings.CamMode.E_OFFSET)
-                pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y - settings.yOffset * 0.5f, transform.position.z);
-            else if (settings.mode == CamSettings.CamMode.E_PCENTERED)
-                pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y, transform.position.z);
-        }
+        //if (zoomTarget != null)
+        //{
+        //    if (settings.mode == CamSettings.CamMode.E_OFFSET)
+        //        pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y - settings.yOffset * 0.5f, transform.position.z);
+        //    else if (settings.mode == CamSettings.CamMode.E_PCENTERED)
+        //        pos = new Vector3(zoomTarget.transform.position.x, zoomTarget.transform.position.y, transform.position.z);
+        //}
 
-        if (settings.mode != CamSettings.CamMode.E_WHOLEMAP)
-            transform.position = pos;
+        //if (settings.mode != CamSettings.CamMode.E_WHOLEMAP)
+        //    transform.position = pos;
 	}
 
     public void switchMode(CamSettings.CamMode cameraMode)
