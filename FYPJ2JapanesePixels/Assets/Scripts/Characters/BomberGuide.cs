@@ -28,7 +28,6 @@ public class BomberGuide : MonoBehaviour {
     public bool hasWaypoint = false;
     List<Vector3Int> waypoints;
     public int wpIndex; // waypoint index
-    Vector3Int lastValid;
     public GameObject bomberobj;
     public TimerRoutine safetyTimer;
     public bool reachedHiding;
@@ -84,7 +83,8 @@ public class BomberGuide : MonoBehaviour {
                 {
                     GetComponent<AStarPath>().init(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(waypoint));
                     waypoints = GetComponent<AStarPath>().runPathFinding();
-                    waypoints = checkWaypointValidity(waypoints);
+                    if (waypoints != null)
+                        waypoints = checkWaypointValidity(waypoints);
                 }
                 else // move
                 {
@@ -93,11 +93,13 @@ public class BomberGuide : MonoBehaviour {
                     if (wpIndex < waypoints.Count - 1)
                     {
                         wpIndex++;
-                        //if (wpIndex == 1)
-                        //lastValid = waypoints[1];
-                        //checkWaypointValidity(waypoints);
-                        //for (int i = 0; i < waypoints.Count; ++i)
-                        //print(waypoints[i] + "co");
+                        int nodeind = TileRefManager.instance.GetNodeIndex(waypoints[wpIndex]);
+                        if (!TileRefManager.instance.GetNode(nodeind).passable)
+                        {
+                            TileRefManager.instance.GetNode(nodeind).passable = true;
+                            //TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_ENEMY, waypoints[wpIndex], TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_GRASS));
+                        }
+
                         direction = convertVec3ToDir(bomberobj.transform.position, waypoints[wpIndex]);
                         moveToWaypoint();
                         canProceed = false;
@@ -160,7 +162,7 @@ public class BomberGuide : MonoBehaviour {
         return cellsAway.magnitude;
     }
 
-    private MOVEDIR getRandomDir()
+    public static MOVEDIR getRandomDir()
     {
         int randnum = Random.Range(0, 100);
         if (randnum < 25)
@@ -261,7 +263,7 @@ public class BomberGuide : MonoBehaviour {
         return MOVEDIR.E_CENTRE;
     }
 
-    private bool obstacleCheck(MOVEDIR dir, int range)
+    bool obstacleCheck(MOVEDIR dir, int range)
     {
         Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         Vector3Int test = Vector3Int.zero;
@@ -339,16 +341,23 @@ public class BomberGuide : MonoBehaviour {
         }
     }
 
-    public void findWaypoint(List<Vector3Int> possible, Vector3 bombpos)
+    public void findWaypoint(List<int> possible, Vector3 bombpos)
     {
         if (!hasWaypoint)
         {
             List<Vector3Int> pro = null;
             for (int i = 0; i < possible.Count; ++i)
             {
+                PNode node = TileRefManager.instance.GetNode(possible[i]);
+                if (node.passable)
+                {
+                    waypoint = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(node.pos);
+                    hasWaypoint = true;
+                    break;
+                }
                 // pathfind gives waypoint cells to move to
-                GetComponent<AStarPath>().init(possible[i]);
-                pro = GetComponent<AStarPath>().runPathFinding();
+                GetComponent<AStarPath>().init(node.pos);
+                pro = GetComponent<AStarPath>().runPathFinding(); // list
                 if (pro != null)
                 {
                     bool gg = false;
@@ -369,8 +378,9 @@ public class BomberGuide : MonoBehaviour {
                     {
                         continue;
                     }
-                    waypoint = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(possible[i]);
+                    waypoint = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(node.pos);
                     hasWaypoint = true;
+                    waypoints = pro;
                     break;
                 }
             }

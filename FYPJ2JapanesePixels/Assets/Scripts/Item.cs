@@ -44,7 +44,7 @@ public class Item : NetworkBehaviour
             player = col.GetComponent<PlayerMoveController>();
             UseItem();
         }
-        else if (col.gameObject.layer == 14)
+        else if (col.gameObject.layer == 8)
         {
             UseItemCPU(col.gameObject);
         }
@@ -91,10 +91,12 @@ public class Item : NetworkBehaviour
                 switch (effectType)
                 {
                     case EFFECT_TYPE.E_EXPLOSION:
-                        go.GetComponent<Inventory>().OnHandRange++;
+                        if (go.GetComponent<Inventory>())
+                            go.GetComponent<Inventory>().OnHandRange++;
                         break;
                     case EFFECT_TYPE.E_HEALTH:
-                        go.GetComponent<CharacterStats>().increaseHealth(go.GetComponent<CharacterStats>().hpSys.MAX_HEALTH);
+                        if (go.GetComponent<CharacterStats>())
+                            go.GetComponent<CharacterStats>().increaseHealth(go.GetComponent<CharacterStats>().hpSys.MAX_HEALTH);
                         break;
                 }
                 // give a randomized skill? or already randomized at the start and just give a skill

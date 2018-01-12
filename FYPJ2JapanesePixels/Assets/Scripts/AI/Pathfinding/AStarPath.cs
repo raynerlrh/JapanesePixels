@@ -6,22 +6,18 @@ public class AStarPath : MonoBehaviour {
     PNode startnode;
     PNode endnode;
     List<Vector3Int> taken_list;
-    public bool end;
-	// Use this for initialization
-	void Start () {
-        end = true;
-	}
+    List<PNode> neighbours;
 
     List<Vector3Int> pathfind(PNode start, PNode goal)
     {
-        List<PNode> open_list;
-        List<Vector3Int> close_list;
-        List<Vector3Int> want_list;
+        //start.gCost = 0;
+        //start.hCost = GetDistHeuristic(start, goal);
+        List<PNode> open_list; // list
+        List<Vector3Int> close_list; // list
+        List<Vector3Int> want_list; // list
         open_list = new List<PNode>();
         close_list = new List<Vector3Int>();
         want_list = new List<Vector3Int>();
-        //start.gCost = 0;
-        //start.hCost = GetDistHeuristic(start, goal);
         open_list.Add(start);
         int temp = 0; // temp is for debugging if this algo crashes becus of the While
         while (open_list.Count > 0)
@@ -46,14 +42,13 @@ public class AStarPath : MonoBehaviour {
             else if (temp > 200)
             {
                 //print("break");
-                end = true;
                 return null;
             }
 
             open_list.Remove(curr);
             close_list.Add(curr.pos);
 
-            List<PNode> neighbours = curr.GetNeighbours();
+            curr.GetNeighbours(ref neighbours); // list
             //print(neighbours.Count);
             for (int j = 0; j < neighbours.Count; ++j)
             {
@@ -109,16 +104,20 @@ public class AStarPath : MonoBehaviour {
 
     public List<Vector3Int> runPathFinding()
     {
-        if (!end)
+        //if (!once)
         {
             taken_list = pathfind(startnode, endnode);
+            //once = true;
+        }
+        /*else
+        {
             if (taken_list != null)
             {
                 //for (int i = 0; i < taken_list.Count; ++i)
                 //    print(taken_list[i]);
-                end = true;
+                once = false;
             }
-        }
+        }*/
         return taken_list;
     }
 
@@ -127,6 +126,11 @@ public class AStarPath : MonoBehaviour {
         startnode = new PNode(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(GetComponent<BomberGuide>().bomberobj.transform.position), true);
         endnode = new PNode(endcell, true);
         taken_list = null;
-        end = false;
+        //open_list.Clear();
+        //close_list.Clear();
+        //want_list.Clear();
+        //open_list.TrimExcess();
+        //close_list.TrimExcess();
+        //want_list.TrimExcess();
     }
 }

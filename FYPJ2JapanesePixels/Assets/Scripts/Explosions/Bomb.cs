@@ -47,7 +47,7 @@ public class Bomb : ObjectStats {
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.localRotation);
-            flame.GetComponent<ObjectStats>().damage = damage;
+            flame.GetComponent<ObjectStats>().damage = 25; // damage
             flame.SetActive(true);
             // Allow spawning of flame at the destructible block position before stopping all spawns
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
@@ -103,7 +103,7 @@ public class Bomb : ObjectStats {
 
     void OnTriggerEnter2D(Collider2D obj)
     {
-        if  (obj.gameObject.layer == 14 && hasMoved )
+        if  ((obj.gameObject.layer == 14 || obj.gameObject.layer == 15) && hasMoved )
             GetComponent<Collider2D>().isTrigger = false;
         //else
           //  hasMoved = false;

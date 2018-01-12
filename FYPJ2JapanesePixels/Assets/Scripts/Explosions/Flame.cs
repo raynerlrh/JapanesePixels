@@ -17,7 +17,7 @@ public class Flame : ObjectStats
 
     void OnTriggerEnter2D(Collider2D obj)
     {
-        if (obj.gameObject.layer == 14)
+        if (obj.gameObject.layer == 14 || obj.gameObject.layer == 8)
         {
             if (obj.GetComponent<CharacterStats>())
             {
@@ -30,13 +30,13 @@ public class Flame : ObjectStats
             Vector3Int cellpos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
             TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, cellpos, null);
             float val = Random.Range(-15f, 15f);
-            if (val > 5f && val < 15f)
+            if (val > 10f && val < 15f)
             {
                 SpawnItem(transform.position, false, -5f); // give player a laughable chance to get a reward
             }
-            else if (val > -5f && val < 5f)
-                SpawnItem(transform.position, true, -1f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_EXPLOSION);
-            else if (val > -15f && val < -5f)
+            else if (val > 0f && val < 10f)
+                SpawnItem(transform.position, false, -1f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_EXPLOSION);
+            else if (val > -15f && val < 0f)
                 SpawnItem(transform.position, true, -4f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_HEALTH);
 
             // testing, need to set val condition later

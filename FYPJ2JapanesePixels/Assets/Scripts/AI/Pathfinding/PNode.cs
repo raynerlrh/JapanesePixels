@@ -22,9 +22,9 @@ public class PNode {
         
     }
 
-    public List<PNode> GetNeighbours()
+    public List<PNode> GetNeighbours(ref List<PNode> neighbourList)
     {
-        List<PNode> neighbours = new List<PNode>();
+        neighbourList = new List<PNode>();
         for (int x = -1; x <= 1; ++x)
             for (int y = -1; y <= 1; ++y)
             {
@@ -37,11 +37,11 @@ public class PNode {
                 // whether can pass depends on whether its a wall
                 Vector3Int closeCell = new Vector3Int(checkx, checky, pos.z);
                 if (WallCheck(closeCell))
-                    neighbours.Add(new PNode(closeCell, true));
+                    neighbourList.Add(new PNode(closeCell, true));
                 //else
                     //neighbours.Add(new PNode(closeCell, false));
             }
-        return neighbours;
+        return neighbourList;
     }
 
     public bool WallCheck(Vector3Int cell)

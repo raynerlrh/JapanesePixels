@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public struct UIProp
 {
@@ -25,6 +26,7 @@ public class GameModeManager : MonoBehaviour
     [SerializeField]
     public GameObject WinscreenUI;
     public ItemSpawner itemSpawner;
+    public Text enemyLeftTxt;
 
     public enum GAME_STATE
     {
@@ -60,6 +62,8 @@ public class GameModeManager : MonoBehaviour
             //if (aiprogress)
             aiprogress.t_progbarwidth = t_progbar.sizeDelta.x / 100;
         }
+        int enemiesRemaining = GameObject.FindGameObjectsWithTag("Enemy").Length;
+        enemyLeftTxt.text = enemiesRemaining.ToString();
     }
 
     void Update()
@@ -67,15 +71,15 @@ public class GameModeManager : MonoBehaviour
 
     }
 
-    void ReceivePlayerChoice(bool wrong)
-    {
-        if (wrong == false)
-        {
-            //GetComponent<RLEnvironment>().resetagent();
-            //question.text.fontSize = 0;
-            Camera.main.GetComponent<CameraController>().switchMode(CamSettings.CamMode.E_OFFSET);
-        }
-    }
+    //void ReceivePlayerChoice(bool wrong)
+    //{
+    //    if (wrong == false)
+    //    {
+    //        //GetComponent<RLEnvironment>().resetagent();
+    //        //question.text.fontSize = 0;
+    //        Camera.main.GetComponent<CameraController>().switchMode(CamSettings.CamMode.E_OFFSET);
+    //    }
+    //}
 
     public void RestartLevel()
     {
@@ -83,6 +87,14 @@ public class GameModeManager : MonoBehaviour
             NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
         else
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void BackMainMenu()
+    {
+        if (MyNetwork.instance.IsOnlineGame())
+            NetworkManager.singleton.ServerChangeScene("MainMenu");
+        else
+            SceneManager.LoadScene(SceneManager.GetSceneByName("MainMenu").buildIndex);
     }
 
     public void ReturnLobby()
@@ -115,4 +127,8 @@ public class GameModeManager : MonoBehaviour
         //Time.fixedDeltaTime = Time.timeScale * 0.02f;
     }
 
+    public int getEnemiesLeft()
+    {
+        return itemSpawner.gameCharacters.childCount - 1; // minus the player
+    }
 }

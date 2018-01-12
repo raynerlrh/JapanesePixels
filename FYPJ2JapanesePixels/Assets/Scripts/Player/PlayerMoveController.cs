@@ -144,7 +144,7 @@ public class PlayerMoveController : NetworkBehaviour
 
             //int keysRemaining = level_numKeysRequired - numKeys;
 
-            int enemiesRemaining = GameObject.FindGameObjectsWithTag("Enemy").Length;
+            int enemiesRemaining = GameModeManager.instance.getEnemiesLeft();
 
             if (enemiesRemaining > 0)
             {
@@ -267,8 +267,7 @@ public class PlayerMoveController : NetworkBehaviour
     bool NoEnemiesRemaining()
     {
         int enemiesRemaining = GameObject.FindGameObjectsWithTag("Enemy").Length;
-
-        return enemiesRemaining == 0;
+        return (enemiesRemaining == 0);
     }
 
     bool CheckIfLevelCleared()
@@ -304,6 +303,8 @@ public class PlayerMoveController : NetworkBehaviour
             {
                 b_levelCleared = true;
                 levelCleared.SetActive(true);
+                if (GameModeManager.instance.getSceneName().Equals("Level2"))
+                    GameModeManager.instance.showWinScreen();
             }
         }
         else

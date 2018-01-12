@@ -7,6 +7,7 @@ public class TileRefManager : MonoBehaviour
 {
     public static TileRefManager instance = null;
     public Tile[] tileRefs;
+    List<PNode> walklist;
 
     public enum TILE_TYPE
     {
@@ -40,6 +41,29 @@ public class TileRefManager : MonoBehaviour
     {
         // Turn off player movement grid at the start
         //GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
+        walklist = new List<PNode>();
+        TileBase[] tileBase;
+        Tilemap map = GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_ENVIRONMENT);
+        map.CompressBounds();
+        BoundsInt bound = map.cellBounds;
+        tileBase = map.GetTilesBlock(bound);
+        int sizehalf = map.size.x / 2;
+        int sizehalfy = map.size.y / 2;
+        if (map.size.y % 2 != 0) // if tilemap size y is odd, it needs to be offset by 1 row
+            sizehalfy += 1;
+        for (int x = 0; x < bound.size.x; x++)
+        {
+            for (int y = 0; y < bound.size.y; y++)
+            {
+                TileBase tile = tileBase[x + y * bound.size.x];
+                if (tile != null)
+                {
+                    Vector3Int cell = new Vector3Int(x - sizehalf, y - sizehalfy, 0);
+                    //TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_ENEMY, cell, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_GRASS));
+                    walklist.Add(new PNode(cell, false));
+                }
+            }
+        }
     }
 
     public Tile GetTileRef(TILE_TYPE tileType)
@@ -75,5 +99,22 @@ public class TileRefManager : MonoBehaviour
     public Tile GetTileAtCellPos(TILEMAP_TYPE tileMapType, Vector3Int cellPos)
     {
         return (Tile)GetTilemap(tileMapType).GetTile(cellPos);
+    }
+
+    public int GetNodeIndex(Vector3Int pos)
+    {
+        for (int i = 0; i < walklist.Count; ++i)
+        {
+            if (walklist[i].pos == pos)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public PNode GetNode(int key)
+    {
+        return walklist[key];
     }
 }

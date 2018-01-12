@@ -11,7 +11,6 @@ public class AnswerArea : MonoBehaviour
             if (col.gameObject.GetComponent<LanguageButton>().b_answer)
             {
                 GameModeManager.instance.languageSystem.RefreshQuestion(true);
-                GameModeManager.instance.SendMessage("ReceivePlayerChoice", false);
 
                 PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
 
@@ -35,7 +34,6 @@ public class AnswerArea : MonoBehaviour
                 //TileRefManager.instance.GetTilemap(TileRefManager.TILEMAP_TYPE.TILEMAP_GRIDCELLS).gameObject.SetActive(false);
 
                 col.gameObject.GetComponent<TouchDrag>().b_ReturnToOriginalPos = true;
-                GameModeManager.instance.SendMessage("ReceivePlayerChoice", true);
                 GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(0, 1);
             }
         }

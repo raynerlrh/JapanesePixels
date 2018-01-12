@@ -5,29 +5,29 @@ using UnityEngine.UI;
 
 public class SkillActivation : MonoBehaviour
 {
-    // The char being targeted so that attacks are focused on target
-    private DefaultCharacter attackTarget;
-    
+    bool once = false;
+    CharacterStats charstat;
+
+    private void Start()
+    {
+        charstat = GetComponent<CharacterStats>();
+    }
     /// <summary>
     /// Auto attack upon collision with enemy
     /// </summary>
     /// <param name="obj"></param>
-    void OnCollisionStay2D(Collision2D obj)
+    void OnTriggerEnter2D(Collider2D obj)
     {
-        if (obj.gameObject.layer == 8)
+        if (obj.gameObject.layer == 14 && !once)
         {
-            if (attackTarget == null)
-            {
-                if (obj.gameObject.GetComponent<Minions>())
-                    attackTarget = obj.gameObject.GetComponent<Minions>().character;
-                else
-                    attackTarget = obj.gameObject.GetComponent<DefaultCharacter>();
-
-            }
-            attackTarget.charStat.decreaseHealth(GetComponent<CharacterStats>().attackVal);
-
-            if (attackTarget.checkIfDead())
-                attackTarget = null;
+            obj.GetComponent<CharacterStats>().decreaseHealth(charstat.attackVal);
+            once = true;
         }
+    }
+
+    private void LateUpdate()
+    {
+        if (once)
+            once = false;
     }
 }

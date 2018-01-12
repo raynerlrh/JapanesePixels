@@ -39,6 +39,7 @@ public class Bomber : MonoBehaviour {
     int priorityRange;
     Animator anim;
     private int colcount;
+    public bool once;
 
     // Use this for initialization
     void Start () {
@@ -66,6 +67,7 @@ public class Bomber : MonoBehaviour {
         anim = transform.parent.GetChild(3).GetChild(0).GetComponent<Animator>();
         guide = transform.parent.GetComponent<BomberGuide>();
         colcount = 0;
+        once = false;
     }
 	
 	// Update is called once per frame
@@ -85,26 +87,29 @@ public class Bomber : MonoBehaviour {
 
         if (dmgBody.GetComponent<DefaultCharacter>().checkIfDead()) // no more health, destroy myself
         {
-            if (GameModeManager.instance.getSceneName().Equals("Level2"))
-            {
-                int enemiesRemaining = GameObject.FindGameObjectsWithTag("Enemy").Length;
-                if (enemiesRemaining < 4)
-                {
-                    GameModeManager.instance.itemSpawner.spawnAnotherEnemy();
-                }
-            }
+            int enemiesRemaining = GameModeManager.instance.getEnemiesLeft();
+            enemiesRemaining -= 1;
+            GameModeManager.instance.enemyLeftTxt.text = enemiesRemaining.ToString();
+            //if (GameModeManager.instance.getSceneName().Equals("Level2"))
+            //{
+            //    enemiesRemaining = GameModeManager.instance.getEnemiesLeft();
+            //    if (enemiesRemaining == 1)
+            //    {
+            //        GameModeManager.instance.itemSpawner.spawnAnotherEnemy();
+            //    }
+            //}
                 
             Destroy(transform.parent.gameObject);
         }
 
-        myCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
-        if (myCellPos != prevCellPos)
-        {
-            TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, null);
-            prevCellPos = myCellPos;
-        }
-        if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, myCellPos) != TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING))
-            TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, myCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
+        //myCellPos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+        //if (myCellPos != prevCellPos)
+        //{
+        //    TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, prevCellPos, null);
+        //    prevCellPos = myCellPos;
+        //}
+        //if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, myCellPos) != TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING))
+        //    TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_PLAYER, myCellPos, TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_WARNING));
         animate();
         //switch ()
 
@@ -116,6 +121,33 @@ public class Bomber : MonoBehaviour {
         //{
         //    p_animator.transform.localScale = new Vector3(-1, 1, 1);
         //}
+    }
+
+    private void OnTriggerEnter2D(Collider2D obj)
+    {
+        if (obj.gameObject.layer == 10 && obj.gameObject.CompareTag("Interactable") && !once)
+        {
+            once = true;
+           // print("do u know de wae?" + colcount);
+            colcount++;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D obj)
+    {
+        if (obj.gameObject.layer == 10 && obj.gameObject.CompareTag("Interactable") && !once)
+        {
+            //print("yes" + colcount);
+            colcount--;
+            if (colcount < 0)
+                colcount = 0;
+        }
+    }
+
+    void LateUpdate()
+    {
+        if (once)
+         once = false;
     }
 
     void OnTriggerStay2D(Collider2D obj)
@@ -142,80 +174,54 @@ public class Bomber : MonoBehaviour {
             }*/
         if (!obj.gameObject.Equals(transform.parent.gameObject) && !obj.gameObject.Equals(dmgBody))
         {
-            if (obj.gameObject.layer == 14 && e_state != BomberState.E_AVOID) // is this a object i care about
+            if (obj.gameObject.layer == 14 && e_state == BomberState.E_NEUTRAL) // is this a object i care about
             {
-                if (canDrop && dmgBody.GetComponent<Inventory>().OnHandAmount > 0) // if i can drop a bomb right now
+                if (canDrop/* && dmgBody.GetComponent<Inventory>().OnHandAmount > 0*/) // if i can drop a bomb right now
                 {
                     // Before i drop, i should do some thinking first, is there a cell i can hide? should i drop it in a deliberate place?
                     if (XYValidDrop(bombRange))
                     {
-                        List<Vector3Int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position), bombRange);
+                        List<int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position), bombRange);
                         guide.findWaypoint(cells, transform.position);
                         if (guide.hasWaypoint)
                             dropBomb(); // drop bomb
                         delay.executeFunction(); // cool down for bomb drop
                         canDrop = false;
-                        dmgBody.GetComponent<Inventory>().OnHandAmount--;
+                        //dmgBody.GetComponent<Inventory>().OnHandAmount--;
                     }
                 }
-                e_state = BomberState.E_ALERT;
             }
-            else if (e_state == BomberState.E_ALERT && bombRef == null && guide.safetyTimer.hasRun == false)
-                e_state = BomberState.E_NEUTRAL;
-            else if (obj.gameObject.layer == 17)
+            //else if (e_state == BomberState.E_ALERT && bombRef == null && guide.safetyTimer.hasRun == false)
+            //    e_state = BomberState.E_NEUTRAL;
+            if (obj.gameObject.layer == 17 && e_state == BomberState.E_NEUTRAL)
             {
-                if (e_state == BomberState.E_NEUTRAL)
+                if (canDrop) // if i can drop a bomb right now
                 {
-                    if (canDrop && dmgBody.GetComponent<Inventory>().OnHandAmount > 0) // if i can drop a bomb right now
+                    // Before i drop, i should do some thinking first, is there a cell i can hide? should i drop it in a deliberate place?
+                    if (XYValidDrop(bombRange))
                     {
-                        // Before i drop, i should do some thinking first, is there a cell i can hide? should i drop it in a deliberate place?
-                        if (XYValidDrop(bombRange))
-                        {
-                            List<Vector3Int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position), bombRange);
-                            guide.findWaypoint(cells, transform.position);
-                            if (guide.hasWaypoint)
-                                dropBomb(); // drop bomb
-                            delay.executeFunction(); // cool down for bomb drop
-                            canDrop = false;
-                            dmgBody.GetComponent<Inventory>().OnHandAmount--;
-                        }
+                        List<int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position), bombRange);
+                        guide.findWaypoint(cells, transform.position);
+                        if (guide.hasWaypoint)
+                            dropBomb(); // drop bomb
+                        delay.executeFunction(); // cool down for bomb drop
+                        canDrop = false;
                     }
                 }
             }
-
             // the following block should not be called if it is the bomber's own bomb
             if (obj.gameObject.layer == 10 && !obj.gameObject.Equals(bombRef) && obj.gameObject.CompareTag("Interactable") && colcount < 2) // is this a solidobject? Ignore my own bomb and do not detect flames which are also solidobjs
             {
                 int bombRange = obj.gameObject.GetComponent<Bomb>().effectRange;
                 bombRef = obj.gameObject;
-                List<Vector3Int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(obj.transform.position), obj.gameObject.GetComponent<Bomb>().effectRange);
+                List<int> cells = findHidingPlace(GameModeManager.instance.gameGrid.GetWorldFlToCellPos(obj.transform.position), obj.gameObject.GetComponent<Bomb>().effectRange);
                 guide.resetWaypoints();
                 guide.findWaypoint(cells, obj.transform.position);
                 e_state = BomberState.E_AVOID;
             }
             else if (e_state == BomberState.E_AVOID && bombRef == null && guide.reachedHiding && guide.safetyTimer.hasRun == false)
                 e_state = BomberState.E_NEUTRAL;
-             
-        }
-    }
 
-    private void OnTriggerEnter2D(Collider2D obj)
-    {
-        if (obj.gameObject.layer == 10 && obj.gameObject.CompareTag("Interactable"))
-        {
-            colcount++;
-            if (colcount > 2)
-                colcount = 2;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D obj)
-    {
-        if (obj.gameObject.layer == 10 && obj.gameObject.CompareTag("Interactable"))
-        { 
-            colcount--;
-            if (colcount < 0)
-                colcount = 0;
         }
     }
 
@@ -327,12 +333,12 @@ public class Bomber : MonoBehaviour {
         return false;
     }
 
-    public List<Vector3Int> findHidingPlace(Vector3Int bombcell, int range)
+    public List<int> findHidingPlace(Vector3Int bombcell, int range)
     {
         Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
         Vector3Int modified = mycell;
-        List<Vector3Int> danger = GetCrossCells(range, bombcell);
-        List<Vector3Int> safe = new List<Vector3Int>();
+        List<Vector3Int> danger = GetCrossCells(range, bombcell); // list
+        List<int> safe = new List<int>(); // list
         int hiderange = sightRange;
         if (range > sightRange)
             hiderange = range;
@@ -341,21 +347,23 @@ public class Bomber : MonoBehaviour {
             for (int y = -hiderange; y <= hiderange; ++y)
             {
                 modified.Set(mycell.x + x, mycell.y + y, mycell.z);
-                if (danger.Contains(modified))
-                    continue;
                 if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, modified) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, modified))
                     continue;
-                //if (modified.x == mycell.x || modified.y == mycell.y)
-                    //continue;
+                if (danger.Contains(modified))
+                    continue;
                 if (guide.fCellsAway(mycell, modified) <= sightRange)
                 {
-                    safe.Add(modified);
+                    int index = TileRefManager.instance.GetNodeIndex(modified);
+                    if (index >= 0)
+                        safe.Add(index);
                 }
             }
+            //if (safe.Count > hiderange)
+            //    return safe;
         }
         //for (int i = 0; i < safe.Count; ++i)
         //    TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_ENEMY, safe[i], TileRefManager.instance.GetTileRef(TileRefManager.TILE_TYPE.TILE_DEBUG));
-        return safe;
+        return safe; // return list
     }
 
     private List<Vector3Int> GetCrossCells(int range, Vector3Int targetcell)

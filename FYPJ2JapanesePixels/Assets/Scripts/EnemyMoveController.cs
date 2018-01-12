@@ -34,12 +34,4 @@ public class EnemyMoveController : MonoBehaviour
 	void Update() 
     {
 	}
-
-    void ReceivePlayerChoice(bool wrong)
-    {
-        //if (wrong)
-        //{
-        //    EnemyMoveController.instance.currentBoss.doAttack();
-        //}
-    }
 }

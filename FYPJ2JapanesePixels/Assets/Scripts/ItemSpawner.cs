@@ -10,9 +10,9 @@ public class ItemSpawner : NetworkBehaviour
     public int numberOfItems;
 
     [SerializeField]
-    Transform gameCharacters;
+    public Transform gameCharacters;
 
-    public GameObject enemyPrefab;
+    public GameObject[] enemyPrefab;
     public Transform[] t_spawnArr;
     public Sprite[] s_spriteList; 
 
@@ -71,14 +71,22 @@ public class ItemSpawner : NetworkBehaviour
 
         for (int j = 0; j < t_spawnArr.Length; ++j)
         {
-            GameObject enemy = (GameObject)Instantiate(enemyPrefab, t_spawnArr[j].position, Quaternion.identity);
+            GameObject enemy;
+            int r = Random.Range(1, 100);
+            if (r <= 50)
+            {
+                Color randCol = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+                enemy = (GameObject)Instantiate(enemyPrefab[0], t_spawnArr[j].position, Quaternion.identity);
+                enemy.transform.GetChild(3).GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().color = randCol;
+                enemy.transform.GetChild(3).GetChild(0).GetChild(1).GetComponent<SpriteRenderer>().color = randCol;
+                enemy.transform.GetChild(3).GetChild(0).GetChild(2).GetComponent<SpriteRenderer>().color = randCol;
+                enemy.transform.GetChild(3).GetChild(0).GetChild(3).GetComponent<SpriteRenderer>().color = randCol;
+                enemy.transform.GetChild(3).GetChild(0).GetChild(4).GetComponent<SpriteRenderer>().color = randCol;
+            }
+            else
+                enemy = (GameObject)Instantiate(enemyPrefab[1], t_spawnArr[j].position, Quaternion.identity);
             enemy.transform.SetParent(gameCharacters);
-            Color randCol = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-            enemy.transform.GetChild(3).GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().color = randCol;
-            enemy.transform.GetChild(3).GetChild(0).GetChild(1).GetComponent<SpriteRenderer>().color = randCol;
-            enemy.transform.GetChild(3).GetChild(0).GetChild(2).GetComponent<SpriteRenderer>().color = randCol;
-            enemy.transform.GetChild(3).GetChild(0).GetChild(3).GetComponent<SpriteRenderer>().color = randCol;
-            enemy.transform.GetChild(3).GetChild(0).GetChild(4).GetComponent<SpriteRenderer>().color = randCol;
+
             NetworkServer.Spawn(enemy);
         }
     }
@@ -86,14 +94,21 @@ public class ItemSpawner : NetworkBehaviour
     public void spawnAnotherEnemy()
     {
         int r = Random.Range(0, t_spawnArr.Length - 1);
-        GameObject enemy = (GameObject)Instantiate(enemyPrefab, t_spawnArr[r].position, Quaternion.identity);
+        GameObject enemy;
+        int rand = Random.Range(1, 100);
+        if (rand <= 50)
+        {
+            enemy = (GameObject)Instantiate(enemyPrefab[0], t_spawnArr[r].position, Quaternion.identity);
+            Color randCol = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
+            enemy.transform.GetChild(3).GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().color = randCol;
+            enemy.transform.GetChild(3).GetChild(0).GetChild(1).GetComponent<SpriteRenderer>().color = randCol;
+            enemy.transform.GetChild(3).GetChild(0).GetChild(2).GetComponent<SpriteRenderer>().color = randCol;
+            enemy.transform.GetChild(3).GetChild(0).GetChild(3).GetComponent<SpriteRenderer>().color = randCol;
+            enemy.transform.GetChild(3).GetChild(0).GetChild(4).GetComponent<SpriteRenderer>().color = randCol;
+        }
+        else
+            enemy = (GameObject)Instantiate(enemyPrefab[1], t_spawnArr[r].position, Quaternion.identity);
         enemy.transform.SetParent(gameCharacters);
-        Color randCol = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
-        enemy.transform.GetChild(3).GetChild(0).GetChild(0).GetComponent<SpriteRenderer>().color = randCol;
-        enemy.transform.GetChild(3).GetChild(0).GetChild(1).GetComponent<SpriteRenderer>().color = randCol;
-        enemy.transform.GetChild(3).GetChild(0).GetChild(2).GetComponent<SpriteRenderer>().color = randCol;
-        enemy.transform.GetChild(3).GetChild(0).GetChild(3).GetComponent<SpriteRenderer>().color = randCol;
-        enemy.transform.GetChild(3).GetChild(0).GetChild(4).GetComponent<SpriteRenderer>().color = randCol;
         NetworkServer.Spawn(enemy);
     }
 }

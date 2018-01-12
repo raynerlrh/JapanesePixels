@@ -1,130 +1,194 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DIRS = BomberGuide.MOVEDIR;
 
 public class Minions : MonoBehaviour
 {
-    bool isFighting; // is minion fighting?
-    public DefaultCharacter character { get; set; }
-    public Vector3Int cellDes;
-    public Vector3 direction;
+    public DIRS direction;
+    private Vector3 bodyDestination;
+    private bool canProceed;
+    public int cellsFree = 3;
+    private int originalCellsFree;
+    private MovementData movement;
+    Rigidbody2D physBody;
+    DefaultCharacter character;
+    Animator animator;
+
+    public enum MinionState
+    {
+        E_NEUTRAL,
+        E_AVOID
+    }
 
     public enum MinionType
     {
-        E_SKELETON,
-        E_FLAMESKULL,
-        E_PROJECTILE
+        E_CREEP1,
+        E_CREEP2,
+        E_CREEP3
     }
 
     public MinionType m_MinionType;
+    public MinionState minionState;
 
-    PlayerMoveController moveController;
-
-	void Start() 
+    void Start()
     {
-        moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+        m_MinionType = MinionType.E_CREEP1;
+        direction = BomberGuide.getRandomDir();
+        canProceed = true;
+        originalCellsFree = cellsFree;
+        movement = new MovementData(3);
+        physBody = transform.GetComponent<Rigidbody2D>();
+        bodyDestination = transform.position;
+        GetComponent<DefaultCharacter>().InitChar();
+        character = GetComponent<DefaultCharacter>();
+        animator = transform.GetChild(4).GetChild(0).GetComponent<Animator>();
+        minionState = MinionState.E_NEUTRAL;
+    }
 
-        isFighting = false;
-        character = gameObject.AddComponent<DefaultCharacter>();
-        if (m_MinionType == MinionType.E_SKELETON)
+    void Update()
+    {
+        if (canProceed)
         {
-            character.InitChar(30);
-            character.charStat.attackVal = 5f;
+            // check if the cell in front of me is blocked
+            if (!ObstacleCheck(direction, 1))
+            {
+                Vector3Int destination = convertDirToVec3(); // not blocked, get next cell to go to depending on my direction
+                SetDestination(destination); // move cell by cell
+                canProceed = false; // until my sprite catches up to me, dont move
+                cellsFree = originalCellsFree; // just resetting a variable
+            }
+            else
+            {
+                DIRS randDir = BomberGuide.getRandomDir(); // Blocked, get a random direction
+                if (!ObstacleCheck(randDir, cellsFree)) // if i meet with a wall, i will find a new path with preferably as many cells free as the range provided
+                    direction = randDir;
+                else
+                    cellsFree--; // check from max range to 0
+            }
         }
-        else if (m_MinionType == MinionType.E_FLAMESKULL)
+        // Moving towards guide
+        float dist = Vector2.Distance(transform.position, bodyDestination);
+        float speed = (movement.speed * Time.deltaTime);
+        if (dist > speed)
         {
-            character.InitChar(30);
-            character.charStat.attackVal = 20f;
+            Vector2 direction = (bodyDestination - transform.position).normalized;
+            physBody.MovePosition((Vector2)transform.position + direction * speed);
         }
         else
         {
-            character.InitChar(30);
-            character.charStat.attackVal = 20f;
-            if (cellDes.x > GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position).x)
-            {
-                direction = transform.right;
-            }
-            else
-                direction = -transform.right;
+            canProceed = true; // tell guide that i reached
         }
-	}
-	
-	void Update() 
-    {
-        if (!isFighting)
-        {
-            if (m_MinionType == MinionType.E_SKELETON)
-                moveForward(-transform.right);
-            else if (m_MinionType == MinionType.E_FLAMESKULL)
-                moveForward(-transform.up);
-            else if (m_MinionType == MinionType.E_PROJECTILE)
-            {
-                moveForward(direction);
-            }
-            if (transform.position.x < GameModeManager.instance.gameGrid.mapWidthX)
-            {
-                Destroy(this.gameObject);
-            }
-            else if (m_MinionType == MinionType.E_FLAMESKULL && GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position) == cellDes)
-            {
-                Destroy(this.gameObject);
-            }
-        }
-        //else
-        {
-            if (character.checkIfDead())
-            {
-                Destroy(this.gameObject);
-            }
-        }
-	}
 
-    /// <summary>
-    /// makes minion move forward
-    /// </summary>
-    /// <param name="forwardvec">facing vector</param>
-    public void moveForward(Vector3 forwardvec)
-    {
-        transform.position = Vector2.MoveTowards(transform.position, transform.position + forwardvec, Time.deltaTime);
-    }
-
-    /// <summary>
-    /// Minion has collided with something, check if it is an enemy to fight!
-    /// </summary>
-    /// <param name="collide"> collided object </param>
-    void OnCollisionEnter2D(Collision2D collide)
-    {
-        isFighting = true;
-        if (m_MinionType == MinionType.E_FLAMESKULL || m_MinionType == MinionType.E_PROJECTILE)
+        if (character.checkIfDead()) // no more health, destroy myself
         {
-            CharacterStats stat = moveController.GetPawn.charStat;
-            stat.decreaseHealth(character.charStat.attackVal);
+            int enemiesRemaining = GameModeManager.instance.getEnemiesLeft();
+            enemiesRemaining -= 1;
+            GameModeManager.instance.enemyLeftTxt.text = enemiesRemaining.ToString();
+            //if (GameModeManager.instance.getSceneName().Equals("Level2"))
+            //{
+            //    if (enemiesRemaining < 2)
+            //    {
+            //        GameModeManager.instance.itemSpawner.spawnAnotherEnemy();
+            //    }
+            //}
             Destroy(this.gameObject);
         }
+
+        animate();
     }
 
-    
-    // detect if minion is fighting
-    void OnCollisionStay2D(Collision2D obj)
+    bool ObstacleCheck(DIRS dir, int range)
     {
-        if (isFighting && m_MinionType == MinionType.E_SKELETON)
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+        Vector3Int test = Vector3Int.zero;
+        bool fail = false;
+        switch (dir)
         {
-            moveController.decreasehealthbytime(2, character.charStat.attackVal);
+            case DIRS.E_LEFT:
+                for (int i = 0; i <= range; ++i)
+                {
+                    test.Set(mycell.x - i, mycell.y, mycell.z);
+                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, test))
+                    {
+                        fail = true;
+                        break;
+                    }
+                }
+                break;
+            case DIRS.E_RIGHT:
+                for (int i = 0; i <= range; ++i)
+                {
+                    test.Set(mycell.x + i, mycell.y, mycell.z);
+                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, test))
+                    {
+                        fail = true;
+                        break;
+                    }
+                }
+                break;
+            case DIRS.E_UP:
+                for (int i = 0; i <= range; ++i)
+                {
+                    test.Set(mycell.x, mycell.y + i, mycell.z);
+                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, test))
+                    {
+                        fail = true;
+                        break;
+                    }
+                }
+                break;
+            case DIRS.E_DOWN:
+                for (int i = 0; i <= range; ++i)
+                {
+                    test.Set(mycell.x, mycell.y - i, mycell.z);
+                    if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_SOLIDWALL, test) || TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, test))
+                    {
+                        fail = true;
+                        break;
+                    }
+                }
+                break;
+        }
+        return fail;
+    }
+
+    public Vector3Int convertDirToVec3()
+    {
+        Vector3Int mycell = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
+        switch (direction)
+        {
+            case DIRS.E_LEFT:
+                return new Vector3Int(mycell.x - 1, mycell.y, mycell.z);
+            case DIRS.E_RIGHT:
+                return new Vector3Int(mycell.x + 1, mycell.y, mycell.z);
+            case DIRS.E_UP:
+                return new Vector3Int(mycell.x, mycell.y + 1, mycell.z);
+            case DIRS.E_DOWN:
+                return new Vector3Int(mycell.x, mycell.y - 1, mycell.z);
+            default:
+                return mycell;
         }
     }
 
-    // detect if minion is fighting
-    void OnCollisionExit2D(Collision2D obj)
+    private void SetDestination(Vector3Int descell)
     {
-        isFighting = false;
+        Vector3 newpos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(descell);
+        bodyDestination = newpos;
     }
 
-    void OnTriggerEnter2D(Collider2D collided)
+    void animate()
     {
-        if (collided.gameObject.tag.Equals("PlayerAttack"))
+        int dir = (int)direction;
+        switch (direction)
         {
-            character.charStat.decreaseHealth(collided.gameObject.GetComponent<ObjectStats>().damage);
-            Destroy(collided.gameObject);
+            case BomberGuide.MOVEDIR.E_LEFT:
+                animator.transform.localScale = new Vector3(1, 1, 1);
+                break;
+            case BomberGuide.MOVEDIR.E_RIGHT:
+                animator.transform.localScale = new Vector3(-1, 1, 1);
+                break;
         }
+        animator.SetFloat("NormalizeSpd", dir);
     }
 }

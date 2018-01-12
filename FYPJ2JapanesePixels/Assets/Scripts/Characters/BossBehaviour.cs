@@ -126,7 +126,6 @@ namespace Boss
                 GameObject summon = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[1], EnemyMoveController.instance.GetBossObj.transform, false);
                 summon.transform.position = grid.GetCellMiddleWPOS(new Vector3Int(cells[i].x, grid.GetTopRightCell().y + cells[i].y, cells[i].z));
                 summon.SetActive(true);
-                summon.GetComponent<Minions>().cellDes = cells[i];
             }
         }
 
@@ -134,8 +133,6 @@ namespace Boss
         {
             GameObject summon = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[1], EnemyMoveController.instance.GetBossObj.transform, false);
             summon.SetActive(true);
-            summon.GetComponent<Minions>().m_MinionType = Minions.MinionType.E_PROJECTILE;
-            summon.GetComponent<Minions>().cellDes = targetPos;
             summon.transform.position = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(initialPos);
         }
 
