@@ -18,6 +18,11 @@ public class Inventory : MonoBehaviour {
     [SerializeField]
     private OnHand equipped;
 
+    public void SetSize(int _size)
+    {
+        equipped.size = _size;
+    }
+
     public int OnHandAmount
     {
         get { return equipped.size; }

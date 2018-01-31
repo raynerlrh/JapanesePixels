@@ -75,6 +75,7 @@ public class PlayerMoveController : NetworkBehaviour
 
     int numKeys;
 
+    public bool b_inQuiz { get; set; }
     bool b_usedKey;
     bool b_levelCleared;
 
@@ -712,6 +713,9 @@ public class PlayerMoveController : NetworkBehaviour
     // why all these here
     private IEnumerator healthcoroutine(float seconds, float damage)
     {
+        if (b_inQuiz)
+            yield return null;
+
         pawn.charStat.decreaseHealth(damage);
         pawn.charStat.hpSys.isHurt = true;
         yield return new WaitForSeconds(seconds);

@@ -35,7 +35,6 @@ public class QuizAnim : MonoBehaviour
     {
         if (b_showRewards)
         {
-
             endTimer += Time.deltaTime;
 
             if (endTimer < 2f) // 2f
@@ -43,9 +42,22 @@ public class QuizAnim : MonoBehaviour
                 timeLeftText.text = "Time's Up!";
                 rewardsText.text = "";
             }
-            else if (endTimer > 1f && endTimer < 3f) // 5f
+            else if (endTimer > 1f && endTimer < 5f) // 5f
+            {
+                if (GetComponent<LanguageSystem>().preGameNumCorrect >= 5)
+                {
+                    rewardsText.text = "More bombs!";
+                    MyNetwork.instance.localPlayer.GetComponent<Inventory>().SetSize(50);
+                }
+                else
+                {
+                    rewardsText.text = "None";
+                    MyNetwork.instance.localPlayer.GetComponent<Inventory>().SetSize(30);
+                }
+
                 timeLeftText.text = "Rewards: ";
-            else if (endTimer > 2f) // 5f
+            }
+            else if (endTimer > 5f) // 5f
                 b_showRewards = false;
         }
         else

@@ -30,9 +30,9 @@ public class Flame : ObjectStats
             Vector3Int cellpos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
             TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, cellpos, null);
             float val = Random.Range(-15f, 15f);
-            if (val > 10f && val < 15f)
+            if (val > 0f && val < 15f)
             {
-                SpawnItem(transform.position, false, -5f); // give player a laughable chance to get a reward
+                SpawnItem(transform.position, false, -5f, Item.ITEM_TYPE.QUESTION); // give player a laughable chance to get a reward
             }
             else if (val > 0f && val < 10f)
                 SpawnItem(transform.position, false, -1f, Item.ITEM_TYPE.SKILL, Item.EFFECT_TYPE.E_EXPLOSION);

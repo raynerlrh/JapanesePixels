@@ -30,7 +30,10 @@ public class QuestionData
 
 public class LanguageSystem : MonoBehaviour 
 {
-    Quiz _quiz;
+    Quiz activeQuiz;
+    Quiz quiz_hiragana;
+    Quiz quiz_katakana;
+
     public LanguageButton theAnswerButton { get; set; }
     public Text preGameTimerText;
 
@@ -38,7 +41,9 @@ public class LanguageSystem : MonoBehaviour
     int activeQuestionIndex;
     List<int> questionIndexList;
 
+    // Players have to answer 3 correctly before question is changed
     int numCorrect;
+    public int preGameNumCorrect { get; set; }
 
     public Transform questionText;
     public Transform buttons;
@@ -49,6 +54,7 @@ public class LanguageSystem : MonoBehaviour
     bool firstQuestionIndex;
     bool firstOptionShown;
     bool b_changedQuestionGroup;
+    bool b_OnSecondTake;
 
     int newQuestionIndex;
     int theOptionIndex;
@@ -60,13 +66,21 @@ public class LanguageSystem : MonoBehaviour
 
     void Awake()
     {
-        string url = "http://fyp2-japanese-pixels.appspot.com/jp_hiragana";
-        WWW www = new WWW(url);
-        StartCoroutine(WaitForRequest(www));
+        // Set up hiragana and katakana quizzes
+        string url_hiragana = "http://fyp2-japanese-pixels.appspot.com/jp_hiragana";
+        WWW www_hiragana = new WWW(url_hiragana);
+        StartCoroutine(WaitForRequest(www_hiragana, true));
+
+        string url_katakana = "http://fyp2-japanese-pixels.appspot.com/jp_katakana";
+        WWW www_katakana = new WWW(url_katakana);
+        StartCoroutine(WaitForRequest(www_katakana, false));
     }
 
     void Start()
     {
+        // temp value
+        preGameTime = 10;
+
         preGameTimer = preGameTime + 1;
         b_changedQuestionGroup = true;
         GetComponent<QuizAnim>().Init();
@@ -88,7 +102,6 @@ public class LanguageSystem : MonoBehaviour
 
                 break;
             case GameModeManager.GAME_STATE.IN_GAME:
-
                 break;
         }
 
@@ -96,7 +109,9 @@ public class LanguageSystem : MonoBehaviour
         int numQuestions = GetActiveQuestionGroup().questionData.Length;
 
         // Reset values
-        numCorrect = 0;
+        if (!b_OnSecondTake)
+            numCorrect = 0;
+
         activeQuestionIndex = 0;
         firstQuestionIndex = false;
         questionIndexTaken = new bool[numQuestions];
@@ -121,28 +136,39 @@ public class LanguageSystem : MonoBehaviour
         DisplayQuiz();
 
         if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.IN_GAME)
+        {
+            MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>().b_inQuiz = true;
             GetComponent<QuizAnim>().enabled = true;
+        }
     }
 
     void OnDisable()
     {
+        MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>().b_inQuiz = false;
         GetComponent<QuizAnim>().enabled = true;
     }
 
-    IEnumerator WaitForRequest(WWW www)
+    IEnumerator WaitForRequest(WWW www, bool _isHiragana)
     {
         yield return www;
 
         // check for errors
         if (www.error == null)
         {
-            _quiz = JsonUtility.FromJson<Quiz>(www.text);
+            if (_isHiragana)
+            {
+                quiz_hiragana = JsonUtility.FromJson<Quiz>(www.text);
 
-            activeQuestionGroupIndex = 0; // start from aiueo
-            activeQuestionIndex = 0;
-            questionIndexTaken = new bool[GetActiveQuestionGroup().questionData.Length];
-            optionIndexTaken = new bool[questionIndexTaken.Length];
-            newQuestionIndex = Random.Range(0, GetActiveQuestionGroup().questionData.Length);
+                activeQuiz = quiz_hiragana;
+
+                activeQuestionGroupIndex = 0; // start from aiueo
+                activeQuestionIndex = 0;
+                questionIndexTaken = new bool[GetActiveQuestionGroup().questionData.Length];
+                optionIndexTaken = new bool[questionIndexTaken.Length];
+                newQuestionIndex = Random.Range(0, GetActiveQuestionGroup().questionData.Length);
+            }
+            else
+                quiz_katakana = JsonUtility.FromJson<Quiz>(www.text);
 
             if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.PRE_GAME)
                 Enable();
@@ -152,7 +178,7 @@ public class LanguageSystem : MonoBehaviour
         }
         else
         {
-            //Debug.Log("WWW Error: " + www.error);
+            Debug.Log("WWW Error: " + www.error);
         }
     }
 
@@ -181,12 +207,12 @@ public class LanguageSystem : MonoBehaviour
 
     Question GetActiveQuestionGroup()
     {
-        return _quiz.languageData.questions[activeQuestionGroupIndex];
+        return activeQuiz.languageData.questions[activeQuestionGroupIndex];
     }
 
     QuestionData GetActiveQuestion(int offset = 0)
     {
-            return _quiz.languageData.questions[activeQuestionGroupIndex].questionData[questionIndexList[activeQuestionIndex + offset]];
+        return activeQuiz.languageData.questions[activeQuestionGroupIndex].questionData[questionIndexList[activeQuestionIndex + offset]];
     }
 
     public int GetQuestionIndex()
@@ -327,9 +353,17 @@ public class LanguageSystem : MonoBehaviour
         b_changedQuestionGroup = true;
         questionIndexList.Clear();
 
+        // Change question group
         activeQuestionGroupIndex++;
-        if (activeQuestionGroupIndex > 2)
-            activeQuestionGroupIndex = 0;
+
+        // Change from hiragana quiz to katakana quiz when hiragana is completed
+        if (activeQuestionGroupIndex > activeQuiz.languageData.questions.Length - 1) // 2
+        {
+            activeQuiz = quiz_katakana;
+
+            activeQuestionGroupIndex = 0; // start from aiueo
+            activeQuestionIndex = 0;
+        }
 
         firstQuestionIndex = false;
         questionIndexTaken = new bool[GetActiveQuestionGroup().questionData.Length];
@@ -349,7 +383,12 @@ public class LanguageSystem : MonoBehaviour
     public void RefreshQuestion(bool _correct)
     {
         if (_correct)
+        {
             numCorrect++;
+
+            if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.PRE_GAME)
+                preGameNumCorrect++;
+        }
 
         // Change questions
         if (activeQuestionIndex + 1 < questionIndexList.Count)
@@ -380,9 +419,18 @@ public class LanguageSystem : MonoBehaviour
         }
         else if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.IN_GAME)
         {
-            // Stop quiz and change hiragana group
             if (numCorrect == 3)
+            {
+                // Stop quiz once answered 3 correctly
+                b_OnSecondTake = true;
+                this.enabled = false;
+            }
+            else if (numCorrect == 6)
+            {
+                // Stop quiz and change hiragana group
                 ChangeQuestionGroup(true);
+                b_OnSecondTake = false;
+            }
         }
     }
 }
