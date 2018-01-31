@@ -40,12 +40,12 @@ public class PlayerMoveController : NetworkBehaviour
     GameGrid gameGrid;
     TileRefManager tileRefManager;
 
-    Dpad dpad;
+    VirtualJoystick dpad;
     GameObject exitRequirements;
     GameObject levelCleared;
 
     [SyncVar]
-    Dpad.MOVE_DIR dpad_moveDir;
+    VirtualJoystick.MOVE_DIR dpad_moveDir;
 
     [SyncVar(hook = "OnReqChanged")]
     int level_numKeysRequired;
@@ -201,7 +201,7 @@ public class PlayerMoveController : NetworkBehaviour
 
         gameGrid = GameObject.Find("Grid").GetComponent<GameGrid>();
         tileRefManager = gameGrid.GetComponent<TileRefManager>();
-        dpad = GameObject.Find("Dpad").GetComponent<Dpad>();
+        dpad = GameObject.Find("JoystickBackground").GetComponent<VirtualJoystick>();
         if (exitRequirements == null)
             exitRequirements = GameObject.Find("LevelExitRequirements");
         exitRequirements.SetActive(false);
@@ -243,7 +243,7 @@ public class PlayerMoveController : NetworkBehaviour
                 continue;
 
             Animator _animator = players[i].transform.GetChild(1).GetChild(0).GetComponent<Animator>();
-            Dpad.MOVE_DIR _dir = players[i].GetComponent<PlayerMoveController>().dpad_moveDir;
+            VirtualJoystick.MOVE_DIR _dir = players[i].GetComponent<PlayerMoveController>().dpad_moveDir;
 
             players[i].GetComponent<PlayerMoveController>().RenderOtherPlayersAnim(_animator, _dir);
         }
@@ -375,7 +375,7 @@ public class PlayerMoveController : NetworkBehaviour
     }
 
     [Command]
-    void CmdUpdateMoveDir(Dpad.MOVE_DIR _dir)
+    void CmdUpdateMoveDir(VirtualJoystick.MOVE_DIR _dir)
     {
         dpad_moveDir = _dir;
     }
@@ -418,12 +418,12 @@ public class PlayerMoveController : NetworkBehaviour
         if (MyNetwork.instance.IsOnlineGame())
         {
             if (!isServer)
-                CmdUpdateMoveDir(dpad.moveDir);
+                CmdUpdateMoveDir(dpad.GetMoveDir());
             else
-                dpad_moveDir = dpad.moveDir;
+                dpad_moveDir = dpad.GetMoveDir();
         }
 
-        Move(dpad.moveDir);
+        Move(dpad.GetMoveDir());
         RenderAnim();
 
         //if (targetTilePos != Vector2.zero)
@@ -450,13 +450,13 @@ public class PlayerMoveController : NetworkBehaviour
             _numKeysRequired = level_numKeysRequired;
     }
 
-    void RenderOtherPlayersAnim(Animator _animator, Dpad.MOVE_DIR _dir)
+    void RenderOtherPlayersAnim(Animator _animator, VirtualJoystick.MOVE_DIR _dir)
     {
-        if (_dir == Dpad.MOVE_DIR.LEFT)
+        if (_dir == VirtualJoystick.MOVE_DIR.LEFT)
         {
             _animator.transform.localScale = new Vector3(1, 1, 1);
         }
-        else if (_dir == Dpad.MOVE_DIR.RIGHT)
+        else if (_dir == VirtualJoystick.MOVE_DIR.RIGHT)
         {
             _animator.transform.localScale = new Vector3(-1, 1, 1);
         }
@@ -466,38 +466,38 @@ public class PlayerMoveController : NetworkBehaviour
 
     void RenderAnim()
     {
-        if (dpad.moveDir == Dpad.MOVE_DIR.LEFT)
+        if (dpad.GetMoveDir() == VirtualJoystick.MOVE_DIR.LEFT)
         {
             p_animator.transform.localScale = new Vector3(1, 1, 1);
         }
-        else if (dpad.moveDir == Dpad.MOVE_DIR.RIGHT)
+        else if (dpad.GetMoveDir() == VirtualJoystick.MOVE_DIR.RIGHT)
         {
             p_animator.transform.localScale = new Vector3(-1, 1, 1);
         }
 
-        p_animator.SetFloat("NormalizeSpd", (int)dpad.moveDir);
+        p_animator.SetFloat("NormalizeSpd", (int)dpad.GetMoveDir());
     }
 
-    void Move(Dpad.MOVE_DIR _moveDir)
+    void Move(VirtualJoystick.MOVE_DIR _moveDir)
     {
         switch (_moveDir)
         {
-            case Dpad.MOVE_DIR.UP:
+            case VirtualJoystick.MOVE_DIR.UP:
                 targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x, playerCellPos.y + 1, playerCellPos.z));
                 break;
-            case Dpad.MOVE_DIR.DOWN:
+            case VirtualJoystick.MOVE_DIR.DOWN:
                 targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x, playerCellPos.y - 1, playerCellPos.z));
                 break;
-            case Dpad.MOVE_DIR.LEFT:
+            case VirtualJoystick.MOVE_DIR.LEFT:
                 targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x - 1, playerCellPos.y, playerCellPos.z));
                 break;
-            case Dpad.MOVE_DIR.RIGHT:
+            case VirtualJoystick.MOVE_DIR.RIGHT:
                 targetTilePos = gameGrid.GetCellToWorld(new Vector3Int(playerCellPos.x + 1, playerCellPos.y, playerCellPos.z));
                 break;
         }
 
         // Move to target cell
-        if (_moveDir != Dpad.MOVE_DIR.NONE)
+        if (_moveDir != VirtualJoystick.MOVE_DIR.NONE)
         {
             Vector2 direction = (targetTilePos - playerPos).normalized;
 
