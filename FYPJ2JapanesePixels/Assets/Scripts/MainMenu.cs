@@ -55,4 +55,14 @@ public class MainMenu : MonoBehaviour
         m1.SetActive(true);
         m2.SetActive(false);
     }
+
+    public void OnClickCredits()
+    {
+        SceneManager.LoadScene("Credits");
+    }
+
+    public void OnClickBack()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
 }

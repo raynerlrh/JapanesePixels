@@ -34,6 +34,9 @@ public class LanguageSystem : MonoBehaviour
     Quiz quiz_hiragana;
     Quiz quiz_katakana;
 
+    [SerializeField]
+    AudioPlayer audioPlayer;
+
     public LanguageButton theAnswerButton { get; set; }
     public Text preGameTimerText;
 
@@ -261,6 +264,11 @@ public class LanguageSystem : MonoBehaviour
             GetQuestionText(0).text = "";
 
         GetQuestionText(1).text = System.Convert.ToString(GetActiveQuestion().symbol);
+
+        //activeQuiz.languageData.questions[activeQuestionGroupIndex].questionData[questionIndexList[activeQuestionIndex + offset]];
+
+        // Play the pronunciation for this japanese symbol
+        audioPlayer.PlayJap(activeQuestionGroupIndex, questionIndexList[activeQuestionIndex]);
 
         if (activeQuestionIndex + 1 < questionIndexList.Count)
             GetQuestionText(2).text = System.Convert.ToString(GetActiveQuestion(1).symbol);
