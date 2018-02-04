@@ -35,6 +35,7 @@ public class SkillButton : MonoBehaviour
         if (skillController.CanPerformSkill(attachedSkill))
         {
             attachedSkill.ExecuteSkill();
+            GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(3, 0.1f);
         }
         else
         {

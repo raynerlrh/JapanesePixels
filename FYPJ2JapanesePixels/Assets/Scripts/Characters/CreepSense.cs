@@ -34,6 +34,7 @@ public class CreepSense : MonoBehaviour {
             if (obj.gameObject.layer == 14 && !once && canDmg)
             {
                 obj.GetComponent<CharacterStats>().decreaseHealth(charstat.attackVal);
+                GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(4, 0.4f);
                 once = true;
             }
         }

@@ -30,9 +30,10 @@ public class GameModeManager : MonoBehaviour
     public int num_event;
     public TimerRoutine event_timer;
     public Text event_timeText;
-    int event_timeLimit;
+    public int event_timeLimit;
     public GameObject eventui_panel;
     public Canvas canvas3d;
+    public AudioSource event_music;
 
     public enum GAME_STATE
     {
@@ -182,6 +183,7 @@ public class GameModeManager : MonoBehaviour
         isEventFailed = false;
         event_timer.hasRun = false;
         eventui_panel.SetActive(false);
+        event_music.Stop();
     }
 
     void SpawnBomb(string _prefabsPath, Vector3 _pos, Quaternion _rot)
@@ -190,9 +192,9 @@ public class GameModeManager : MonoBehaviour
 
         GameObject spawn = null;
         if (moveController.isServer)
-            moveController.RpcSpawn(_prefabsPath, _pos, _rot, 10, true, 250);
+            moveController.RpcSpawn(_prefabsPath, _pos, _rot, 10, true, 250, true);
         else
-            moveController.CmdSpawn(_prefabsPath, _pos, _rot, 10, true, 250);
+            moveController.CmdSpawn(_prefabsPath, _pos, _rot, 10, true, 250, true);
 
         if (spawn)
         {

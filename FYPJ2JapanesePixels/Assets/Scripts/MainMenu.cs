@@ -65,4 +65,14 @@ public class MainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("MainMenu");
     }
+
+    public void OnClickTutorial()
+    {
+        SceneManager.LoadScene("Tutorial");
+    }
+
+    public void OnClickTutorialPg2()
+    {
+        SceneManager.LoadScene("Tutorial2");
+    }
 }

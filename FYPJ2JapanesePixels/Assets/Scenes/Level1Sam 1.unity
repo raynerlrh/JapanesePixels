@@ -3912,7 +3912,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &803036885
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5652,6 +5652,8 @@ GameObject:
   - component: {fileID: 1345140544}
   - component: {fileID: 1345140540}
   - component: {fileID: 1345140545}
+  - component: {fileID: 1345140547}
+  - component: {fileID: 1345140546}
   m_Layer: 0
   m_Name: Controllers
   m_TagString: Untagged
@@ -5673,6 +5675,9 @@ MonoBehaviour:
   tracks:
   - {fileID: 8300000, guid: 7798230e27c4d8f4dbe07a625c4095eb, type: 3}
   - {fileID: 8300000, guid: 81e64701bc58db4468bf011371941ebd, type: 3}
+  - {fileID: 8300000, guid: 6c97f720d3386e2489fa307f404d3492, type: 3}
+  - {fileID: 8300000, guid: 0bdb103a00e9db046a14ad21c70c24fa, type: 3}
+  - {fileID: 8300000, guid: cf3a768b1594c3145b5c5b84d5a9bcd8, type: 3}
   japaneseClips:
   - clips:
     - {fileID: 8300000, guid: fc1b023d22ec28d4f9ea4e40f9589388, type: 3}
@@ -5786,8 +5791,10 @@ MonoBehaviour:
   num_event: 0
   event_timer: {fileID: 0}
   event_timeText: {fileID: 1045725746}
+  event_timeLimit: 0
   eventui_panel: {fileID: 803036884}
   canvas3d: {fileID: 0}
+  event_music: {fileID: 1345140547}
 --- !u!114 &1345140543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5825,10 +5832,10 @@ AudioSource:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1345140539}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 470d8043ce033b140b5199d76fbe7be9, type: 3}
+  m_audioClip: {fileID: 8300000, guid: c72a79b146feca941a2288b634ffa1a6, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.44
   m_Pitch: 1
@@ -5887,6 +5894,103 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 0
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+--- !u!114 &1345140546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1345140539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52774eb4e08ee1f44a312b607e84fb4e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_DriveableProperty:
+    m_Fields:
+    - m_Target: {fileID: 1345140542}
+      m_FieldPath: event_timeLimit
+      m_RSKeyName: EventTime
+      m_Type: int
+--- !u!82 &1345140547
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1345140539}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 2daea6bb54c222b40b69a9e46e329509, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 1
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 75
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   reverbZoneMixCustomCurve:
     serializedVersion: 2
     m_Curve:

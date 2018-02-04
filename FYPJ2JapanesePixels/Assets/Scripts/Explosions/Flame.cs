@@ -22,6 +22,7 @@ public class Flame : ObjectStats
             if (obj.GetComponent<CharacterStats>())
             {
                 obj.GetComponent<CharacterStats>().decreaseHealth(damage);
+                GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(4, 0.4f);
                 DestroySelf();
             }
         }

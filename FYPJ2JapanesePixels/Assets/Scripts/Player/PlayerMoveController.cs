@@ -738,18 +738,19 @@ public class PlayerMoveController : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range, bool _unstoppable, float dmg)
+    public void CmdSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range, bool _unstoppable, float dmg, bool playSound)
     {
-        RpcSpawn(_prefabsPath, _pos, _rot, _range, _unstoppable, dmg);
+        RpcSpawn(_prefabsPath, _pos, _rot, _range, _unstoppable, dmg, playSound);
     }
 
     [ClientRpc]
-    public void RpcSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range, bool _unstoppable, float dmg)
+    public void RpcSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range, bool _unstoppable, float dmg, bool playSound)
     {
         GameObject _bomb = Resources.Load(_prefabsPath) as GameObject;
         GameObject _gameObject = GameObject.Instantiate(_bomb, _pos, _rot);
         _gameObject.GetComponent<Bomb>().effectRange = _range;
         _gameObject.GetComponent<Bomb>().unstoppable = _unstoppable;
         _gameObject.GetComponent<Bomb>().damage = dmg;
+        _gameObject.GetComponent<Bomb>().playsSound = playSound;
     }
 }

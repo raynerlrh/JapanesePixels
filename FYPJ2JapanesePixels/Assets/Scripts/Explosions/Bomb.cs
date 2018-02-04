@@ -10,6 +10,7 @@ public class Bomb : ObjectStats {
     Vector3Int startPos;
     Vector3Int[] effectPos;
     public bool unstoppable = false;
+    public bool playsSound = false;
 	// Use this for initialization
 	void Start () {
         explode_time = gameObject.AddComponent<TimerRoutine>();
@@ -32,6 +33,8 @@ public class Bomb : ObjectStats {
 
     void Explode()
     {
+        if (playsSound)
+            GameModeManager.instance.GetComponent<AudioPlayer>().PlayOnceTrack(2, 1);
         if (unstoppable)
         {
             spawnUnstopFlames();

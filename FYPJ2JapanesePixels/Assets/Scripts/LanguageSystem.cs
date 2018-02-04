@@ -369,6 +369,7 @@ public class LanguageSystem : MonoBehaviour
             GameModeManager.instance.event_timer.executeFunction();
             GameModeManager.instance.isEventStarted = true;
             GameModeManager.instance.num_event = Random.Range(1, 3);
+            GameModeManager.instance.event_music.Play();
             QuestionData[] data = GetActiveQuestionGroup().questionData;
             int randidx = Random.Range(0, data.Length);
             symbolTxt.text = data[randidx].symbol;

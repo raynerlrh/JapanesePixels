@@ -53,6 +53,7 @@ public class DefaultAttack : PlayerSkill
             GameObject bombPrefab = Resources.Load("Prefabs/Bomb") as GameObject;
             GameObject _bomb = GameObject.Instantiate(bombPrefab, spawnPos, playerTrans.rotation);
             _bomb.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
+            _bomb.GetComponent<Bomb>().playsSound = true;
         }
 
         b_needsUpdate = true;
@@ -67,9 +68,9 @@ public class DefaultAttack : PlayerSkill
         int bombRange = moveController.GetInventory.OnHandRange;
 
         if (moveController.isServer)
-            moveController.RpcSpawn(_prefabsPath, _pos, _rot, bombRange, false, 100);
+            moveController.RpcSpawn(_prefabsPath, _pos, _rot, bombRange, false, 100, true);
         else
-            moveController.CmdSpawn(_prefabsPath, _pos, _rot, bombRange, false, 100);
+            moveController.CmdSpawn(_prefabsPath, _pos, _rot, bombRange, false, 100, true);
 
         if (spawn)
             spawn.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;
