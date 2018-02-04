@@ -147,7 +147,8 @@ public class TileRefManager : MonoBehaviour
                     Vector3 f = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(randpos);
                     f.Set(f.x, f.y + 0.4f, f.z);
                     Text txt = Instantiate(GameModeManager.instance.canvas3d.transform.GetChild(0).gameObject, f, GameModeManager.instance.languageSystem.symbolTxt.rectTransform.rotation, GameModeManager.instance.canvas3d.transform).GetComponent<Text>();
-                    txt.fontSize = 100;
+                    txt.text = GameModeManager.instance.languageSystem.symbolTxt.text;
+                    txt.fontSize = 75;
                     txt.gameObject.SetActive(true);
                     tile_dict.Add(randpos, txt.gameObject);
                 }
@@ -162,7 +163,7 @@ public class TileRefManager : MonoBehaviour
                     Vector3 f = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(randpos);
                     f.Set(f.x, f.y + 0.4f, f.z);
                     Text txt = Instantiate(GameModeManager.instance.canvas3d.transform.GetChild(0).gameObject, f, GameModeManager.instance.languageSystem.symbolTxt.rectTransform.rotation, GameModeManager.instance.canvas3d.transform).GetComponent<Text>();
-                    txt.fontSize = 100;
+                    txt.fontSize = 75;
                     txt.text = data[r_idx].symbol;
                     txt.gameObject.SetActive(true);
                     tile_dict.Add(randpos, txt.gameObject);

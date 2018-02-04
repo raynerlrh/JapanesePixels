@@ -2,18 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioPlayer : MonoBehaviour {
+[System.Serializable]
+public class AudioClipArray
+{
+    public AudioClip[] clips;
+}
+
+public class AudioPlayer : MonoBehaviour 
+{
     private AudioSource soundobj;
     public AudioClip[] tracks;
-	// Use this for initialization
-	void Start () {
+
+    [SerializeField]
+    AudioClipArray[] japaneseClips;
+
+	void Start () 
+    {
         soundobj = gameObject.AddComponent<AudioSource>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    public void PlayJap(int _groupIndex, int _questionIndex)
+    {
+        soundobj.PlayOneShot(japaneseClips[_groupIndex].clips[_questionIndex], 5f);
+    }
 
     public void PlayOnceTrack(int index, float volumeScalar = 1)
     {
