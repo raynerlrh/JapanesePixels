@@ -16,13 +16,15 @@ public class AudioPlayer : MonoBehaviour
     [SerializeField]
     AudioClipArray[] japaneseClips;
 
-	void Start () 
+	void Awake() 
     {
         soundobj = gameObject.AddComponent<AudioSource>();
 	}
 
     public void PlayJap(int _groupIndex, int _questionIndex)
     {
+        if (soundobj == null)
+            Debug.Log("NULL");
         soundobj.PlayOneShot(japaneseClips[_groupIndex].clips[_questionIndex], 5f);
     }
 

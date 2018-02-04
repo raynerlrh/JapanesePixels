@@ -31,8 +31,7 @@ public class QuestionData
 public class LanguageSystem : MonoBehaviour 
 {
     Quiz activeQuiz;
-    Quiz quiz_hiragana;
-    Quiz quiz_katakana;
+    LanguageDataRetriever languageDataRetriever;
 
     [SerializeField]
     AudioPlayer audioPlayer;
@@ -70,20 +69,13 @@ public class LanguageSystem : MonoBehaviour
 
     void Awake()
     {
-        // Set up hiragana and katakana quizzes
-        string url_hiragana = "http://fyp2-japanese-pixels.appspot.com/jp_hiragana";
-        WWW www_hiragana = new WWW(url_hiragana);
-        StartCoroutine(WaitForRequest(www_hiragana, true));
-
-        string url_katakana = "http://fyp2-japanese-pixels.appspot.com/jp_katakana";
-        WWW www_katakana = new WWW(url_katakana);
-        StartCoroutine(WaitForRequest(www_katakana, false));
+        languageDataRetriever = GameObject.Find("LanguageDataRetriever").GetComponent<LanguageDataRetriever>();
     }
 
     void Start()
     {
         // temp value
-        preGameTime = 10;
+        preGameTime = 30;
 
         preGameTimer = preGameTime + 1;
         b_changedQuestionGroup = true;
@@ -96,6 +88,18 @@ public class LanguageSystem : MonoBehaviour
         {
             questionPosArr[i] = questionText.GetChild(i).localPosition;
         }
+
+        // Set up for pre-game quiz
+        activeQuiz = languageDataRetriever.quiz_hiragana;
+
+        activeQuestionGroupIndex = 0; // start from aiueo
+        activeQuestionIndex = 0;
+        questionIndexTaken = new bool[GetActiveQuestionGroup().questionData.Length];
+        optionIndexTaken = new bool[questionIndexTaken.Length];
+        newQuestionIndex = Random.Range(0, GetActiveQuestionGroup().questionData.Length);
+
+        if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.PRE_GAME)
+            Enable();
     }
 
     public void Enable()
@@ -150,40 +154,6 @@ public class LanguageSystem : MonoBehaviour
     {
         MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>().b_inQuiz = false;
         GetComponent<QuizAnim>().enabled = true;
-    }
-
-    IEnumerator WaitForRequest(WWW www, bool _isHiragana)
-    {
-        yield return www;
-
-        // check for errors
-        if (www.error == null)
-        {
-            if (_isHiragana)
-            {
-                quiz_hiragana = JsonUtility.FromJson<Quiz>(www.text);
-
-                activeQuiz = quiz_hiragana;
-
-                activeQuestionGroupIndex = 0; // start from aiueo
-                activeQuestionIndex = 0;
-                questionIndexTaken = new bool[GetActiveQuestionGroup().questionData.Length];
-                optionIndexTaken = new bool[questionIndexTaken.Length];
-                newQuestionIndex = Random.Range(0, GetActiveQuestionGroup().questionData.Length);
-            }
-            else
-                quiz_katakana = JsonUtility.FromJson<Quiz>(www.text);
-
-            if (GameModeManager.instance.gameState == GameModeManager.GAME_STATE.PRE_GAME)
-                Enable();
-
-            //Debug.Log("WWW OK!");
-            //gameObject.SetActive(false);
-        }
-        else
-        {
-            Debug.Log("WWW Error: " + www.error);
-        }
     }
 
     void Update()
@@ -383,7 +353,7 @@ public class LanguageSystem : MonoBehaviour
         // Change from hiragana quiz to katakana quiz when hiragana is completed
         if (activeQuestionGroupIndex > activeQuiz.languageData.questions.Length - 1) // 2
         {
-            activeQuiz = quiz_katakana;
+            activeQuiz = languageDataRetriever.quiz_katakana;
 
             activeQuestionGroupIndex = 0; // start from aiueo
             activeQuestionIndex = 0;
