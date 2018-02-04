@@ -298,9 +298,15 @@ public class PlayerMoveController : NetworkBehaviour
         if (!pawn_sprite.activeSelf)
             return;
 
+
+        if (pawn.checkIfDead())
+        {
+            GameModeManager.instance.showDeathScreen();
+        }
+
         if (!b_levelCleared)
         {
-            if (CheckIfLevelCleared())
+            if (CheckIfLevelCleared() && !pawn.checkIfDead())
             {
                 b_levelCleared = true;
                 levelCleared.SetActive(true);
@@ -341,11 +347,6 @@ public class PlayerMoveController : NetworkBehaviour
         //}
 
         //Debug.Log(level_numKeysRequired);
-
-        if (pawn.checkIfDead())
-        {
-            GameModeManager.instance.showDeathScreen();
-        }
 
         //if (e_playstate.Equals(PlayState.E_COMBAT))
         {
@@ -737,16 +738,18 @@ public class PlayerMoveController : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range)
+    public void CmdSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range, bool _unstoppable, float dmg)
     {
-        RpcSpawn(_prefabsPath, _pos, _rot, _range);
+        RpcSpawn(_prefabsPath, _pos, _rot, _range, _unstoppable, dmg);
     }
 
     [ClientRpc]
-    public void RpcSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range)
+    public void RpcSpawn(string _prefabsPath, Vector3 _pos, Quaternion _rot, int _range, bool _unstoppable, float dmg)
     {
         GameObject _bomb = Resources.Load(_prefabsPath) as GameObject;
         GameObject _gameObject = GameObject.Instantiate(_bomb, _pos, _rot);
         _gameObject.GetComponent<Bomb>().effectRange = _range;
+        _gameObject.GetComponent<Bomb>().unstoppable = _unstoppable;
+        _gameObject.GetComponent<Bomb>().damage = dmg;
     }
 }

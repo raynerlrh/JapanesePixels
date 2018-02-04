@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public struct UIProp
@@ -27,6 +25,14 @@ public class GameModeManager : MonoBehaviour
     public GameObject WinscreenUI;
     public ItemSpawner itemSpawner;
     public Text enemyLeftTxt;
+    public bool isEventStarted;
+    public bool isEventFailed;
+    public int num_event;
+    public TimerRoutine event_timer;
+    public Text event_timeText;
+    int event_timeLimit;
+    public GameObject eventui_panel;
+    public Canvas canvas3d;
 
     public enum GAME_STATE
     {
@@ -64,11 +70,23 @@ public class GameModeManager : MonoBehaviour
         }
         int enemiesRemaining = GameObject.FindGameObjectsWithTag("Enemy").Length;
         enemyLeftTxt.text = enemiesRemaining.ToString();
+        isEventStarted = false;
+        isEventFailed = false;
+        num_event = 0;
+        event_timer = gameObject.AddComponent<TimerRoutine>();
+        event_timeLimit = 120;
+        event_timer.initTimer(event_timeLimit);
+        event_timer.executedFunction = ResetEvent;
+        canvas3d = GameObject.FindGameObjectWithTag("3DCanvas").GetComponent<Canvas>();
     }
 
     void Update()
     {
-
+        if (event_timer.hasRun)
+        {
+            int left = (int)(event_timeLimit - (Time.time - event_timer.secStarted));
+            event_timeText.text = left.ToString();
+        }
     }
 
     //void ReceivePlayerChoice(bool wrong)
@@ -130,5 +148,56 @@ public class GameModeManager : MonoBehaviour
     public int getEnemiesLeft()
     {
         return itemSpawner.gameCharacters.childCount - 1; // minus the player
+    }
+
+    public void ResetEvent()
+    {
+        if (num_event > 0)
+        {
+            isEventFailed = true;
+            GameObject[] items = new GameObject[TileRefManager.instance.tile_dict.Count];
+            TileRefManager.instance.tile_dict.Values.CopyTo(items, 0);
+
+            TileRefManager.instance.deleteTileDict(); // must be called after values copyto
+            for (int i = 0; i < items.Length; ++i)
+            {
+                if (items[i].GetComponent<Text>().text.Equals(languageSystem.symbolTxt.text))
+                {
+                    TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, gameGrid.GetWorldFlToCellPos(items[i].transform.position), null);
+                    SpawnBomb("Prefabs/Bomb", items[i].transform.position, Quaternion.identity);
+                }
+                Destroy(items[i]);
+            }
+        }
+        else
+        {
+            GameObject[] items = new GameObject[TileRefManager.instance.tile_dict.Count];
+            TileRefManager.instance.tile_dict.Values.CopyTo(items, 0);
+            TileRefManager.instance.deleteTileDict();
+            for (int i = 0; i < items.Length; ++i)
+                Destroy(items[i]);
+        }
+        num_event = 0;
+        isEventStarted = false;
+        isEventFailed = false;
+        event_timer.hasRun = false;
+        eventui_panel.SetActive(false);
+    }
+
+    void SpawnBomb(string _prefabsPath, Vector3 _pos, Quaternion _rot)
+    {
+        PlayerMoveController moveController = MyNetwork.instance.localPlayer.GetComponent<PlayerMoveController>();
+
+        GameObject spawn = null;
+        if (moveController.isServer)
+            moveController.RpcSpawn(_prefabsPath, _pos, _rot, 10, true, 250);
+        else
+            moveController.CmdSpawn(_prefabsPath, _pos, _rot, 10, true, 250);
+
+        if (spawn)
+        {
+            spawn.GetComponent<Bomb>().effectRange = 10;
+            spawn.GetComponent<Bomb>().unstoppable = true;
+        }
     }
 }

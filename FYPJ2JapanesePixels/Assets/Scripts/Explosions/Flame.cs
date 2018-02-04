@@ -29,6 +29,8 @@ public class Flame : ObjectStats
         {
             Vector3Int cellpos = GameModeManager.instance.gameGrid.GetWorldFlToCellPos(transform.position);
             TileRefManager.instance.SetTile(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, cellpos, null);
+            if (GameModeManager.instance.isEventStarted)
+                TileRefManager.instance.removeWordTile(cellpos);
             float val = Random.Range(-15f, 15f);
             if (val > 0f && val < 15f)
             {
@@ -74,8 +76,14 @@ public class Flame : ObjectStats
                 //    Vector3 sizing = item.transform.localScale;
                 //    item.transform.localScale = new Vector3(sizing.x * 10, sizing.y * 10, sizing.z * 10);
                 //}
+                _sprite = Resources.Load<Sprite>("Sprites/QuestionIcon");
+                item.GetComponent<SpriteRenderer>().sprite = _sprite;
+                if (item.effectType == Item.EFFECT_TYPE.E_HEALTH)
+                    item.GetComponent<SpriteRenderer>().material.color = new Color(0, 0.2f, 0);
                 break;
             case Item.ITEM_TYPE.QUESTION:
+                _sprite = Resources.Load<Sprite>("Sprites/QuestionIcon");
+                item.GetComponent<SpriteRenderer>().sprite = _sprite;
                 break;
             case Item.ITEM_TYPE.KEY:
                 _sprite = Resources.Load<Sprite>("Sprites/Key");

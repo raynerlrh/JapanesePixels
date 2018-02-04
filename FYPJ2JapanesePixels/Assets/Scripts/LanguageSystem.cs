@@ -63,6 +63,7 @@ public class LanguageSystem : MonoBehaviour
     float preGameTimer;
 
     Vector2[] questionPosArr; // prev, curr, next
+    public Text symbolTxt;
 
     void Awake()
     {
@@ -352,6 +353,20 @@ public class LanguageSystem : MonoBehaviour
     {
         b_changedQuestionGroup = true;
         questionIndexList.Clear();
+
+        // Plant minigame letters
+        if (!GameModeManager.instance.isEventStarted)
+        {
+            GameModeManager.instance.eventui_panel.SetActive(true);
+            GameModeManager.instance.event_timer.executeFunction();
+            GameModeManager.instance.isEventStarted = true;
+            GameModeManager.instance.num_event = Random.Range(1, 3);
+            QuestionData[] data = GetActiveQuestionGroup().questionData;
+            int randidx = Random.Range(0, data.Length);
+            symbolTxt.text = data[randidx].symbol;
+            TileRefManager.instance.plantLanguageTile(GameModeManager.instance.num_event, 10, data);
+            GameModeManager.instance.eventui_panel.transform.GetChild(1).GetComponent<Text>().text = data[randidx].symbol;
+        }
 
         // Change question group
         activeQuestionGroupIndex++;

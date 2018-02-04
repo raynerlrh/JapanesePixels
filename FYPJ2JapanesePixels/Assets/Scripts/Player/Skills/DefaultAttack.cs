@@ -67,9 +67,9 @@ public class DefaultAttack : PlayerSkill
         int bombRange = moveController.GetInventory.OnHandRange;
 
         if (moveController.isServer)
-            moveController.RpcSpawn(_prefabsPath, _pos, _rot, bombRange);
+            moveController.RpcSpawn(_prefabsPath, _pos, _rot, bombRange, false, 100);
         else
-            moveController.CmdSpawn(_prefabsPath, _pos, _rot, bombRange);
+            moveController.CmdSpawn(_prefabsPath, _pos, _rot, bombRange, false, 100);
 
         if (spawn)
             spawn.GetComponent<Bomb>().effectRange = moveController.GetInventory.OnHandRange;

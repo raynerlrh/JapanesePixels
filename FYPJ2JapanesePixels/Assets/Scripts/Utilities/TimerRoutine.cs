@@ -10,6 +10,7 @@ public class TimerRoutine : MonoBehaviour {
         waitSeconds = waitSec;
     }
     public bool hasRun = false;
+    public float secStarted;
 
     /// <summary>
     /// Delegatable function that can be passed to timer
@@ -28,6 +29,7 @@ public class TimerRoutine : MonoBehaviour {
     public void executeFunction()
     {
         hasRun = true;
+        secStarted = Time.time;
         StartCoroutine(run());
     }
 }

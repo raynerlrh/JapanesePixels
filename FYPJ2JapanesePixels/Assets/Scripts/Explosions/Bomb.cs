@@ -9,6 +9,7 @@ public class Bomb : ObjectStats {
     public int effectRange = 4;
     Vector3Int startPos;
     Vector3Int[] effectPos;
+    public bool unstoppable = false;
 	// Use this for initialization
 	void Start () {
         explode_time = gameObject.AddComponent<TimerRoutine>();
@@ -31,7 +32,12 @@ public class Bomb : ObjectStats {
 
     void Explode()
     {
-        spawnFlames();
+        if (unstoppable)
+        {
+            spawnUnstopFlames();
+        }
+        else
+            spawnFlames();
         Destroy(this.gameObject);
     }
 
@@ -47,7 +53,7 @@ public class Bomb : ObjectStats {
             }
             Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
             GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.localRotation);
-            flame.GetComponent<ObjectStats>().damage = 25; // damage
+            flame.GetComponent<ObjectStats>().damage = damage; // damage
             flame.SetActive(true);
             // Allow spawning of flame at the destructible block position before stopping all spawns
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
@@ -98,6 +104,22 @@ public class Bomb : ObjectStats {
             flame.SetActive(true);
             if (TileRefManager.instance.GetTileAtCellPos(TileRefManager.TILEMAP_TYPE.TILEMAP_DESTRUCTIBLE, spawnCell))
                 break;
+        }
+    }
+
+    void spawnUnstopFlames()
+    {
+        for (int x = -effectRange; x <= effectRange; ++x)
+        {
+            for (int y = -effectRange; y <= effectRange; ++y)
+            {
+                Vector3Int spawnCell = Vector3Int.zero;
+                spawnCell.Set(startPos.x + x, startPos.y + y, startPos.z);
+                Vector3 spawnPos = GameModeManager.instance.gameGrid.GetCellMiddleWPOS(spawnCell);
+                GameObject flame = GameObject.Instantiate(EnemyMoveController.instance.enemyPrefabs[2], spawnPos, transform.localRotation);
+                flame.GetComponent<ObjectStats>().damage = damage; // damage
+                flame.SetActive(true);
+            }
         }
     }
 
